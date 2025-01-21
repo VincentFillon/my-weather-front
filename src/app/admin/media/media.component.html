@@ -1,0 +1,73 @@
+<div class="media-container">
+  <h1>Media Management</h1>
+
+  <mat-tab-group>
+    <mat-tab label="Images">
+      <div class="media-grid">
+        @for (image of images; track image._id) {
+        <mat-card class="media-card">
+          <img [src]="getMediaUrl(image)" alt="Image" mat-card-image />
+          <mat-card-actions align="end">
+            <button mat-button (click)="copyUrl(getMediaUrl(image))">
+              <mat-icon fontIcon="content_copy"></mat-icon>
+              Copier l'URL
+            </button>
+            <button mat-icon-button (click)="removeMedia(image)" color="warn">
+              <mat-icon fontIcon="delete"></mat-icon>
+            </button>
+          </mat-card-actions>
+        </mat-card>
+        }
+      </div>
+
+      <div class="upload-section">
+        <input
+          type="file"
+          #imageInput
+          style="display: none"
+          (change)="uploadImage($event)"
+          accept="image/png,image/jpeg,image/gif"
+        />
+        <button mat-raised-button color="primary" (click)="imageInput.click()">
+          <mat-icon fontIcon="add_photo_alternate"></mat-icon>
+          Ajouter une Image
+        </button>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Sounds">
+      <div class="media-grid">
+        @for (sound of sounds; track sound._id) {
+        <mat-card class="media-card">
+          <mat-card-content>
+            <audio controls [src]="getMediaUrl(sound)"></audio>
+          </mat-card-content>
+          <mat-card-actions align="end">
+            <button mat-button (click)="copyUrl(getMediaUrl(sound))">
+              <mat-icon fontIcon="content_copy"></mat-icon>
+              Copier l'URL
+            </button>
+            <button mat-icon-button (click)="removeMedia(sound)" color="warn">
+              <mat-icon fontIcon="delete"></mat-icon>
+            </button>
+          </mat-card-actions>
+        </mat-card>
+        }
+      </div>
+
+      <div class="upload-section">
+        <input
+          type="file"
+          #soundInput
+          style="display: none"
+          (change)="uploadSound($event)"
+          accept="audio/mpeg,audio/wav"
+        />
+        <button mat-raised-button color="primary" (click)="soundInput.click()">
+          <mat-icon fontIcon="audio_file"></mat-icon>
+          Ajouter un audio
+        </button>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

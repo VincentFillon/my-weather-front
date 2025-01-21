@@ -1,0 +1,145 @@
+<div class="board-container">
+  <!-- Zone neutre -->
+  <div class="neutral-zone">
+    <div class="neutral-header">
+      <!-- Menu utilisateur -->
+      <button
+        mat-icon-button
+        [matMenuTriggerFor]="userMenu"
+        class="user-menu-button"
+        [style.backgroundImage]="
+          'url(' + (currentUser?.image || 'assets/default-avatar.png') + ')'
+        "
+      ></button>
+      <mat-menu #userMenu="matMenu">
+        <div class="user-menu-header">
+          <div
+            class="user-avatar"
+            [style.backgroundImage]="
+              'url(' + (currentUser?.image || 'assets/default-avatar.png') + ')'
+            "
+          ></div>
+          <p>Connecté en tant que</p>
+          <h3>{{ currentUser?.username }}</h3>
+          <!-- <p>{{ currentUser?.role }}</p> -->
+        </div>
+        <mat-divider class="user-menu-divider"></mat-divider>
+        <button mat-menu-item routerLink="/profile">
+          <mat-icon fontIcon="account_circle"></mat-icon>
+          <span>Mon profil</span>
+        </button>
+        @if (isAdmin) {
+        <button mat-menu-item routerLink="/admin/moods">
+          <mat-icon fontIcon="admin_panel_settings"></mat-icon>
+          <span>Administration</span>
+        </button>
+        }
+        <button mat-menu-item (click)="logout()">
+          <mat-icon fontIcon="exit_to_app" color="warn"></mat-icon>
+          <span>Déconnexion</span>
+        </button>
+      </mat-menu>
+      <h2>Zone Neutre</h2>
+    </div>
+    <div
+      class="user-list"
+      cdkDropList
+      id="neutral"
+      [cdkDropListData]="'neutral'"
+      (cdkDropListDropped)="onUserDrop($event)"
+      [cdkDropListConnectedTo]="moodsIds"
+    >
+      @for (user of getUsersByMood(); track user._id) {
+      <div
+        class="user-card"
+        cdkDrag
+        [cdkDragDisabled]="!canMoveUser(user._id)"
+        [cdkDragData]="user._id"
+        [class.cannot-move]="!canMoveUser(user._id)"
+      >
+        <div class="user-card-title">
+          <div
+            class="user-avatar"
+            [style.backgroundImage]="
+              'url(' + (user.image || 'assets/default-avatar.png') + ')'
+            "
+          ></div>
+          <h3>{{ user.username }}</h3>
+        </div>
+      </div>
+      }
+    </div>
+
+    @if (medianMood) {
+    <!-- Hummeur médiane -->
+    <div class="median-mood-column">
+      <div class="mood-header">
+        <h3>Hummeur médiane :</h3>
+        <div class="mood-icon-container">
+          <img [src]="medianMood.image" alt="Image" class="mood-icon" />
+        </div>
+        <h2>
+          {{ medianMood.name }}
+        </h2>
+      </div>
+    </div>
+    }
+  </div>
+
+  <div class="board-grid">
+    <!-- Colonnes des humeurs -->
+    @for (mood of moods; track mood._id) {
+    <div class="mood-column">
+      <div class="mood-header">
+        <div class="mood-icon-container">
+          <img [src]="mood.image" alt="Image" class="mood-icon" />
+        </div>
+        <h2>
+          {{ mood.name }}
+
+          @if (mood.sound) {
+          <button
+            mat-icon-button
+            class="sound-button"
+            [color]="isPlaying(mood._id) ? 'warn' : 'primary'"
+            (click)="toggleSound(mood, $event)"
+          >
+            <mat-icon
+              [fontIcon]="isPlaying(mood._id) ? 'stop' : 'play_arrow'"
+            ></mat-icon>
+          </button>
+          }
+        </h2>
+      </div>
+      <div
+        class="user-list"
+        cdkDropList
+        [id]="mood._id"
+        [cdkDropListData]="mood._id"
+        (cdkDropListDropped)="onUserDrop($event)"
+        [cdkDropListConnectedTo]="getOtherMoodsIds(mood._id)"
+      >
+        @for (user of getUsersByMood(mood._id); track user) {
+        <div
+          class="user-card"
+          cdkDrag
+          [cdkDragDisabled]="!canMoveUser(user._id)"
+          [cdkDragData]="user._id"
+          [class.cannot-move]="!canMoveUser(user._id)"
+        >
+          <div class="user-card-title">
+            <div
+              class="user-avatar"
+              [style.backgroundImage]="
+                'url(' + (user.image || 'assets/default-avatar.png') + ')'
+              "
+            ></div>
+            <h3>{{ user.username }}</h3>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+    }
+  </div>
+</div>

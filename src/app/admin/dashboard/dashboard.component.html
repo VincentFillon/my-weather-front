@@ -1,0 +1,51 @@
+<div class="dashboard-container">
+  <div class="main-actions">
+    <button mat-raised-button type="button" routerLink="/board">Retour</button>
+  </div>
+
+  <div class="dashboard-cards">
+    <!-- Carte des humeurs -->
+    <mat-card class="dashboard-card" [routerLink]="['/admin/moods']">
+      <mat-card-header>
+        <mat-card-title>Humeurs</mat-card-title>
+        <mat-card-subtitle>Gérer les colonnes du tableau</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-container">
+          <mat-icon fontIcon="mood"></mat-icon>
+          <span class="stat-number">{{ moods.length }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Carte des médias -->
+    <mat-card class="dashboard-card" [routerLink]="['/admin/media']">
+      <mat-card-header>
+        <mat-card-title>Médias</mat-card-title>
+        <mat-card-subtitle>Gérer les images et sons</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-container">
+          <mat-icon>perm_media</mat-icon>
+          <span class="stat-number">{{ images.length + sounds.length }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Carte des utilisateurs -->
+    <mat-card class="dashboard-card" [routerLink]="['/admin/users']">
+      <mat-card-header>
+        <mat-card-title>Utilisateurs</mat-card-title>
+        <mat-card-subtitle>Gérer les utilisateurs</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-container">
+          <mat-icon fontIcon="people"></mat-icon>
+          <span class="stat-number">{{ users.length }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <router-outlet></router-outlet>
+</div>

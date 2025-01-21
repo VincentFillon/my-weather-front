@@ -1,0 +1,59 @@
+<div class="user-management-container">
+  <div class="header">
+    <h1>Gestion des utilisateurs</h1>
+  </div>
+
+  <table mat-table [dataSource]="users" class="user-table">
+    <!-- Colonne Image -->
+    <ng-container matColumnDef="image">
+      <th mat-header-cell *matHeaderCellDef>Avatar</th>
+      <td mat-cell *matCellDef="let user">
+        <div class="user-avatar" [style.backgroundImage]="'url(' + (user.image || 'assets/default-avatar.png') + ')'"></div>
+      </td>
+    </ng-container>
+
+    <!-- Colonne Username -->
+    <ng-container matColumnDef="username">
+      <th mat-header-cell *matHeaderCellDef>Nom d'utilisateur</th>
+      <td mat-cell *matCellDef="let user">{{ user.username }}</td>
+    </ng-container>
+
+    <!-- Colonne Role -->
+    <ng-container matColumnDef="role">
+      <th mat-header-cell *matHeaderCellDef>Rôle</th>
+      <td mat-cell *matCellDef="let user">{{ user.role }}</td>
+    </ng-container>
+
+    <!-- Colonne Mood -->
+    <ng-container matColumnDef="mood">
+      <th mat-header-cell *matHeaderCellDef>Humeur</th>
+      <td mat-cell *matCellDef="let user">
+        @if (user.mood) {
+          <div class="mood-info">
+            <img [src]="user.mood.image" [alt]="user.mood.name" class="mood-icon">
+            <span>{{ user.mood.name }}</span>
+          </div>
+        }
+        @if (!user.mood) {
+          <span>Non définie</span>
+        }
+      </td>
+    </ng-container>
+
+    <!-- Colonne Actions -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let user">
+        <button mat-icon-button color="primary" (click)="onEditUser(user)">
+          <mat-icon fontIcon="edit"></mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="onDeleteUser(user._id)">
+          <mat-icon fontIcon="delete"></mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>

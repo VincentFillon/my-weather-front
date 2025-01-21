@@ -1,0 +1,55 @@
+.user-management-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 500;
+  }
+}
+
+.user-table {
+  width: 100%;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    background-color: #e0e0e0;
+  }
+
+  .mood-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .mood-icon {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+    }
+  }
+
+  th.mat-header-cell {
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.87);
+  }
+
+  td.mat-cell {
+    padding: 12px 8px;
+  }
+}

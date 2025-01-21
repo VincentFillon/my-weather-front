@@ -1,0 +1,58 @@
+<h2 mat-dialog-title>{{ isNewUser ? 'Nouvel utilisateur' : 'Modifier l\'utilisateur' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <mat-dialog-content>
+    <mat-form-field appearance="fill">
+      <mat-label>Nom d'utilisateur</mat-label>
+      <input matInput formControlName="username" required>
+      @if (form.get('username')?.hasError('required')) {
+        <mat-error>
+          Le nom d'utilisateur est requis
+        </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Rôle</mat-label>
+      <mat-select formControlName="role" required>
+        @for (role of roles; track role) {
+          <mat-option [value]="role">
+            {{ role }}
+          </mat-option>
+        }
+      </mat-select>
+      @if (form.get('role')?.hasError('required')) {
+        <mat-error>
+          Le rôle est requis
+        </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>URL de l'avatar (optionnel)</mat-label>
+      <input matInput formControlName="image">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>{{ isNewUser ? 'Mot de passe' : 'Nouveau mot de passe (optionnel)' }}</mat-label>
+      <input matInput type="password" formControlName="password" [required]="isNewUser">
+      @if (form.get('password')?.hasError('required')) {
+        <mat-error>
+          Le mot de passe est requis
+        </mat-error>
+      }
+      @if (form.get('password')?.hasError('minlength')) {
+        <mat-error>
+          Le mot de passe doit contenir au moins 6 caractères
+        </mat-error>
+      }
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="onCancel()">Annuler</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="!form.valid">
+      {{ isNewUser ? 'Créer' : 'Modifier' }}
+    </button>
+  </mat-dialog-actions>
+</form>

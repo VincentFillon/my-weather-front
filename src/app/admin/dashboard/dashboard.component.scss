@@ -1,0 +1,48 @@
+.dashboard-container {
+  padding: 15px;
+}
+
+.main-actions {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+}
+
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 15px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard-card {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.stat-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 15px;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: #2196f3;
+  }
+
+  .stat-number {
+    font-size: 36px;
+    font-weight: 500;
+    color: #333;
+  }
+}

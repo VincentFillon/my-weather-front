@@ -1,0 +1,198 @@
+<div class="settings-container">
+  <div class="main-actions">
+    <button mat-raised-button type="button" routerLink="/board">Retour</button>
+  </div>
+
+  <mat-card class="settings-card">
+    <mat-card-header>
+      <mat-card-title>Paramètres du compte</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <mat-tab-group>
+        <!-- Modification du nom d'utilisateur -->
+        <mat-tab label="Nom d'utilisateur">
+          <div class="tab-content">
+            <form [formGroup]="usernameForm" (ngSubmit)="onUpdateUsername()">
+              <mat-form-field appearance="outline">
+                <mat-label>Nom d'utilisateur</mat-label>
+                <input
+                  matInput
+                  formControlName="username"
+                  placeholder="Entrez votre nouveau nom d'utilisateur"
+                />
+                @if (usernameForm.get('username')?.hasError('required')) {
+                <mat-error> Le nom d'utilisateur est requis </mat-error>
+                }
+              </mat-form-field>
+
+              <div class="form-actions">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="!usernameForm.valid"
+                >
+                  Mettre à jour le nom d'utilisateur
+                </button>
+              </div>
+            </form>
+          </div>
+        </mat-tab>
+
+        <!-- Modification de l'image de profil -->
+        <mat-tab label="Image de profil">
+          <div class="tab-content">
+            <div class="image-preview">
+              <img
+                [src]="currentUser?.image || 'assets/default-avatar.png'"
+                alt="Image de profil"
+              />
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <form [formGroup]="imageForm" (ngSubmit)="onUpdateImage()">
+              <mat-form-field appearance="outline">
+                <mat-label>URL de l'image de profil</mat-label>
+                <input
+                  matInput
+                  formControlName="image"
+                  placeholder="Entrez l'URL de votre nouvelle image de profil"
+                />
+                @if (imageForm.get('image')?.hasError('required')) {
+                <mat-error> L'URL de l'image de profil est requise </mat-error>
+                }
+              </mat-form-field>
+
+              <div class="form-actions">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="!imageForm.valid"
+                >
+                  Mettre à jour l'image de profil
+                </button>
+              </div>
+            </form>
+          </div>
+        </mat-tab>
+
+        <!-- Modification du mot de passe -->
+        <mat-tab label="Mot de passe">
+          <div class="tab-content">
+            <form [formGroup]="passwordForm" (ngSubmit)="onUpdatePassword()">
+              <mat-form-field appearance="outline">
+                <mat-label>Mot de passe actuel</mat-label>
+                <input
+                  matInput
+                  [type]="hideCurrentPassword ? 'password' : 'text'"
+                  formControlName="currentPassword"
+                />
+                <button
+                  mat-icon-button
+                  matSuffix
+                  (click)="hideCurrentPassword = !hideCurrentPassword"
+                  type="button"
+                >
+                  <mat-icon
+                    [fontIcon]="
+                      hideCurrentPassword ? 'visibility_off' : 'visibility'
+                    "
+                  ></mat-icon>
+                </button>
+                @if (passwordForm.get('currentPassword')?.hasError('required'))
+                {
+                <mat-error> Le mot de passe actuel est requis </mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Nouveau mot de passe</mat-label>
+                <input
+                  matInput
+                  [type]="hideNewPassword ? 'password' : 'text'"
+                  formControlName="newPassword"
+                />
+                <button
+                  mat-icon-button
+                  matSuffix
+                  (click)="hideNewPassword = !hideNewPassword"
+                  type="button"
+                >
+                  <mat-icon
+                    [fontIcon]="
+                      hideNewPassword ? 'visibility_off' : 'visibility'
+                    "
+                  ></mat-icon>
+                </button>
+                @if (passwordForm.get('newPassword')?.hasError('required')) {
+                <mat-error> Le nouveau mot de passe est requis </mat-error>
+                } @if (passwordForm.get('newPassword')?.hasError('minlength')) {
+                <mat-error>
+                  Le mot de passe doit contenir au moins 6 caractères
+                </mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Confirmer le nouveau mot de passe</mat-label>
+                <input
+                  matInput
+                  [type]="hideConfirmPassword ? 'password' : 'text'"
+                  formControlName="confirmPassword"
+                />
+                <button
+                  mat-icon-button
+                  matSuffix
+                  (click)="hideConfirmPassword = !hideConfirmPassword"
+                  type="button"
+                >
+                  <mat-icon
+                    [fontIcon]="
+                      hideConfirmPassword ? 'visibility_off' : 'visibility'
+                    "
+                  ></mat-icon>
+                </button>
+                @if (passwordForm.get('confirmPassword')?.hasError('required'))
+                {
+                <mat-error>
+                  La confirmation du mot de passe est requise
+                </mat-error>
+                } @if (passwordForm.hasError('mismatch')) {
+                <mat-error> Les mots de passe ne correspondent pas </mat-error>
+                }
+              </mat-form-field>
+
+              <div class="form-actions">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="!passwordForm.valid"
+                >
+                  Mettre à jour le mot de passe
+                </button>
+              </div>
+            </form>
+          </div>
+        </mat-tab>
+
+        <!-- Suppression du compte -->
+        <mat-tab label="Supprimer le compte">
+          <div class="tab-content danger-zone">
+            <h3>Zone dangereuse</h3>
+            <p>
+              La suppression de votre compte est irréversible. Toutes vos
+              données seront définitivement supprimées.
+            </p>
+            <button mat-raised-button color="warn" (click)="onDeleteAccount()">
+              Supprimer mon compte
+            </button>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div>

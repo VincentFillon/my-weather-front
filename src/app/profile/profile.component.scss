@@ -1,0 +1,5 @@
+.profile-container {
+  padding: 2rem;
+  min-height: calc(100vh - 64px); // Hauteur totale moins la hauteur de la navbar
+  background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+}

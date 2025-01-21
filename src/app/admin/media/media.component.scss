@@ -1,0 +1,41 @@
+.media-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 500;
+  }
+}
+
+.upload-section {
+  margin: 20px auto;
+  display: flex;
+  justify-content: center;
+}
+
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.media-card {
+  img {
+    width: 100%;
+    height: 200px;
+    object-fit: contain;
+  }
+
+  audio {
+    width: 100%;
+  }
+
+  mat-card-actions {
+    display: flex;
+    justify-content: center;
+  }
+}
