@@ -57,7 +57,7 @@ export class UserService {
       this.userCreatedObserver =
         this.socketService.fromEvent<User>('userCreated');
     }
-    console.debug('[WebSocket] subscribed to "userCreated" event');
+    // console.debug('[WebSocket] subscribed to "userCreated" event');
     return this.userCreatedObserver;
   }
 
@@ -66,7 +66,7 @@ export class UserService {
       this.userUpdatedObserver =
         this.socketService.fromEvent<User>('userUpdated');
     }
-    console.debug('[WebSocket] subscribed to "userUpdated" event');
+    // console.debug('[WebSocket] subscribed to "userUpdated" event');
     return this.userUpdatedObserver;
   }
 
@@ -75,7 +75,7 @@ export class UserService {
       this.userMoodUpdatedObserver =
         this.socketService.fromEvent<User>('userMoodUpdated');
     }
-    console.debug('[WebSocket] subscribed to "userMoodUpdated" event');
+    // console.debug('[WebSocket] subscribed to "userMoodUpdated" event');
     return this.userMoodUpdatedObserver;
   }
 
@@ -84,7 +84,7 @@ export class UserService {
       this.userRemovedObserver =
         this.socketService.fromEvent<string>('userRemoved');
     }
-    console.debug('[WebSocket] subscribed to "userRemoved" event');
+    // console.debug('[WebSocket] subscribed to "userRemoved" event');
     return this.userRemovedObserver;
   }
 }

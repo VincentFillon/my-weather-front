@@ -117,7 +117,7 @@ export class SocketService {
             if (err.status === 'error' && err.message === 'Unauthorized') {
               this.removeAllListeners();
               this.disconnect();
-              console.debug('[SocketService] logout');
+              console.warn('[SocketService] token expiré ou invalide : déconnexion');
               this.authService.logout();
             }
           });

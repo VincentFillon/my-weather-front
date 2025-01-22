@@ -16,7 +16,7 @@ export class NotificationService {
 
   constructor() {
     this.authService.currentUser$.subscribe((currentUser) => {
-      console.debug('[NotificationService] currentUser:', currentUser);
+      // console.debug('[NotificationService] currentUser:', currentUser);
       if (currentUser) {
         // S'abonner aux notifications de changement d'humeur
         this.socketService

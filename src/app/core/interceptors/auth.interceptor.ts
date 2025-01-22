@@ -2,7 +2,7 @@ import {
   HttpErrorResponse,
   HttpEvent,
   HttpHandlerFn,
-  HttpRequest
+  HttpRequest,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
@@ -28,7 +28,9 @@ export function authInterceptor(
     return next(clonedRequest).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
-          console.debug('[AuthInterceptor] logout');
+          console.warn(
+            '[AuthInterceptor] token expiré ou invalide : déconnexion'
+          );
           // Token expiré ou invalide
           authService.logout();
         }

@@ -188,7 +188,7 @@ export class ProfileSettingsComponent implements OnInit {
       if (result) {
         this.authService.deleteAccount().subscribe({
           next: () => {
-            console.debug('[ProfileSettingsComponent] logout');
+            // console.debug('[ProfileSettingsComponent] logout');
             this.authService.logout();
             this.snackBar.open('Compte supprimé avec succès', 'Fermer', {
               duration: 3000,

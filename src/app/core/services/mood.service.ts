@@ -49,7 +49,7 @@ export class MoodService {
       this.moodCreatedObserver =
         this.socketService.fromEvent<Mood>('moodCreated');
     }
-    console.debug('[WebSocket] subscribed to "moodCreated" event');
+    // console.debug('[WebSocket] subscribed to "moodCreated" event');
     return this.moodCreatedObserver;
   }
 
@@ -58,7 +58,7 @@ export class MoodService {
       this.moodUpdatedObserver =
         this.socketService.fromEvent<Mood>('moodUpdated');
     }
-    console.debug('[WebSocket] subscribed to "moodUpdated" event');
+    // console.debug('[WebSocket] subscribed to "moodUpdated" event');
     return this.moodUpdatedObserver;
   }
 
@@ -67,7 +67,7 @@ export class MoodService {
       this.moodRemovedObserver =
         this.socketService.fromEvent<string>('moodRemoved');
     }
-    console.debug('[WebSocket] subscribed to "moodRemoved" event');
+    // console.debug('[WebSocket] subscribed to "moodRemoved" event');
     return this.moodRemovedObserver;
   }
 }
