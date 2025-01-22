@@ -117,8 +117,8 @@ export class SocketService {
             if (err.status === 'error' && err.message === 'Unauthorized') {
               this.removeAllListeners();
               this.disconnect();
+              console.debug('[SocketService] logout');
               this.authService.logout();
-              this.router.navigate(['/login']);
             }
           });
 

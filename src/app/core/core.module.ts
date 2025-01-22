@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { tokenInterceptor } from './interceptors/http.interceptor';
+import { authInterceptor } from './interceptors/auth.interceptor';
 import { AuthService } from './services/auth.service';
 import { MoodService } from './services/mood.service';
 import { NotificationService } from './services/notification.service';
@@ -14,7 +14,7 @@ import { UserService } from './services/user.service';
   imports: [CommonModule],
   providers: [
     AuthService,
-    provideHttpClient(withInterceptors([tokenInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor])),
     SocketService,
     MoodService,
     UserService,
@@ -22,4 +22,4 @@ import { UserService } from './services/user.service';
     NotificationService,
   ],
 })
-export class CoreModule {}
+export class CoreModule { }

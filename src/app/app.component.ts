@@ -23,7 +23,8 @@ export class AppComponent implements OnInit, OnDestroy {
     this.currentUserSubscription = this.authService.currentUser$.subscribe(
       (user) => {
         if (!user) {
-          this.router.navigate(['/login']);
+          console.debug('[AppComponent] redirection vers /login');
+          this.router.navigate(['/auth/login']);
         } else {
           const token = this.authService.getToken();
           if (token) {

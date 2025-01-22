@@ -266,7 +266,7 @@ export class BoardComponent implements OnInit, OnDestroy {
   }
 
   logout() {
+    console.debug('[BoardComponent] logout');
     this.authService.logout();
-    this.router.navigate(['/login']);
   }
 }

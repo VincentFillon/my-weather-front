@@ -1,14 +1,15 @@
 import {
+  HttpErrorResponse,
   HttpEvent,
   HttpHandlerFn,
   HttpRequest
 } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { catchError, Observable, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../services/auth.service';
 
-export function tokenInterceptor(
+export function authInterceptor(
   req: HttpRequest<unknown>,
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> {
@@ -24,7 +25,16 @@ export function tokenInterceptor(
         'Bearer ' + authService.getToken()
       ),
     });
-    return next(clonedRequest);
+    return next(clonedRequest).pipe(
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 401) {
+          console.debug('[AuthInterceptor] logout');
+          // Token expiré ou invalide
+          authService.logout();
+        }
+        return throwError(() => error);
+      })
+    );
   }
   return next(req);
 }

@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 import { User } from '../models/user';
 import { AuthService } from './auth.service';
 import { SocketService } from './socket.service';
@@ -11,20 +12,28 @@ export class NotificationService {
   private snackBar = inject(MatSnackBar);
   private authService = inject(AuthService);
   private socketService = inject(SocketService);
+  private router = inject(Router);
 
   constructor() {
-    // S'abonner aux notifications de changement d'humeur
-    this.socketService.fromEvent<User>('userMoodUpdated').subscribe((user) => {
-      const currentUser = this.authService.currentUser();
-      if (!currentUser || currentUser._id === user._id) {
-        return;
-      }
-      const message = `${user.username} est maintenant dans ${
-        user.mood?.name || 'la zone neutre'
-      }`;
+    this.authService.currentUser$.subscribe((currentUser) => {
+      console.debug('[NotificationService] currentUser:', currentUser);
+      if (currentUser) {
+        // S'abonner aux notifications de changement d'humeur
+        this.socketService
+          .fromEvent<User>('userMoodUpdated')
+          .subscribe((user) => {
+            const currentUser = this.authService.currentUser();
+            if (!currentUser || currentUser._id === user._id) {
+              return;
+            }
+            const message = `${user.username} est maintenant dans ${
+              user.mood?.name || 'la zone neutre'
+            }`;
 
-      this.showNotification(message);
-      this.showSystemNotification(message, user.mood?.image);
+            this.showNotification(message);
+            this.showSystemNotification(message, user.mood?.image);
+          });
+      }
     });
   }
 
