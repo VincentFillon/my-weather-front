@@ -95,7 +95,9 @@ export class BoardComponent implements OnInit, OnDestroy {
       (a.mood?._id || '').localeCompare(b.mood?._id || '')
     );
 
-    // Trouver l'index médian (si nombre pair, prendre le plus petit des deux du milieu)
+    // Trouver l'index médian
+    // la médiane est volontairement pessimiste et va récupérer l'élément supérieur en cas de nombre impair
+    // pour une médiane "optimiste", il faudrait utiliser Math.floor
     const medianIndex = Math.ceil((usersWithMood.length - 1) / 2);
     const medianUserId = usersWithMood[medianIndex].mood?._id;
 

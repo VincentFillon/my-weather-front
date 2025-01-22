@@ -67,11 +67,11 @@ export class NotificationService {
     };
 
     if (Notification.permission === 'granted') {
-      new Notification('Notification', options);
+      new Notification('Ma Météo', options);
     } else if (Notification.permission !== 'denied') {
       Notification.requestPermission().then((permission) => {
         if (permission === 'granted') {
-          new Notification('Notification', options);
+          new Notification('Ma Météo', options);
         }
       });
     }
