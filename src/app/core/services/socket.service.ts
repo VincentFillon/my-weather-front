@@ -68,13 +68,16 @@ export class SocketService {
     this.removeAllListeners();
     this.disconnect();
 
+    const { hostname, port } = window.location;
+    const wsUrl = `${environment.production ? 'wss' : 'ws'}//${hostname}${port ? `:${port}` : ''}/api`;
+
     return (
       new Observable<boolean>((subscribe) => {
         // Si le navigateur est compatible et qu'on a bien un utilisateur connecté
         if (this.BROWSER_SUPPORTS_WEBSOCKETS && token) {
           // Configuration de la WebSocket
           const config: SocketIoConfig = {
-            url: environment.wsUrl,
+            url: wsUrl,
             options: {
               // transports: ['websocket'],
               reconnection: true,

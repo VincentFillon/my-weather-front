@@ -6,7 +6,6 @@ import {
 } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
-import { environment } from '../../../environments/environment';
 import { AuthService } from '../services/auth.service';
 
 export function authInterceptor(
@@ -14,7 +13,6 @@ export function authInterceptor(
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> {
   if (
-    req.url.includes(environment.apiUrl) &&
     !req.url.includes('/login') &&
     !req.url.includes('/register')
   ) {

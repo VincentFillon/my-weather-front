@@ -1,13 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
 import { Media } from '../models/media';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UploadService {
-  private readonly API_URL = `${environment.apiUrl}/api/upload`;
+  private readonly API_URL = `/api/upload`;
 
   constructor(private http: HttpClient) {}
 

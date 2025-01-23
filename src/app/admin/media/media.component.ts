@@ -1,12 +1,11 @@
 import { Clipboard } from '@angular/cdk/clipboard';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
-import { environment } from '../../../environments/environment';
 import { Media } from '../../core/models/media';
 import { MediaType } from '../../core/models/media-type.enum';
 import { UploadService } from '../../core/services/upload.service';
@@ -25,14 +24,19 @@ import { UploadService } from '../../core/services/upload.service';
   styleUrls: ['./media.component.scss'],
 })
 export class MediaComponent implements OnInit {
+  private uploadService = inject(UploadService);
+  private snackBar = inject(MatSnackBar);
+  private clipboard = inject(Clipboard);
+
+  private baseUrl: string;
+
   images: Media[] = [];
   sounds: Media[] = [];
 
-  constructor(
-    private uploadService: UploadService,
-    private snackBar: MatSnackBar,
-    private clipboard: Clipboard
-  ) {}
+  constructor() {
+    const { protocol, hostname, port } = window.location;
+    this.baseUrl = `${protocol}//${hostname}${port ? `:${port}` : ''}`;
+  }
 
   ngOnInit() {
     this.uploadService.findAllUploads().subscribe((medias) => {
@@ -42,7 +46,7 @@ export class MediaComponent implements OnInit {
   }
 
   getMediaUrl(media: Media) {
-    return `${environment.apiUrl}/uploads/${media.filename}`;
+    return `${this.baseUrl}/api/data/${media.filename}`;
   }
 
   uploadImage(event: any) {
