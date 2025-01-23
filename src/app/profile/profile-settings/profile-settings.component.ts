@@ -83,6 +83,9 @@ export class ProfileSettingsComponent implements OnInit {
         this.usernameForm.patchValue({
           username: user.username,
         });
+        this.imageForm.patchValue({
+          image: user.image,
+        });
       }
     });
   }
@@ -97,7 +100,7 @@ export class ProfileSettingsComponent implements OnInit {
     if (this.usernameForm.valid) {
       const { username } = this.usernameForm.value;
       this.authService.updateUsername(username).subscribe({
-        next: () => {
+        next: (user: User) => {
           this.snackBar.open(
             "Nom d'utilisateur mis à jour avec succès",
             'Fermer',
