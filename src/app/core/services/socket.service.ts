@@ -4,7 +4,6 @@ import { Observable, Subject, catchError, of, share } from 'rxjs';
 import { ManagerOptions, Socket, SocketOptions, io } from 'socket.io-client';
 
 import { Router } from '@angular/router';
-import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
 
 export interface SocketIoConfig {
@@ -68,8 +67,8 @@ export class SocketService {
     this.removeAllListeners();
     this.disconnect();
 
-    const { hostname, port } = window.location;
-    const wsUrl = `${environment.production ? 'wss' : 'ws'}//${hostname}${port ? `:${port}` : ''}/api`;
+    const { protocol, hostname, port } = window.location;
+    const wsUrl = `${/* environment.production ? 'wss' : 'ws' */protocol}//${hostname}${port ? `:${port}` : ''}`;
 
     return (
       new Observable<boolean>((subscribe) => {

@@ -28,25 +28,16 @@ export class MediaComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   private clipboard = inject(Clipboard);
 
-  private baseUrl: string;
-
   images: Media[] = [];
   sounds: Media[] = [];
 
-  constructor() {
-    const { protocol, hostname, port } = window.location;
-    this.baseUrl = `${protocol}//${hostname}${port ? `:${port}` : ''}`;
-  }
+  constructor() {}
 
   ngOnInit() {
     this.uploadService.findAllUploads().subscribe((medias) => {
       this.images = medias.filter((media) => media.type === MediaType.IMAGE);
       this.sounds = medias.filter((media) => media.type === MediaType.SOUND);
     });
-  }
-
-  getMediaUrl(media: Media) {
-    return `${this.baseUrl}/api/data/${media.filename}`;
   }
 
   uploadImage(event: any) {

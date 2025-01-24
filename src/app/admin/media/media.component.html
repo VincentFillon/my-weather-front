@@ -6,9 +6,9 @@
       <div class="media-grid">
         @for (image of images; track image._id) {
         <mat-card class="media-card">
-          <img [src]="getMediaUrl(image)" alt="Image" mat-card-image />
+          <img [src]="'/api/data/' + image.filename" alt="Image" mat-card-image />
           <mat-card-actions align="end">
-            <button mat-button (click)="copyUrl(getMediaUrl(image))">
+            <button mat-button (click)="copyUrl('/api/data/' + image.filename)">
               <mat-icon fontIcon="content_copy"></mat-icon>
               Copier l'URL
             </button>
@@ -40,10 +40,10 @@
         @for (sound of sounds; track sound._id) {
         <mat-card class="media-card">
           <mat-card-content>
-            <audio controls [src]="getMediaUrl(sound)"></audio>
+            <audio controls [src]="'/api/data/' + sound.filename"></audio>
           </mat-card-content>
           <mat-card-actions align="end">
-            <button mat-button (click)="copyUrl(getMediaUrl(sound))">
+            <button mat-button (click)="copyUrl('/api/data/' + sound.filename)">
               <mat-icon fontIcon="content_copy"></mat-icon>
               Copier l'URL
             </button>
