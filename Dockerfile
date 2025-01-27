@@ -28,6 +28,6 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /usr/src/app/dist/meteo-front /usr/share/nginx/html
 
 # Expose the port the app runs on
-ARG PORT=80
+ARG PORT=3006
 ENV PORT=${PORT}
 EXPOSE ${PORT}
