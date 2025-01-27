@@ -3,14 +3,9 @@
   <div class="neutral-zone">
     <div class="neutral-header">
       <!-- Menu utilisateur -->
-      <button
-        mat-icon-button
-        [matMenuTriggerFor]="userMenu"
-        class="user-menu-button"
-        [style.backgroundImage]="
-          'url(' + (currentUser?.image || 'assets/default-avatar.png') + ')'
-        "
-      ></button>
+      <button mat-icon-button [matMenuTriggerFor]="userMenu">
+        <mat-icon fontIcon="menu"></mat-icon>
+      </button>
       <mat-menu #userMenu="matMenu">
         <div class="user-menu-header">
           <div
@@ -39,7 +34,7 @@
           <span>Déconnexion</span>
         </button>
       </mat-menu>
-      <h2>Zone Neutre</h2>
+      <h2>{{ currentUser?.username }}</h2>
     </div>
     <div
       class="user-list"
@@ -49,6 +44,7 @@
       (cdkDropListDropped)="onUserDrop($event)"
       [cdkDropListConnectedTo]="moodsIds"
     >
+      <h2 class="neutral-zone-title">Zone Neutre</h2>
       @for (user of getUsersByMood(); track user._id) {
       <div
         class="user-card"

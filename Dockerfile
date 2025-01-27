@@ -14,19 +14,20 @@ COPY . .
 RUN npm install
 
 # Generate the build of the application
-RUN npm run start --port 3006 --host 0.0.0.0
-
+RUN npm run build
 
 # Stage 2: Serve app with nginx server
 
-# # Use official nginx image as the base image
-# FROM nginx:latest
+# Use official nginx image as the base image
+FROM nginx:latest
 
-# # Copy the nginx config file with Angular Router redirection rule.
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy the nginx config file with Angular Router redirection rule.
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# # Copy the build output to replace the default nginx contents.
-# COPY --from=build /usr/src/app/dist/meteo-front /usr/share/nginx/html
+# Copy the build output to replace the default nginx contents.
+COPY --from=build /usr/src/app/dist/meteo-front /usr/share/nginx/html
 
-# # Expose port 3006
-# EXPOSE 3006
+# Expose the port the app runs on
+ARG PORT=80
+ENV PORT=${PORT}
+EXPOSE ${PORT}

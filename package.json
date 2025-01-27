@@ -10,7 +10,7 @@
     "test": "ng test",
     "docker:build-dev": "docker build -t meteo-front -f Dockerfile.dev .",
     "docker:build": "docker build -t meteo-front .",
-    "docker:run": "dotenv -- sh -c 'docker run -p ${PORT:-4200}:3006 --name meteo-front meteo-front'"
+    "docker:run": "dotenv -- sh -c 'docker run -p ${PORT:-4200}:${PORT:-80} --name meteo-front meteo-front'"
   },
   "private": true,
   "dependencies": {

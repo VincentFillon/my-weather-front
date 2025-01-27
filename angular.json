@@ -97,7 +97,8 @@
               "buildTarget": "meteo-front:build:production"
             },
             "development": {
-              "buildTarget": "meteo-front:build:development"
+              "buildTarget": "meteo-front:build:development",
+              "proxyConfig": "src/proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"
