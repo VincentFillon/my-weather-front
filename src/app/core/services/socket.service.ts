@@ -80,6 +80,7 @@ export class SocketService {
           const config: SocketIoConfig = {
             url: wsUrl,
             options: {
+              path: '/api',
               // transports: ['websocket'],
               reconnection: true,
               reconnectionAttempts: Infinity,
