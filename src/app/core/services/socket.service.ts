@@ -68,7 +68,9 @@ export class SocketService {
     this.disconnect();
 
     const { protocol, hostname, port } = window.location;
-    const wsUrl = `${/* environment.production ? 'wss' : 'ws' */protocol}//${hostname}${port ? `:${port}` : ''}/api`;
+    const wsUrl = `${/* environment.production ? 'wss' : 'ws' */protocol}//${hostname}${port ? `:${port}` : ''}`;
+    console.debug(wsUrl);
+
 
     return (
       new Observable<boolean>((subscribe) => {
