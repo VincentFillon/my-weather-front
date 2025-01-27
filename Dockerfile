@@ -1,8 +1,7 @@
 # Stage 1: Compile and Build angular codebase
 
 # Use the official Node.js image from the Docker Hub
-FROM node:22-alpine
-# as build
+FROM node:22-alpine as build
 
 # Set the working directory
 WORKDIR /usr/src/app
