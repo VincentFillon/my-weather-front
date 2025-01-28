@@ -1,6 +1,13 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
+import {
+  animate,
+  state,
+  style,
+  transition,
+  trigger,
+} from '@angular/animations';
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -30,13 +37,24 @@ import { UserService } from '../../core/services/user.service';
   ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss'],
+  animations: [
+    trigger('fadeOutShrink', [
+      state('void', style({ opacity: 0, transform: 'scale(0.9)' })),
+      transition(':enter', [
+        style({ opacity: 0, transform: 'scale(0.9)' }),
+        animate('1s ease-in', style({ opacity: 1, transform: 'scale(1)' })),
+      ]),
+      transition(':leave', [
+        animate('1s ease-in', style({ opacity: 0, transform: 'scale(0.9)' })),
+      ]),
+    ]),
+  ],
 })
 export class BoardComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private moodService = inject(MoodService);
   private userService = inject(UserService);
   private notificationService = inject(NotificationService);
-  private router = inject(Router);
 
   currentUser: User | null = null;
   isAdmin = false;
@@ -45,6 +63,10 @@ export class BoardComponent implements OnInit, OnDestroy {
   medianMood: Mood | null = null;
 
   users: User[] = [];
+
+  focusedUser: User | null = null;
+  focusedUserTimeout?: NodeJS.Timeout;
+
   private subscriptions: Subscription[] = [];
 
   private currentAudio: HTMLAudioElement | null = null;
@@ -220,6 +242,17 @@ export class BoardComponent implements OnInit, OnDestroy {
   // Vérifier si l'utilisateur peut déplacer un utilisateur donné
   canMoveUser(userId: string): boolean {
     return userId === this.currentUser?._id || this.isAdmin;
+  }
+
+  toggleUserFocus(user: User, focused: boolean) {
+    clearTimeout(this.focusedUserTimeout);
+    if (focused) {
+      this.focusedUser = user;
+    } else {
+      this.focusedUserTimeout = setTimeout(() => {
+        this.focusedUser = null;
+      }, 2000);
+    }
   }
 
   toggleSound(mood: Mood, event: Event) {

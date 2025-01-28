@@ -52,7 +52,10 @@
         [cdkDragDisabled]="!canMoveUser(user._id)"
         [cdkDragData]="user._id"
         [class.cannot-move]="!canMoveUser(user._id)"
+        (mouseenter)="toggleUserFocus(user, true)"
+        (mouseleave)="toggleUserFocus(user, false)"
       >
+        >
         <div class="user-card-title">
           <div
             class="user-avatar"
@@ -66,9 +69,21 @@
       }
     </div>
 
-    @if (medianMood) {
-    <div class="median-mood-spacer"></div>
+    <div class="focused-user-container">
+      @if (focusedUser) {
+      <div class="focused-user-card" @fadeOutShrink>
+        <div
+          class="user-avatar"
+          [style.backgroundImage]="
+            'url(' + (focusedUser.image || 'assets/default-avatar.png') + ')'
+          "
+        ></div>
+        <h3>{{ focusedUser.username }}</h3>
+      </div>
+      }
+    </div>
 
+    @if (medianMood) {
     <!-- Hummeur médiane -->
     <div class="median-mood-column">
       <div class="mood-header">
@@ -124,6 +139,8 @@
           [cdkDragDisabled]="!canMoveUser(user._id)"
           [cdkDragData]="user._id"
           [class.cannot-move]="!canMoveUser(user._id)"
+          (mouseenter)="toggleUserFocus(user, true)"
+          (mouseleave)="toggleUserFocus(user, false)"
         >
           <div class="user-card-title">
             <div
