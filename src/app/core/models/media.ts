@@ -9,5 +9,5 @@ export interface Media {
 
   createdAt?: Date;
 
-  updateddAt?: Date;
+  updatedAt?: Date;
 }
