@@ -1,13 +1,13 @@
 import { Component, inject } from '@angular/core';
 
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
-import { User } from '../../../core/models/user';
 import { Role } from '../../../core/models/role.enum';
+import { User } from '../../../core/models/user';
 
 interface DialogData {
   user?: User;
@@ -44,7 +44,7 @@ export class UserDialogComponent {
       username: [data.user?.username || '', [Validators.required]],
       role: [data.user?.role || Role.USER, [Validators.required]],
       image: [data.user?.image || ''],
-      password: ['', this.isNewUser ? [Validators.required, Validators.minLength(6)] : []]
+      password: ['', this.isNewUser ? [Validators.required, Validators.minLength(8)] : []]
     });
   }
 
