@@ -35,19 +35,17 @@
 
   .focused-user-container {
     flex: 1;
+    height: 300px;
+    width: 300px;
     margin-top: 20px;
 
     .focused-user-card {
       padding: 12px;
-      margin-bottom: 12px;
+      margin: 0;
       border-radius: 8px;
       background-color: #fefefe;
       border: 1px solid #eee;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
-      &:last-child {
-        margin-bottom: 0;
-      }
 
       .user-avatar {
         height: 250px;
@@ -56,7 +54,7 @@
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
-        margin: auto;
+        margin: 0 auto;
       }
 
       h3 {
