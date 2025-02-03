@@ -49,7 +49,7 @@ export class TicTacToeComponent implements OnInit, OnDestroy {
 
   private getGame() {
     if (!this._gameId) return;
-    console.log('getGame', this._gameId);
+    // console.log('getGame', this._gameId);
     this.gameJoinedSubscription = this.ticTacToeService
       .onTicTacToeJoined()
       .subscribe((game) => {
