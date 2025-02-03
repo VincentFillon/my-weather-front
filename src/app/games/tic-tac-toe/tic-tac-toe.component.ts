@@ -29,6 +29,7 @@ export class TicTacToeComponent implements OnInit, OnDestroy {
   isMyTurn = false;
 
   private gameSubscription?: Subscription;
+  private gameJoinedSubscription?: Subscription;
   private gameUpdatedSubscription?: Subscription;
 
   @Input() set gameId(gameId: string) {
@@ -38,18 +39,11 @@ export class TicTacToeComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.user = this.authService.currentUser();
-    this.gameUpdatedSubscription = this.ticTacToeService
-      .onTicTacToeUpdated()
-      .subscribe((game) => {
-        if (game._id !== this.game?._id) return;
-        this.game = game;
-        this.setTurn();
-        this.checkGameStatus();
-      });
   }
 
   ngOnDestroy() {
     this.gameSubscription?.unsubscribe();
+    this.gameJoinedSubscription?.unsubscribe();
     this.gameUpdatedSubscription?.unsubscribe();
   }
 
@@ -59,9 +53,22 @@ export class TicTacToeComponent implements OnInit, OnDestroy {
     this.gameSubscription = this.ticTacToeService
       .findOne(this._gameId)
       .subscribe((game) => {
-        this.game = game;
-        this.setTurn();
-        this.checkGameStatus();
+        this.gameJoinedSubscription = this.ticTacToeService
+          .onTicTacToeJoined()
+          .subscribe((game) => {
+            this.gameUpdatedSubscription = this.ticTacToeService
+              .onTicTacToeUpdated()
+              .subscribe((game) => {
+                if (game._id !== this.game?._id) return;
+                this.game = game;
+                this.setTurn();
+                this.checkGameStatus();
+              });
+            this.game = game;
+            this.setTurn();
+            this.checkGameStatus();
+          });
+        this.ticTacToeService.joinGame(this._gameId);
       });
   }
 
