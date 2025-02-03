@@ -1,0 +1,31 @@
+<div class="game-container" [class]="gameStatus">
+  @if (gameStatus !== 'playing') {
+  <div class="status-message">
+    @switch (gameStatus) {
+      @case ('won') {
+        <span>Victoire !</span>
+      } @case ('lost') {
+        <span>Défaite...</span>
+      } @case ('draw') {
+        <span>Match nul</span>
+      }
+    }
+  </div>
+  }
+
+  <div class="board">
+    @for (cell of game?.grid; track $index; let i = $index) {
+    <div
+      class="cell"
+      [class.clickable]="isMyTurn && !cell"
+      [class.x]="cell === 'X'"
+      [class.o]="cell === 'O'"
+      (click)="onCellClick(i)"
+    >
+      {{ cell }}
+    </div>
+    }
+  </div>
+
+  <button mat-button routerLink="/games" color="warn">Fermer</button>
+</div>

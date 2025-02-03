@@ -20,7 +20,6 @@ import { Role } from '../../core/models/role.enum';
 import { User } from '../../core/models/user';
 import { AuthService } from '../../core/services/auth.service';
 import { MoodService } from '../../core/services/mood.service';
-import { NotificationService } from '../../core/services/notification.service';
 import { UserService } from '../../core/services/user.service';
 
 @Component({
@@ -54,7 +53,6 @@ export class BoardComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private moodService = inject(MoodService);
   private userService = inject(UserService);
-  private notificationService = inject(NotificationService);
 
   currentUser: User | null = null;
   isAdmin = false;
@@ -128,8 +126,6 @@ export class BoardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.notificationService.init();
-
     const currentUserSubscription = this.authService.currentUser$.subscribe(
       (user) => {
         this.currentUser = user;

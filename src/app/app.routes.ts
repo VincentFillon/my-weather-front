@@ -18,6 +18,11 @@ export const routes: Routes = [
         canActivate: [AuthGuard]
     },
     {
+        path: 'games',
+        loadChildren: () => import('./games/games.routes').then(m => m.routes),
+        canActivate: [AuthGuard]
+    },
+    {
         path: 'admin',
         loadChildren: () => import('./admin/admin.routes').then((m) => m.routes),
         canActivate: [AuthGuard, AdminGuard]

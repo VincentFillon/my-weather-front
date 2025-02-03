@@ -9,12 +9,12 @@ import { SocketService } from './socket.service';
 export class UserService {
   private socketService = inject(SocketService);
 
-  private usersObserver?: Observable<User[]>;
-  private userObserver?: Observable<User>;
-  private userCreatedObserver?: Observable<User>;
-  private userUpdatedObserver?: Observable<User>;
-  private userMoodUpdatedObserver?: Observable<User>;
-  private userRemovedObserver?: Observable<string>;
+  private users$?: Observable<User[]>;
+  private user$?: Observable<User>;
+  private userCreated$?: Observable<User>;
+  private userUpdated$?: Observable<User>;
+  private userMoodUpdated$?: Observable<User>;
+  private userRemoved$?: Observable<string>;
 
   // Méthodes pour les users
   public createUser(user: CreateUserDto): void {
@@ -22,19 +22,19 @@ export class UserService {
   }
 
   public findAllUsers(): Observable<User[]> {
-    if (!this.usersObserver) {
-      this.usersObserver = this.socketService.fromEvent<User[]>('usersFound');
+    if (!this.users$) {
+      this.users$ = this.socketService.fromEvent<User[]>('usersFound');
     }
     this.socketService.emit('findAllUser', {});
-    return this.usersObserver;
+    return this.users$;
   }
 
   public findOneUser(_id: string): Observable<User> {
-    if (!this.userObserver) {
-      this.userObserver = this.socketService.fromEvent<User>('userFound');
+    if (!this.user$) {
+      this.user$ = this.socketService.fromEvent<User>('userFound');
     }
     this.socketService.emit('findOneUser', { _id });
-    return this.userObserver;
+    return this.user$;
   }
 
   public updateUser(user: UpdateUserDto): void {
@@ -53,38 +53,38 @@ export class UserService {
   }
 
   public onUserCreated(): Observable<User> {
-    if (!this.userCreatedObserver) {
-      this.userCreatedObserver =
+    if (!this.userCreated$) {
+      this.userCreated$ =
         this.socketService.fromEvent<User>('userCreated');
     }
     // console.debug('[WebSocket] subscribed to "userCreated" event');
-    return this.userCreatedObserver;
+    return this.userCreated$;
   }
 
   public onUserUpdated(): Observable<User> {
-    if (!this.userUpdatedObserver) {
-      this.userUpdatedObserver =
+    if (!this.userUpdated$) {
+      this.userUpdated$ =
         this.socketService.fromEvent<User>('userUpdated');
     }
     // console.debug('[WebSocket] subscribed to "userUpdated" event');
-    return this.userUpdatedObserver;
+    return this.userUpdated$;
   }
 
   public onUserMoodUpdated(): Observable<User> {
-    if (!this.userMoodUpdatedObserver) {
-      this.userMoodUpdatedObserver =
+    if (!this.userMoodUpdated$) {
+      this.userMoodUpdated$ =
         this.socketService.fromEvent<User>('userMoodUpdated');
     }
     // console.debug('[WebSocket] subscribed to "userMoodUpdated" event');
-    return this.userMoodUpdatedObserver;
+    return this.userMoodUpdated$;
   }
 
   public onUserRemoved(): Observable<string> {
-    if (!this.userRemovedObserver) {
-      this.userRemovedObserver =
+    if (!this.userRemoved$) {
+      this.userRemoved$ =
         this.socketService.fromEvent<string>('userRemoved');
     }
     // console.debug('[WebSocket] subscribed to "userRemoved" event');
-    return this.userRemovedObserver;
+    return this.userRemoved$;
   }
 }

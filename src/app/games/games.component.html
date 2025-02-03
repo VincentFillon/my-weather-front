@@ -1,0 +1,59 @@
+<div class="games-container">
+  <!-- Liste des parties en cours -->
+  <div class="active-games">
+    <button mat-raised-button routerLink="/board">Retour</button>
+    <h2>Parties en cours</h2>
+    @if (games.length > 0) {
+    <div class="games-list">
+      @for (game of games; track game._id) {
+      <div
+        class="game-item"
+        [class.selected]="game === selectedGame"
+        (click)="selectGame(game)"
+      >
+        {{ getGameDisplayName(game) }}
+        @if (selectedGame && selectedGame._id === game._id) {
+        <button mat-icon-button color="warn" (click)="closeSelectedGame()">
+          <mat-icon fontIcon="close"></mat-icon>
+        </button>
+        }
+      </div>
+      }
+    </div>
+    } @else {
+    <div class="no-games">Aucune partie en cours</div>
+    }
+  </div>
+
+  <!-- Zone centrale -->
+  <div class="game-area">
+    <router-outlet></router-outlet>
+  </div>
+
+  <!-- Classement -->
+  <div class="leaderboard">
+    <h2>Classement</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Joueur</th>
+          <th>V</th>
+          <th>N</th>
+          <th>D</th>
+          <th>Dernières parties</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (entry of leaderboard; track entry._id) {
+        <tr>
+          <td>{{ entry.name }}</td>
+          <td>{{ entry.wins }}</td>
+          <td>{{ entry.draws }}</td>
+          <td>{{ entry.losses }}</td>
+          <td>{{ entry.recentGames }}</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
