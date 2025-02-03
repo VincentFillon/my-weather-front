@@ -2,6 +2,7 @@ import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from './core/services/auth.service';
+import { NotificationService } from './core/services/notification.service';
 import { SocketService } from './core/services/socket.service';
 
 @Component({
@@ -14,6 +15,7 @@ import { SocketService } from './core/services/socket.service';
 export class AppComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private socketService = inject(SocketService);
+  private notificationService = inject(NotificationService);
   private router = inject(Router);
 
   private currentUserSubscription: Subscription | null = null;
@@ -29,7 +31,11 @@ export class AppComponent implements OnInit, OnDestroy {
           if (token) {
             this.socketSubscription = this.socketService
               .initSocket(token)
-              .subscribe();
+              .subscribe((connected) => {
+                if (connected) {
+                  this.notificationService.init();
+                }
+              });
           }
         }
       }

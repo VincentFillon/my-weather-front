@@ -8,6 +8,7 @@ import { NotificationService } from './services/notification.service';
 import { SocketService } from './services/socket.service';
 import { UploadService } from './services/upload.service';
 import { UserService } from './services/user.service';
+import { TicTacToeService } from './services/tic-tac-toe.service';
 
 @NgModule({
   declarations: [],
@@ -20,6 +21,7 @@ import { UserService } from './services/user.service';
     UserService,
     UploadService,
     NotificationService,
+    TicTacToeService,
   ],
 })
 export class CoreModule { }

@@ -1,12 +1,9 @@
 {
-  "/socket": {
+  "/api/socket": {
     "target": "http://localhost:3005",
     "secure": false,
     "ws": true,
-    "logLevel": "debug",
-    "pathRewrite": {
-      "^/socket": ""
-    }
+    "logLevel": "debug"
   },
   "/api": {
     "target": "http://localhost:3005",

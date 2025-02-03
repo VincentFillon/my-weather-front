@@ -1,0 +1,41 @@
+<div class="new-game-container">
+  @if (showNewGameForm) {
+  <form
+    [formGroup]="newGameForm"
+    (ngSubmit)="onStartNewGame()"
+    class="new-game-form"
+  >
+    <h3>Choisir un adversaire</h3>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Adversaire</mat-label>
+      <mat-select formControlName="playerO">
+        <mat-option value=""> Ordinateur </mat-option>
+        @for (user of users; track user._id) {
+        <mat-option [value]="user">
+          {{ user.username }}
+        </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      [disabled]="newGameForm.invalid"
+    >
+      Commencer
+    </button>
+  </form>
+  } @else {
+  <button
+    mat-raised-button
+    color="primary"
+    class="new-game-btn"
+    (click)="startNewGame()"
+  >
+    Nouvelle partie
+  </button>
+  }
+</div>
