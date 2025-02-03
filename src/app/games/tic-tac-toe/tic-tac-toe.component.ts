@@ -50,26 +50,22 @@ export class TicTacToeComponent implements OnInit, OnDestroy {
   private getGame() {
     if (!this._gameId) return;
     console.log('getGame', this._gameId);
-    this.gameSubscription = this.ticTacToeService
-      .findOne(this._gameId)
+    this.gameJoinedSubscription = this.ticTacToeService
+      .onTicTacToeJoined()
       .subscribe((game) => {
-        this.gameJoinedSubscription = this.ticTacToeService
-          .onTicTacToeJoined()
-          .subscribe((game) => {
-            this.gameUpdatedSubscription = this.ticTacToeService
-              .onTicTacToeUpdated()
-              .subscribe((game) => {
-                if (game._id !== this.game?._id) return;
-                this.game = game;
-                this.setTurn();
-                this.checkGameStatus();
-              });
-            this.game = game;
+        this.gameUpdatedSubscription = this.ticTacToeService
+          .onTicTacToeUpdated()
+          .subscribe((updatedGame) => {
+            if (updatedGame._id !== this.game?._id) return;
+            this.game = updatedGame;
             this.setTurn();
             this.checkGameStatus();
           });
-        this.ticTacToeService.joinGame(this._gameId);
+        this.game = game;
+        this.setTurn();
+        this.checkGameStatus();
       });
+    this.ticTacToeService.joinGame(this._gameId);
   }
 
   private setTurn() {
