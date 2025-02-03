@@ -24,6 +24,7 @@ body {
 
   &::before {
     content: "";
+    z-index: -1;
     position: absolute;
     width: 150%;
     height: 150%;

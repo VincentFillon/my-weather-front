@@ -1,0 +1,112 @@
+.game-container {
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.new-game-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  h3 {
+    text-align: center;
+  }
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background-color: #333;
+  padding: 5px;
+  border-radius: 8px;
+}
+
+.cell {
+  width: 100px;
+  height: 100px;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2em;
+  font-weight: bold;
+  cursor: default;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      background-color: #eee;
+    }
+  }
+
+  &.x {
+    color: #e74c3c;
+  }
+
+  &.o {
+    color: #3498db;
+  }
+}
+
+.status-message {
+  font-size: 2em;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+// Animations
+.won .board {
+  animation: victory 0.5s ease;
+}
+
+.lost .board {
+  animation: defeat 0.5s ease;
+}
+
+.draw .board {
+  animation: draw 0.5s ease;
+}
+
+@keyframes victory {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes defeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(0.9);
+  }
+}
+
+@keyframes draw {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+
+  25% {
+    transform: rotate(-5deg);
+  }
+
+  75% {
+    transform: rotate(5deg);
+  }
+}
