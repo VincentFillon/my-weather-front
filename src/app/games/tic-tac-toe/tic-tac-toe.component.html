@@ -1,4 +1,5 @@
 <div class="game-container" [class]="gameStatus">
+  <h2>{{ displayName }}</h2>
   @if (gameStatus !== 'playing') {
   <div class="status-message">
     @switch (gameStatus) {

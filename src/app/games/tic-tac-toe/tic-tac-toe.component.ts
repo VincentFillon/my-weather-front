@@ -23,6 +23,7 @@ export class TicTacToeComponent implements OnInit, OnDestroy {
   private user: User | null = null;
 
   game?: TicTacToe;
+  displayName?: string;
   gameStatus: 'playing' | 'won' | 'lost' | 'draw' = 'playing';
 
   currentPlayer: 'X' | 'O' = 'X';
@@ -62,6 +63,7 @@ export class TicTacToeComponent implements OnInit, OnDestroy {
             this.checkGameStatus();
           });
         this.game = game;
+        this.setGameDisplayName();
         this.setTurn();
         this.checkGameStatus();
       });
@@ -82,6 +84,15 @@ export class TicTacToeComponent implements OnInit, OnDestroy {
           this.game.playerO?._id === this.user?._id) ||
         !this.game.playerO;
     }
+  }
+
+  private setGameDisplayName() {
+    if (this.game?.playerX?._id === this.user?._id) {
+      this.displayName = this.game?.playerO?.username || 'Ordinateur';
+    } else if (this.game?.playerO && this.game?.playerO._id === this.user?._id) {
+      this.displayName = this.game?.playerX?.username || 'Ordinateur';
+    }
+    this.displayName = 'Inconnu';
   }
 
   onCellClick(index: number) {

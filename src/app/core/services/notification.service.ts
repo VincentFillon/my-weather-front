@@ -56,7 +56,7 @@ export class NotificationService {
             }
 
             const otherPlayer =
-              game.playerX._id === currentUser._id
+              game.playerO && game.playerO._id === currentUser._id
                 ? game.playerX
                 : game.playerO;
             if (!otherPlayer) return;
@@ -70,7 +70,9 @@ export class NotificationService {
               },
               'Jouer'
             );
-            this.showSystemNotification(message);
+            this.showSystemNotification(message, undefined, () => {
+              this.router.navigate(['/games', game._id]);
+            });
           });
       }
     });
@@ -102,7 +104,7 @@ export class NotificationService {
       panelClass: ['notification'],
     });
 
-    if (action) {
+    if (action != null) {
       snackBarRef.onAction().subscribe(() => {
         action();
       });
@@ -124,12 +126,12 @@ export class NotificationService {
       icon: image,
     };
 
-    if (action) options.requireInteraction = true;
+    if (action != null) options.requireInteraction = true;
 
     if (Notification.permission === 'granted') {
       const notif = new Notification('Ma Météo', options);
       notif.onclick = () => {
-        if (action) {
+        if (action != null) {
           action();
         }
       };
