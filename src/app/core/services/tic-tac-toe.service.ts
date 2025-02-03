@@ -17,11 +17,16 @@ export class TicTacToeService {
   private ticTacToeFound$?: Observable<TicTacToe>;
   private ticTacToesFound$?: Observable<TicTacToe[]>;
   private ticTacToeCreated$?: Observable<TicTacToe>;
+  private ticTacToeJoined$?: Observable<TicTacToe>;
   private ticTacToeUpdated$?: Observable<TicTacToe>;
   private ticTacToeRemoved$?: Observable<TicTacToe>;
 
   public create(createTicTacToeDto: CreateTicTacToeDto) {
     this.socketService.emit('createTicTacToe', createTicTacToeDto);
+  }
+
+  public joinGame(gameId: string) {
+    this.socketService.emit('joinTicTacToe', gameId);
   }
 
   public findAll(): Observable<TicTacToe[]> {
@@ -78,6 +83,14 @@ export class TicTacToeService {
         this.socketService.fromEvent<TicTacToe>('ticTacToeCreated');
     }
     return this.ticTacToeCreated$;
+  }
+
+  public onTicTacToeJoined(): Observable<TicTacToe> {
+    if (!this.ticTacToeJoined$) {
+      this.ticTacToeJoined$ =
+        this.socketService.fromEvent<TicTacToe>('ticTacToeJoined');
+    }
+    return this.ticTacToeJoined$;
   }
 
   public onTicTacToeUpdated(): Observable<TicTacToe> {
