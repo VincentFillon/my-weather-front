@@ -15,8 +15,8 @@
             "
           ></div>
           <p>Connecté en tant que</p>
-          <h3>{{ currentUser?.username }}</h3>
-          <!-- <p>{{ currentUser?.role }}</p> -->
+          <h3>{{ currentUser?.displayName }}</h3>
+          <p>{{ currentUser?.username }}</p>
         </div>
         <mat-divider class="user-menu-divider"></mat-divider>
         <button mat-menu-item routerLink="/profile">
@@ -38,7 +38,7 @@
           <span>Déconnexion</span>
         </button>
       </mat-menu>
-      <h2>{{ currentUser?.username }}</h2>
+      <h2>{{ currentUser?.displayName }}</h2>
     </div>
     <div
       class="user-list"
@@ -66,7 +66,7 @@
               'url(' + (user.image || 'assets/default-avatar.png') + ')'
             "
           ></div>
-          <h3>{{ user.username }}</h3>
+          <h3>{{ user.displayName }}</h3>
         </div>
       </div>
       }
@@ -81,7 +81,8 @@
             'url(' + (focusedUser.image || 'assets/default-avatar.png') + ')'
           "
         ></div>
-        <h3>{{ focusedUser.username }}</h3>
+        <h3>{{ focusedUser.displayName }}</h3>
+        <p>{{ focusedUser.username }}</p>
       </div>
       }
     </div>
@@ -152,7 +153,7 @@
                 'url(' + (user.image || 'assets/default-avatar.png') + ')'
               "
             ></div>
-            <h3>{{ user.username }}</h3>
+            <h3>{{ user.displayName }}</h3>
           </div>
         </div>
         }

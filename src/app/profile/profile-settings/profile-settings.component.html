@@ -10,8 +10,41 @@
 
     <mat-card-content>
       <mat-tab-group>
+        <!-- Modification du pseudonyme -->
+        <mat-tab label="Pseudonyme">
+          <div class="tab-content">
+            <form
+              [formGroup]="displayNameForm"
+              (ngSubmit)="onUpdateDisplayName()"
+            >
+              <mat-form-field appearance="outline">
+                <mat-label>Pseudonyme</mat-label>
+                <input
+                  matInput
+                  formControlName="displayName"
+                  placeholder="Entrez votre nouveau pseudonyme"
+                />
+                @if (displayNameForm.get('displayName')?.hasError('required')) {
+                <mat-error> Le pseudonyme est requis </mat-error>
+                }
+              </mat-form-field>
+
+              <div class="form-actions">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="!displayNameForm.valid"
+                >
+                  Mettre à jour le pseudonyme
+                </button>
+              </div>
+            </form>
+          </div>
+        </mat-tab>
+
         <!-- Modification du nom d'utilisateur -->
-        <mat-tab label="Nom d'utilisateur">
+        <mat-tab label="Nom d'utilisateur (identifiant)">
           <div class="tab-content">
             <form [formGroup]="usernameForm" (ngSubmit)="onUpdateUsername()">
               <mat-form-field appearance="outline">

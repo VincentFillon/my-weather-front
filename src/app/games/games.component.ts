@@ -70,7 +70,7 @@ export class GamesComponent implements OnInit, OnDestroy {
             for (const player of leaderboard) {
               const entry: LeaderboardEntry = {
                 _id: player.player._id,
-                name: player.player.username,
+                name: player.player.displayName,
                 wins: player.wins.nb,
                 draws: player.draws.nb,
                 losses: player.losses.nb,
@@ -144,9 +144,9 @@ export class GamesComponent implements OnInit, OnDestroy {
 
   getGameDisplayName(game: TicTacToe): string {
     if (game.playerX._id === this.user?._id) {
-      return game.playerO?.username || 'Ordinateur';
+      return game.playerO?.displayName || 'Ordinateur';
     } else if (game.playerO && game.playerO._id === this.user?._id) {
-      return game.playerX?.username || 'Ordinateur';
+      return game.playerX?.displayName || 'Ordinateur';
     }
     return 'Inconnu';
   }
