@@ -21,7 +21,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   private dialog = inject(MatDialog);
 
   users: User[] = [];
-  displayedColumns: string[] = ['image', 'username', 'role', 'mood', 'actions'];
+  displayedColumns: string[] = ['image', 'displayName', 'username', 'role', 'mood', 'actions'];
   private subscriptions: Subscription[] = [];
 
   ngOnInit() {

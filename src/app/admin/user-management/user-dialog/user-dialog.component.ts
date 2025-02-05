@@ -41,6 +41,7 @@ export class UserDialogComponent {
 
     this.isNewUser = !data.user;
     this.form = this.fb.group({
+      displayName: [data.user?.displayName || '', [Validators.required]],
       username: [data.user?.username || '', [Validators.required]],
       role: [data.user?.role || Role.USER, [Validators.required]],
       image: [data.user?.image || ''],

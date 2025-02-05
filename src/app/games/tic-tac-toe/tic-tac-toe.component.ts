@@ -88,9 +88,9 @@ export class TicTacToeComponent implements OnInit, OnDestroy {
 
   private setGameDisplayName() {
     if (this.game?.playerX?._id === this.user?._id) {
-      this.displayName = this.game?.playerO?.username || 'Ordinateur';
+      this.displayName = this.game?.playerO?.displayName || 'Ordinateur';
     } else if (this.game?.playerO && this.game?.playerO._id === this.user?._id) {
-      this.displayName = this.game?.playerX?.username || 'Ordinateur';
+      this.displayName = this.game?.playerX?.displayName || 'Ordinateur';
     }
     this.displayName = 'Inconnu';
   }

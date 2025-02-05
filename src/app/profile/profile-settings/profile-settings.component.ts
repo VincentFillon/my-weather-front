@@ -14,7 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { User } from '../../core/models/user';
 import { AuthService } from '../../core/services/auth.service';
 import { UploadService } from '../../core/services/upload.service';
@@ -46,9 +46,9 @@ export class ProfileSettingsComponent implements OnInit {
   private authService = inject(AuthService);
   private snackBar = inject(MatSnackBar);
   private dialog = inject(MatDialog);
-  private router = inject(Router);
   private uploadService = inject(UploadService);
 
+  displayNameForm: FormGroup;
   usernameForm: FormGroup;
   imageForm: FormGroup;
   passwordForm: FormGroup;
@@ -58,6 +58,10 @@ export class ProfileSettingsComponent implements OnInit {
   currentUser: User | null = null;
 
   constructor() {
+    this.displayNameForm = this.fb.group({
+      displayName: ['', [Validators.required]],
+    });
+
     this.usernameForm = this.fb.group({
       username: ['', [Validators.required]],
     });
@@ -94,6 +98,26 @@ export class ProfileSettingsComponent implements OnInit {
     return g.get('newPassword')?.value === g.get('confirmPassword')?.value
       ? null
       : { mismatch: true };
+  }
+
+  onUpdateDisplayName(): void {
+    if (this.displayNameForm.valid) {
+      const { displayName } = this.displayNameForm.value;
+      this.authService.updateDisplayName(displayName).subscribe({
+        next: (user: User) => {
+          this.snackBar.open('Pseudonyme mis à jour avec succès', 'Fermer', {
+            duration: 3000,
+          });
+        },
+        error: (error: any) => {
+          let message = 'Une erreur est survenue';
+          if (error.status === 409) {
+            message = 'Ce pseudonyme est déjà utilisé';
+          }
+          this.snackBar.open(message, 'Fermer', { duration: 5000 });
+        },
+      });
+    }
   }
 
   onUpdateUsername(): void {

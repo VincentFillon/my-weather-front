@@ -4,6 +4,7 @@ import { Role } from "./role.enum";
 export interface User {
     _id: string;
     username: string;
+    displayName: string;
     role: Role;
     image?: string;
     mood?: Mood;
@@ -15,6 +16,7 @@ export interface User {
 export interface CreateUserDto {
     username: string;
     password: string;
+    displayName: string;
     role: Role;
     image?: string;
     mood?: Mood;

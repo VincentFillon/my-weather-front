@@ -33,7 +33,7 @@ export class NotificationService {
             if (!currentUser || currentUser._id === user._id) {
               return;
             }
-            const message = `${user.username} est maintenant dans ${
+            const message = `${user.displayName} est maintenant dans ${
               user.mood?.name || 'la zone neutre'
             }`;
 
@@ -61,7 +61,7 @@ export class NotificationService {
                 : game.playerO;
             if (!otherPlayer) return;
 
-            const message = `${otherPlayer.username} a démarré une partie de morpion avec vous`;
+            const message = `${otherPlayer.displayName} a démarré une partie de morpion avec vous`;
 
             this.showNotification(
               message,

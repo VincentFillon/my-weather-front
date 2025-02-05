@@ -144,6 +144,15 @@ export class AuthService {
     );
   }
 
+  updateDisplayName(displayName: string): Observable<User> {
+    return this.http.put<User>(`${this.API_URL}/display-name`, { displayName }).pipe(
+      tap((user) => {
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        this.currentUserSubject.next(user);
+      })
+    );
+  }
+
   updateImage(image: string): Observable<User> {
     return this.http.put<User>(`${this.API_URL}/image`, { image }).pipe(
       tap((user) => {

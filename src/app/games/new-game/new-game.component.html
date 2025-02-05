@@ -13,7 +13,7 @@
         <mat-option value=""> Ordinateur </mat-option>
         @for (user of users; track user._id) {
         <mat-option [value]="user">
-          {{ user.username }}
+          {{ user.displayName }}
         </mat-option>
         }
       </mat-select>
