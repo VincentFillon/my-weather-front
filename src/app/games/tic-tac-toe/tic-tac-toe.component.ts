@@ -73,9 +73,9 @@ export class TicTacToeComponent implements OnInit, OnDestroy {
   private setTurn() {
     if (this.game) {
       if (this.game.turn % 2 === 0) {
-        this.currentPlayer = 'O';
+        this.currentPlayer = this.game.firstPlayer === 'X' ? 'O' : 'X';
       } else {
-        this.currentPlayer = 'X';
+        this.currentPlayer = this.game.firstPlayer === 'X' ? 'X' : 'O';
       }
       this.isMyTurn =
         (this.currentPlayer === 'X' &&

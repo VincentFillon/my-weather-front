@@ -1,8 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import {
+  AbstractControl,
   FormBuilder,
+  FormControl,
   FormGroup,
   ReactiveFormsModule,
+  ValidatorFn,
   Validators,
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -58,25 +61,34 @@ export class ProfileSettingsComponent implements OnInit {
   currentUser: User | null = null;
 
   constructor() {
-    this.displayNameForm = this.fb.group({
-      displayName: ['', [Validators.required]],
+    this.displayNameForm = new FormGroup({
+      displayName: new FormControl('', [Validators.required]),
     });
 
-    this.usernameForm = this.fb.group({
-      username: ['', [Validators.required]],
+    this.usernameForm = new FormGroup({
+      username: new FormControl('', [Validators.required]),
     });
 
-    this.imageForm = this.fb.group({
-      image: ['', [Validators.required]],
+    this.imageForm = new FormGroup({
+      image: new FormControl('', [Validators.required]),
     });
 
-    this.passwordForm = this.fb.group(
+    const passwordMatchValidator: ValidatorFn = (g: AbstractControl) => {
+      return g.get('newPassword')?.value === g.get('confirmPassword')?.value
+        ? null
+        : { mismatch: true };
+    };
+
+    this.passwordForm = new FormGroup(
       {
-        currentPassword: ['', [Validators.required]],
-        newPassword: ['', [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ['', [Validators.required]],
+        currentPassword: new FormControl('', [Validators.required]),
+        newPassword: new FormControl('', [
+          Validators.required,
+          Validators.minLength(6),
+        ]),
+        confirmPassword: new FormControl('', [Validators.required]),
       },
-      { validator: this.passwordMatchValidator }
+      { validators: [passwordMatchValidator] }
     );
   }
 
@@ -84,6 +96,9 @@ export class ProfileSettingsComponent implements OnInit {
     this.authService.currentUser$.subscribe((user) => {
       if (user) {
         this.currentUser = user;
+        this.displayNameForm.patchValue({
+          displayName: user.displayName,
+        });
         this.usernameForm.patchValue({
           username: user.username,
         });
@@ -92,12 +107,6 @@ export class ProfileSettingsComponent implements OnInit {
         });
       }
     });
-  }
-
-  passwordMatchValidator(g: FormGroup) {
-    return g.get('newPassword')?.value === g.get('confirmPassword')?.value
-      ? null
-      : { mismatch: true };
   }
 
   onUpdateDisplayName(): void {
