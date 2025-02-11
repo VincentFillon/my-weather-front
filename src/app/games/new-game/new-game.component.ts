@@ -4,7 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { Router } from '@angular/router';
-import { finalize, Subscription } from 'rxjs';
+import { filter, finalize, Subscription } from 'rxjs';
 import { TicTacToe } from '../../core/models/tic-tac-toe';
 import { User } from '../../core/models/user';
 import { AuthService } from '../../core/services/auth.service';
@@ -90,6 +90,14 @@ export class NewGameComponent implements OnInit, OnDestroy {
     if (this.user) {
       const gameCreatedSubscription = this.ticTacToeService
         .onTicTacToeCreated()
+        .pipe(
+          // On vérifie si l'utilisateur est concerné par la partie
+          filter(
+            (ticTacToe) =>
+              this.user?._id === ticTacToe.playerX._id ||
+              this.user?._id === ticTacToe.playerO?._id
+          )
+        )
         .pipe(finalize(() => gameCreatedSubscription.unsubscribe()))
         .subscribe((game: TicTacToe) => {
           this.router.navigate([`/games/${game._id}`]);

@@ -7,6 +7,7 @@ export interface TicTacToe {
   playerX: User;
   playerO?: User | null;
   grid: TicTacToeValue[];
+  firstPlayer: 'X' | 'O';
   turn: number;
   winner?: TicTacToeValue;
   isFinished: boolean;

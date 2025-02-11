@@ -47,6 +47,7 @@ export class NotificationService {
           .fromEvent<TicTacToe>('ticTacToeCreated')
           .subscribe((game) => {
             console.debug(game);
+            // On vérifie si l'utilisateur est concerné par la partie
             if (
               !currentUser ||
               (currentUser._id !== game.playerX._id &&
