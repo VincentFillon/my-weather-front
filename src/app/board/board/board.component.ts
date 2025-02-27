@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, LOCALE_ID, OnDestroy, OnInit, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import {
@@ -9,6 +9,7 @@ import {
   trigger,
 } from '@angular/animations';
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
+import { DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
@@ -16,10 +17,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { Subscription } from 'rxjs';
 import { Mood } from '../../core/models/mood';
+import { PublicHoliday } from '../../core/models/public-holiday';
 import { Role } from '../../core/models/role.enum';
 import { User } from '../../core/models/user';
 import { AuthService } from '../../core/services/auth.service';
 import { MoodService } from '../../core/services/mood.service';
+import { PublicHolidaysService } from '../../core/services/public-holidays.service';
 import { UserService } from '../../core/services/user.service';
 
 @Component({
@@ -33,6 +36,7 @@ import { UserService } from '../../core/services/user.service';
     MatIconModule,
     MatButtonModule,
     RouterModule,
+    DatePipe,
   ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss'],
@@ -48,14 +52,20 @@ import { UserService } from '../../core/services/user.service';
       ]),
     ]),
   ],
+  providers: [{ provide: LOCALE_ID, useValue: 'fr-FR' }],
 })
 export class BoardComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private moodService = inject(MoodService);
   private userService = inject(UserService);
+  private publicHolidaysService = inject(PublicHolidaysService);
 
   currentUser: User | null = null;
   isAdmin = false;
+
+  today = new Date();
+  nextPublicHoliday: PublicHoliday | null = null;
+
   moods: Mood[] = [];
   moodsIds: string[] = [];
   medianMood: Mood | null = null;
@@ -133,6 +143,14 @@ export class BoardComponent implements OnInit, OnDestroy {
       }
     );
     this.subscriptions.push(currentUserSubscription);
+
+    // Récupérer le prochain jour férié
+    const nextPublicHolidaySubscription = this.publicHolidaysService
+      .findNext()
+      .subscribe((publicHoliday) => {
+        this.nextPublicHoliday = publicHoliday;
+      });
+    this.subscriptions.push(nextPublicHolidaySubscription);
 
     // S'abonner aux mises à jour des humeurs
     const moodsSubscription = this.moodService

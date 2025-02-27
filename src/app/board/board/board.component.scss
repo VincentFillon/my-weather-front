@@ -113,13 +113,36 @@
   --mat-menu-divider-bottom-spacing: 10px;
 }
 
-.board-grid {
+.date-container {
+  margin-bottom: 10px;
+
+  .today-date {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 0;
+
+    .next-public-holiday {
+      margin-left: 15px;
+      font-size: 0.8rem;
+      font-weight: normal;
+      color: #666;
+    }
+  }
+}
+
+.board-grid-container {
   flex: 1;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 5px;
-  overflow-y: auto;
   padding: 12px;
+
+  .board-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 5px;
+    overflow-y: auto;
+  }
 }
 
 .mood-column {
