@@ -57,6 +57,7 @@
         [cdkDragData]="user._id"
         [class.cannot-move]="!canMoveUser(user._id)"
         (mouseenter)="toggleUserFocus(user, true)"
+        (mouseleave)="toggleUserFocus(user, false)"
       >
         <div class="user-card-title">
           <div
