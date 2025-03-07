@@ -28,12 +28,32 @@ export class TimerComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.startTimer();
+    // this.simulateDay();
   }
 
   ngOnDestroy() {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
+  }
+
+  simulateDay() {
+    const startOfDay = new Date();
+    startOfDay.setHours(8, 0, 0, 0); // 8h00
+
+    const endOfDay = new Date();
+    endOfDay.setHours(18, 30, 0, 0); // 18h30
+
+    let now = new Date(startOfDay.getTime());
+    const interval = setInterval(() => {
+      if (now.getTime() <= endOfDay.getTime()) {
+        this.updateTimer(now);
+        now = new Date(now.getTime() + 3 * 60 * 1000); // Avance de 3 minutes
+      } else {
+        clearInterval(interval);
+        this.simulateDay(); // Recommence une journée
+      }
+    }, 100);
   }
 
   /**
@@ -49,8 +69,7 @@ export class TimerComponent implements OnInit, OnDestroy {
   /**
    * Mise à jour de la phase de la journée et du temps restant.
    */
-  updateTimer() {
-    const now = new Date();
+  updateTimer(now: Date = new Date()) {
     const day = now.getDay();
     const hours = now.getHours();
     const minutes = now.getMinutes();
@@ -220,12 +239,39 @@ export class TimerComponent implements OnInit, OnDestroy {
     const totalDiff = endTime.getTime() - startTime.getTime();
     const elapsed = now.getTime() - startTime.getTime();
     let ratio = elapsed / totalDiff;
-    // On s' assure que le ratio reste entre 0 et 1
-    ratio = Math.min(1, Math.max(0, ratio));
-    const red = Math.round(255 * (1 - ratio));
-    const green = Math.round(255 * ratio);
 
-    return `rgb(${red}, ${green}, 0)`;
+    // Assure que le ratio reste entre 0 et 1
+    ratio = Math.min(1, Math.max(0, ratio));
+
+    console.debug('Ratio initial : ', ratio);
+
+    // Utilisation d'une fonction logarithmique inversée pour la progression
+    if (ratio > 0) {
+      ratio = 1 - Math.log(1 + (Math.E - 1) * (1 - ratio));
+      console.debug('Ratio (log) : ', ratio);
+    }
+
+    // Calcul des couleurs
+    let red: number, green: number, blue: number;
+    if (ratio < 0.5) {
+        // Dégradé du rouge à l'orange
+        red = 255;
+        green = Math.round(165 * 2 * ratio);
+        blue = 0;
+    } else {
+        // Dégradé de l'orange au vert foncé
+        const ratio2 = (ratio - 0.45) * 2; // Ratio pour la seconde moitié
+        red = Math.round(255 * (1 - ratio2)); // Diminue le rouge
+        green = Math.round(82 * (1 + ratio2)); // Augmente le vert
+        blue = Math.round(50 * ratio2); // Ajoute un peu de bleu pour le vert foncé
+    }
+
+    // Assure que les valeurs restent entre 0 et 255
+    red = Math.min(255, Math.max(0, red));
+    green = Math.min(255, Math.max(0, green));
+    blue = Math.min(255, Math.max(0, blue));
+
+    return `rgb(${red}, ${green}, ${blue})`;
   }
 
   /**
