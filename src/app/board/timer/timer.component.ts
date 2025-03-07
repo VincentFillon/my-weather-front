@@ -36,18 +36,26 @@ export class TimerComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Démarre le minuteur en s'abonnant à un observable d'intervalle et en appelant
+   * `updateTimer` toutes les secondes.
+   */
   startTimer() {
     this.subscription = interval(1000).subscribe(() => {
       this.updateTimer();
     });
   }
 
+  /**
+   * Mise à jour de la phase de la journée et du temps restant.
+   */
   updateTimer() {
     const now = new Date();
     const day = now.getDay();
     const hours = now.getHours();
     const minutes = now.getMinutes();
 
+    let startTime: Date | null = null;
     let endTime: Date | null = null;
 
     // Lundi à jeudi
@@ -60,6 +68,15 @@ export class TimerComponent implements OnInit, OnDestroy {
       if (hours >= 8 && (hours < 12 || (hours === 12 && minutes < 30))) {
         this.phase = DayPhases.WORKING;
 
+        startTime = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          8,
+          30,
+          0
+        );
+
         endTime = new Date(
           now.getFullYear(),
           now.getMonth(),
@@ -68,7 +85,6 @@ export class TimerComponent implements OnInit, OnDestroy {
           30,
           0
         );
-        this.color = this.calculateColor(now, endTime);
       }
       // Pause déjeuner
       else if (
@@ -82,6 +98,15 @@ export class TimerComponent implements OnInit, OnDestroy {
       else if (hours >= 14 && hours < 18) {
         this.phase = DayPhases.WORKING;
 
+        startTime = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          8 + 1, // Prendre en compte la pause déjeuner
+          30 + 30, // Prendre en compte la pause déjeuner
+          0
+        );
+
         endTime = new Date(
           now.getFullYear(),
           now.getMonth(),
@@ -90,7 +115,6 @@ export class TimerComponent implements OnInit, OnDestroy {
           0,
           0
         );
-        this.color = this.calculateColor(now, endTime);
       }
       // Fin de journée
       else {
@@ -112,6 +136,15 @@ export class TimerComponent implements OnInit, OnDestroy {
       ) {
         this.phase = DayPhases.WORKING;
 
+        startTime = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          8,
+          30,
+          0
+        );
+
         endTime = new Date(
           now.getFullYear(),
           now.getMonth(),
@@ -120,7 +153,6 @@ export class TimerComponent implements OnInit, OnDestroy {
           30,
           0
         );
-        this.color = this.calculateColor(now, endTime);
       }
       // Pause déjeuner
       else if (
@@ -134,6 +166,15 @@ export class TimerComponent implements OnInit, OnDestroy {
       else if (hours >= 14 && hours < 17) {
         this.phase = DayPhases.WORKING;
 
+        startTime = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          8 + 1, // Prendre en compte la pause déjeuner
+          30 + 30, // Prendre en compte la pause déjeuner
+          0
+        );
+
         endTime = new Date(
           now.getFullYear(),
           now.getMonth(),
@@ -142,7 +183,6 @@ export class TimerComponent implements OnInit, OnDestroy {
           0,
           0
         );
-        this.color = this.calculateColor(now, endTime);
       }
       // Fin de journée
       else {
@@ -153,6 +193,7 @@ export class TimerComponent implements OnInit, OnDestroy {
     }
 
     if (endTime) {
+      this.color = this.calculateColor(endTime, endTime, now);
       const diff = endTime.getTime() - now.getTime();
       if (diff > 0) {
         const hoursLeft = Math.floor(diff / (1000 * 60 * 60));
@@ -164,13 +205,25 @@ export class TimerComponent implements OnInit, OnDestroy {
       }
     } else {
       this.timeLeft = '00:00:00';
-      this.color = 'black'; // Ou toute autre couleur pour hors des heures de travail
+      this.color = 'initial'; // Couleur parente pour hors des heures de travail
     }
   }
 
-  calculateColor(now: Date, endTime: Date): string {
-    const totalDiff = endTime.getTime() - now.getTime();
-    const elapsed = new Date().getTime() - now.getTime();
+  /**
+   * Calcule une couleur basée sur le temps restant jusqu'à la fin de la journée de travail.
+   * La couleur est un dégradé du rouge (début de la journée) au vert (fin de la journée).
+   * @param startTime L'heure du début de la journée de travail.
+   * @param endTime L'heure de fin de la journée de travail.
+   * @param now L'heure actuelle.
+   * @returns Une chaîne représentant la couleur au format RGB.
+   */
+  calculateColor(
+    startTime: Date,
+    endTime: Date,
+    now: Date = new Date()
+  ): string {
+    const totalDiff = endTime.getTime() - startTime.getTime();
+    const elapsed = endTime.getTime() - now.getTime();
     const ratio = elapsed / totalDiff;
     const red = Math.round(255 * (1 - ratio));
     const green = Math.round(255 * ratio);
@@ -178,10 +231,22 @@ export class TimerComponent implements OnInit, OnDestroy {
     return `rgb(${red}, ${green}, 0)`;
   }
 
+  /**
+   * Formate une heure en heures, minutes et secondes en une chaîne 'HH:MM:SS'.
+   * @param hours Le nombre d'heures.
+   * @param minutes Le nombre de minutes.
+   * @param seconds Le nombre de secondes.
+   * @returns La chaîne de temps formatée.
+   */
   formatTime(hours: number, minutes: number, seconds: number): string {
     return `${this.pad(hours)}:${this.pad(minutes)}:${this.pad(seconds)}`;
   }
 
+  /**
+   * Ajoute un zéro devant un nombre s'il est inférieur à 10.
+   * @param num Le nombre à compléter.
+   * @returns Le nombre complété sous forme de chaîne.
+   */
   pad(num: number): string {
     return num.toString().padStart(2, '0');
   }
