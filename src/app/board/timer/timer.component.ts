@@ -223,8 +223,10 @@ export class TimerComponent implements OnInit, OnDestroy {
     now: Date = new Date()
   ): string {
     const totalDiff = endTime.getTime() - startTime.getTime();
-    const elapsed = endTime.getTime() - now.getTime();
-    const ratio = elapsed / totalDiff;
+    const elapsed = now.getTime() - startTime.getTime();
+    let ratio = elapsed / totalDiff;
+    // On s' assure que le ratio reste entre 0 et 1
+    ratio = Math.min(1, Math.max(0, ratio));
     const red = Math.round(255 * (1 - ratio));
     const green = Math.round(255 * ratio);
 
