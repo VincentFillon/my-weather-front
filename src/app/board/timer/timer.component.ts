@@ -65,7 +65,11 @@ export class TimerComponent implements OnInit, OnDestroy {
         this.phase = DayPhases.BEFORE_WORK;
       }
       // Matin
-      if (hours >= 8 && (hours < 12 || (hours === 12 && minutes < 30))) {
+      else if (
+        (hours > 8 && hours < 12) ||
+        (hours === 8 && minutes >= 30) ||
+        (hours === 12 && minutes < 30)
+      ) {
         this.phase = DayPhases.WORKING;
 
         startTime = new Date(
@@ -87,11 +91,7 @@ export class TimerComponent implements OnInit, OnDestroy {
         );
       }
       // Pause déjeuner
-      else if (
-        hours >= 12 &&
-        hours < 14 &&
-        (hours > 12 || (hours === 12 && minutes >= 30))
-      ) {
+      else if ((hours === 12 && minutes >= 30) || hours === 13) {
         this.phase = DayPhases.BREAK;
       }
       // Après-midi
@@ -129,9 +129,8 @@ export class TimerComponent implements OnInit, OnDestroy {
       }
       // Matin
       else if (
-        hours > 8 ||
+        (hours > 8 && hours < 12) ||
         (hours === 8 && minutes >= 30) ||
-        hours < 12 ||
         (hours === 12 && minutes < 30)
       ) {
         this.phase = DayPhases.WORKING;
@@ -155,11 +154,7 @@ export class TimerComponent implements OnInit, OnDestroy {
         );
       }
       // Pause déjeuner
-      else if (
-        hours >= 12 &&
-        hours < 14 &&
-        (hours > 12 || (hours === 12 && minutes >= 30))
-      ) {
+      else if ((hours === 12 && minutes >= 30) || hours === 13) {
         this.phase = DayPhases.BREAK;
       }
       // Après-midi
