@@ -192,8 +192,8 @@ export class TimerComponent implements OnInit, OnDestroy {
       this.phase = DayPhases.WEEKEND;
     }
 
-    if (endTime) {
-      this.color = this.calculateColor(endTime, endTime, now);
+    if (startTime && endTime) {
+      this.color = this.calculateColor(startTime, endTime, now);
       const diff = endTime.getTime() - now.getTime();
       if (diff > 0) {
         const hoursLeft = Math.floor(diff / (1000 * 60 * 60));
