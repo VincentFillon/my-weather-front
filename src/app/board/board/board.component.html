@@ -107,14 +107,17 @@
     <!-- Date du jour -->
     <div class="date-container">
       <h2 class="today-date">
-        {{ today | date : "longDate" }}
+        {{ today | date : "longDate" }},
+        <span class="end-of-day-timer">
+          <app-timer></app-timer>
+        </span>
         @if (nextPublicHoliday) {
         <span class="next-public-holiday">
-          Prochain jour férié :
+          ( Prochain jour férié :
           <strong
             ><u>{{ nextPublicHoliday.date | date : "fullDate" }}</u></strong
           >,
-          <i>&laquo;{{ nextPublicHoliday.name }}&raquo;</i>
+          <i>&laquo;{{ nextPublicHoliday.name }}&raquo;</i> )
         </span>
         }
       </h2>

@@ -24,6 +24,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { MoodService } from '../../core/services/mood.service';
 import { PublicHolidaysService } from '../../core/services/public-holidays.service';
 import { UserService } from '../../core/services/user.service';
+import { TimerComponent } from '../timer/timer.component';
 
 @Component({
   selector: 'app-board',
@@ -37,6 +38,7 @@ import { UserService } from '../../core/services/user.service';
     MatButtonModule,
     RouterModule,
     DatePipe,
+    TimerComponent,
   ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss'],

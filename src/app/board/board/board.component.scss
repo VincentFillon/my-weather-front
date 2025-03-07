@@ -135,6 +135,12 @@
     flex-wrap: wrap;
     margin: 0;
 
+    .end-of-day-timer {
+      margin-left: 15px;
+      font-weight: normal;
+      color: #666;
+    }
+
     .next-public-holiday {
       margin-left: 15px;
       font-size: 0.8rem;
