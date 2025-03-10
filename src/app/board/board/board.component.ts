@@ -15,15 +15,18 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subscription } from 'rxjs';
 import { Mood } from '../../core/models/mood';
 import { PublicHoliday } from '../../core/models/public-holiday';
 import { Role } from '../../core/models/role.enum';
 import { User } from '../../core/models/user';
+import { WorldDay } from '../../core/models/world-day';
 import { AuthService } from '../../core/services/auth.service';
 import { MoodService } from '../../core/services/mood.service';
 import { PublicHolidaysService } from '../../core/services/public-holidays.service';
 import { UserService } from '../../core/services/user.service';
+import { WorldDaysService } from '../../core/services/world-days.service';
 import { TimerComponent } from '../timer/timer.component';
 
 @Component({
@@ -39,6 +42,7 @@ import { TimerComponent } from '../timer/timer.component';
     RouterModule,
     DatePipe,
     TimerComponent,
+    MatTooltipModule,
   ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss'],
@@ -60,12 +64,14 @@ export class BoardComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private moodService = inject(MoodService);
   private userService = inject(UserService);
+  private worldDaysService = inject(WorldDaysService);
   private publicHolidaysService = inject(PublicHolidaysService);
 
   currentUser: User | null = null;
   isAdmin = false;
 
   today = new Date();
+  todayWorldDay: WorldDay | undefined;
   nextPublicHoliday: PublicHoliday | null = null;
 
   moods: Mood[] = [];
@@ -145,6 +151,14 @@ export class BoardComponent implements OnInit, OnDestroy {
       }
     );
     this.subscriptions.push(currentUserSubscription);
+
+    // Récupérer la journée mondiale actuelle
+    const worldDaySubscription = this.worldDaysService
+      .getToday()
+      .subscribe((wordlDay) => {
+        this.todayWorldDay = wordlDay;
+      });
+    this.subscriptions.push(worldDaySubscription);
 
     // Récupérer le prochain jour férié
     const nextPublicHolidaySubscription = this.publicHolidaysService
