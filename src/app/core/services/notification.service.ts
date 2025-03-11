@@ -21,9 +21,9 @@ export class NotificationService {
     // Demander l'autorisation d'envoyer des notifications système
     this.requestNotificationPermission();
 
-    this.authService.currentUser$.subscribe((currentUser) => {
+    this.authService.currentUser$.subscribe((connectedUser) => {
       // console.debug('[NotificationService] currentUser:', currentUser);
-      if (currentUser) {
+      if (connectedUser) {
         // S'abonner aux notifications de changement d'humeur
         console.debug("Souscription aux changements d'humeur");
         this.socketService
@@ -46,7 +46,8 @@ export class NotificationService {
         this.socketService
           .fromEvent<TicTacToe>('ticTacToeCreated')
           .subscribe((game) => {
-            console.debug(game);
+            const currentUser = this.authService.currentUser();
+            // console.debug(game);
             // On vérifie si l'utilisateur est concerné par la partie
             if (
               !currentUser ||
@@ -56,13 +57,15 @@ export class NotificationService {
               return;
             }
 
-            const otherPlayer =
-              game.playerO && game.playerO._id === currentUser._id
-                ? game.playerX
-                : game.playerO;
-            if (!otherPlayer) return;
+            // On vérifie que ça n'est pas une partie contre l'ordinateur
+            if (!game.playerO) return;
 
-            const message = `${otherPlayer.displayName} a démarré une partie de morpion avec vous`;
+            let message = 'Une partie de morpion a démarré';
+            if (game.playerO._id === currentUser._id) {
+              message = `${game.playerX.displayName} a démarré une partie de morpion avec vous`;
+            } else if (game.playerX._id === currentUser._id) {
+              message = `Vous avez démarré une partie de morpion avec ${game.playerO.displayName}`;
+            }
 
             this.showNotification(
               message,

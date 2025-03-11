@@ -10,25 +10,30 @@ export const routes: Routes = [
     },
     {
         path: 'auth',
+        title: 'Météo des humeurs - Connexion',
         loadChildren: () => import('./auth/auth.routes').then(m => m.routes)
     },
     {
         path: 'board',
+        title: 'Météo des humeurs',
         loadChildren: () => import('./board/board.routes').then(m => m.routes),
         canActivate: [AuthGuard]
     },
     {
         path: 'games',
+        title: 'Météo des humeurs - Jeux',
         loadChildren: () => import('./games/games.routes').then(m => m.routes),
         canActivate: [AuthGuard]
     },
     {
         path: 'admin',
+        title: 'Météo des humeurs - Administration',
         loadChildren: () => import('./admin/admin.routes').then((m) => m.routes),
         canActivate: [AuthGuard, AdminGuard]
     },
     {
         path: 'profile',
+        title: 'Météo des humeurs - Mon profil',
         loadChildren: () => import('./profile/profile.routes').then(m => m.routes),
         canActivate: [AuthGuard]
     },
