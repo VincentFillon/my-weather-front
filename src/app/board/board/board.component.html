@@ -1,4 +1,4 @@
-<div class="board-container">
+<div class="board-container" >
   <!-- Zone neutre -->
   <div class="neutral-zone">
     <div class="neutral-header">
@@ -53,6 +53,7 @@
       <div
         class="user-card"
         cdkDrag
+        cdkDragBoundary=".board-container"
         [cdkDragDisabled]="!canMoveUser(user._id)"
         [cdkDragData]="user._id"
         [class.cannot-move]="!canMoveUser(user._id)"
@@ -160,10 +161,11 @@
           (cdkDropListDropped)="onUserDrop($event)"
           [cdkDropListConnectedTo]="getOtherMoodsIds(mood._id)"
         >
-          @for (user of getUsersByMood(mood._id); track user) {
+          @for (user of getUsersByMood(mood._id); track user._id) {
           <div
             class="user-card"
             cdkDrag
+            cdkDragBoundary=".board-container"
             [cdkDragDisabled]="!canMoveUser(user._id)"
             [cdkDragData]="user._id"
             [class.cannot-move]="!canMoveUser(user._id)"

@@ -281,7 +281,7 @@ export class BoardComponent implements OnInit, OnDestroy {
     } else {
       this.focusedUserTimeout = setTimeout(() => {
         this.focusedUser = null;
-      }, 1000);
+      }, 2000);
     }
   }
 

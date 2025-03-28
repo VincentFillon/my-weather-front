@@ -1,16 +1,19 @@
 .board-container {
   position: relative;
-  height: 100vh;
+  height: 100%;
+  width: 100%;
   // background-color: #f5f5f5;
   overflow: hidden;
   display: flex;
   flex-direction: row;
   justify-content: start;
   flex-wrap: nowrap;
+  contain: layout;
 }
 
 .neutral-zone {
   min-width: 300px;
+  max-width: 500px;
   background-color: rgba(#f8f9fa, 0.5);
   padding: 15px;
   display: flex;
@@ -38,8 +41,8 @@
 
   .focused-user-container {
     flex: 1;
-    height: 300px;
-    width: 300px;
+    max-width: 100%;
+    max-height: 100%;
 
     .focused-user-card {
       position: relative;
@@ -53,8 +56,10 @@
       max-height: 100%;
 
       .user-avatar {
-        height: 250px;
-        width: 250px;
+        min-height: 250px;
+        min-width: 250px;
+        max-width: 100%;
+        max-height: 100%;
         // border-radius: 50%;
         background-size: contain;
         background-repeat: no-repeat;
@@ -248,6 +253,7 @@
   transition: transform 0.2s, box-shadow 0.2s;
   background-color: #fefefe;
   border: 1px solid #eee;
+  box-sizing: border-box;
 
   &:last-child {
     margin-bottom: 0;
@@ -286,6 +292,7 @@
 
     h3 {
       margin: 0;
+      white-space: pre-line;
     }
   }
 }
