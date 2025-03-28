@@ -243,12 +243,12 @@ export class TimerComponent implements OnInit, OnDestroy {
     // Assure que le ratio reste entre 0 et 1
     ratio = Math.min(1, Math.max(0, ratio));
 
-    console.debug('Ratio initial : ', ratio);
+    // console.debug('Ratio initial : ', ratio);
 
     // Utilisation d'une fonction logarithmique inversée pour la progression
     if (ratio > 0) {
       ratio = 1 - Math.log(1 + (Math.E - 1) * (1 - ratio));
-      console.debug('Ratio (log) : ', ratio);
+      // console.debug('Ratio (log) : ', ratio);
     }
 
     // Calcul des couleurs
