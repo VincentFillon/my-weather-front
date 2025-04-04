@@ -6,23 +6,21 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { TicTacToe } from '../../core/models/tic-tac-toe';
+import { Pong } from '../../core/models/pong';
 import { User } from '../../core/models/user';
 import { AuthService } from '../../core/services/auth.service';
-import { TicTacToeService } from '../../core/services/tic-tac-toe.service';
+import { PongService } from '../../core/services/pong.service';
 
 interface LeaderboardEntry {
   _id: string;
   name: string;
   wins: number;
-  draws: number;
   losses: number;
   recentGames: string;
 }
 
 @Component({
-  standalone: true,
-  selector: 'app-tic-tac-toe',
+  selector: 'app-pong',
   imports: [
     ReactiveFormsModule,
     MatFormFieldModule,
@@ -31,12 +29,12 @@ interface LeaderboardEntry {
     MatButtonModule,
     MatIconModule,
   ],
-  templateUrl: './tic-tac-toe.component.html',
-  styleUrl: './tic-tac-toe.component.scss',
+  templateUrl: './pong.component.html',
+  styleUrl: './pong.component.scss',
 })
-export class TicTacToeComponent implements OnInit, OnDestroy {
+export class PongComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
-  private ticTacToeService = inject(TicTacToeService);
+  private pongService = inject(PongService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -52,8 +50,8 @@ export class TicTacToeComponent implements OnInit, OnDestroy {
 
   leaderboard: LeaderboardEntry[] = [];
 
-  games: TicTacToe[] = [];
-  selectedGame: TicTacToe | null = null;
+  games: Pong[] = [];
+  selectedGame: Pong | null = null;
   gameSubscription?: Subscription;
 
   ngOnInit() {
@@ -63,7 +61,7 @@ export class TicTacToeComponent implements OnInit, OnDestroy {
         this.leaderboardSubscription?.unsubscribe();
         this.gamesSubscription?.unsubscribe();
 
-        this.leaderboardSubscription = this.ticTacToeService
+        this.leaderboardSubscription = this.pongService
           .onLeaderboardUpdated()
           .subscribe((leaderboard) => {
             const leaderboardEntries: LeaderboardEntry[] = [];
@@ -72,13 +70,8 @@ export class TicTacToeComponent implements OnInit, OnDestroy {
                 _id: player.player._id,
                 name: player.player.displayName,
                 wins: player.wins.nb,
-                draws: player.draws.nb,
                 losses: player.losses.nb,
-                recentGames: [
-                  ...player.wins.games,
-                  ...player.draws.games,
-                  ...player.losses.games,
-                ]
+                recentGames: [...player.wins.games, ...player.losses.games]
                   .sort(
                     (a, b) =>
                       new Date(b.createdAt!).getTime() -
@@ -86,19 +79,10 @@ export class TicTacToeComponent implements OnInit, OnDestroy {
                   )
                   .slice(0, 5)
                   .map((game) => {
-                    switch (game.winner) {
-                      case 'O':
-                        return game.playerO &&
-                          game.playerO._id === player.player._id
-                          ? 'V'
-                          : 'D';
-                      case 'X':
-                        return game.playerX._id === player.player._id
-                          ? 'V'
-                          : 'D';
-                      default:
-                        return 'N';
-                    }
+                    return game.winner === 1 &&
+                      game.player1._id === player.player._id
+                      ? 'V'
+                      : 'D';
                   })
                   .join(', '),
               };
@@ -106,7 +90,7 @@ export class TicTacToeComponent implements OnInit, OnDestroy {
             }
             this.leaderboard = leaderboardEntries;
           });
-        this.gamesSubscription = this.ticTacToeService
+        this.gamesSubscription = this.pongService
           .findByUser(user._id, false)
           .subscribe((games) => {
             this.games = games;
@@ -142,23 +126,23 @@ export class TicTacToeComponent implements OnInit, OnDestroy {
     this.gameRemovedSubscription?.unsubscribe();
   }
 
-  getGameDisplayName(game: TicTacToe): string {
-    if (game.playerX._id === this.user?._id) {
-      return game.playerO?.displayName || 'Ordinateur';
-    } else if (game.playerO && game.playerO._id === this.user?._id) {
-      return game.playerX?.displayName || 'Ordinateur';
+  getGameDisplayName(game: Pong): string {
+    if (game.player1._id === this.user?._id) {
+      return game.player2?.displayName || 'Ordinateur';
+    } else if (game.player2 && game.player2._id === this.user?._id) {
+      return game.player1?.displayName || 'Ordinateur';
     }
     return 'Inconnu';
   }
 
-  selectGame(game: TicTacToe) {
+  selectGame(game: Pong) {
     this.selectedGame = game;
-    this.router.navigate([`/games/tic-tac-toe/${game._id}`]);
+    this.router.navigate([`/games/pong/${game._id}`]);
   }
 
   closeSelectedGame() {
     console.debug('closeSelectedGame');
     this.selectedGame = null;
-    this.router.navigate(['/games/tic-tac-toe']);
+    this.router.navigate(['/games/pong']);
   }
 }

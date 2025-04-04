@@ -5,24 +5,24 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { Router } from '@angular/router';
 import { filter, finalize, Subscription } from 'rxjs';
-import { TicTacToe } from '../../core/models/tic-tac-toe';
-import { User } from '../../core/models/user';
-import { AuthService } from '../../core/services/auth.service';
-import { TicTacToeService } from '../../core/services/tic-tac-toe.service';
-import { UserService } from '../../core/services/user.service';
+import { TicTacToe } from '../../../core/models/tic-tac-toe';
+import { User } from '../../../core/models/user';
+import { AuthService } from '../../../core/services/auth.service';
+import { TicTacToeService } from '../../../core/services/tic-tac-toe.service';
+import { UserService } from '../../../core/services/user.service';
 
 @Component({
-  selector: 'app-new-game',
+  selector: 'app-tic-tac-toe-new-game',
   imports: [
     ReactiveFormsModule,
     MatFormFieldModule,
     MatSelectModule,
     MatButtonModule,
   ],
-  templateUrl: './new-game.component.html',
-  styleUrl: './new-game.component.scss',
+  templateUrl: './tic-tac-toe-new-game.component.html',
+  styleUrl: './tic-tac-toe-new-game.component.scss',
 })
-export class NewGameComponent implements OnInit, OnDestroy {
+export class TicTacToeNewGameComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private userService = inject(UserService);
   private ticTacToeService = inject(TicTacToeService);
@@ -70,6 +70,7 @@ export class NewGameComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.userSubscription?.unsubscribe();
     this.usersSubscriptions.forEach((sub) => sub.unsubscribe());
   }
 
@@ -100,7 +101,7 @@ export class NewGameComponent implements OnInit, OnDestroy {
         )
         .pipe(finalize(() => gameCreatedSubscription.unsubscribe()))
         .subscribe((game: TicTacToe) => {
-          this.router.navigate([`/games/${game._id}`]);
+          this.router.navigate([`/games/tic-tac-toe/${game._id}`]);
         });
       let playerO: User | null = null;
       if (this.newGameForm.value.playerO && this.newGameForm.value.playerO._id)

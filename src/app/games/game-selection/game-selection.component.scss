@@ -1,0 +1,45 @@
+.games-container {
+  width: 100%;
+  height: 100%;
+
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    transition: opacity 0.5s ease-in-out;
+
+    &.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+
+  .game-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    cursor: pointer;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 15px;
+    color: white;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  .tic-tac-toe {
+    background: linear-gradient(45deg, #ff4e50, #f9d423);
+  }
+
+  .pong {
+    background: linear-gradient(45deg, #007991, #78ffd6);
+  }
+}

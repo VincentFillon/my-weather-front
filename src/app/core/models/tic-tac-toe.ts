@@ -16,7 +16,7 @@ export interface TicTacToe {
   _v?: number;
 }
 
-export interface PlayerGames {
+export interface TicTacToePlayerGames {
   nb: number;
   games: TicTacToe[];
 }
@@ -24,9 +24,9 @@ export interface PlayerGames {
 export interface TicTacToePlayer {
   _id: string;
   player: User;
-  wins: PlayerGames;
-  draws: PlayerGames;
-  losses: PlayerGames;
+  wins: TicTacToePlayerGames;
+  draws: TicTacToePlayerGames;
+  losses: TicTacToePlayerGames;
   createdAt?: Date;
   updatedAt?: Date;
   _v?: number;
