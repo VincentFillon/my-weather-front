@@ -1,0 +1,13 @@
+<div class="games-container" @fadeInOut>
+  <button mat-raised-button class="back-button" (click)="goBack()">
+    Retour
+  </button>
+  <div class="grid-container">
+    <div class="game-card tic-tac-toe" (click)="navigateTo('tic-tac-toe')">
+      <h2>Tic-Tac-Toe</h2>
+    </div>
+    <div class="game-card pong" (click)="navigateTo('pong')">
+      <h2>Pong</h2>
+    </div>
+  </div>
+</div>

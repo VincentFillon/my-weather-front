@@ -1,0 +1,33 @@
+<div class="game-container">
+  @if (game) {
+    <div class="game-opponents">
+      <div class="game-opponent">{{ game.player1.displayName }}</div>
+      <div class="game-opponent">
+        {{ game.player2?.displayName ?? "Ordinateur" }}
+      </div>
+    </div>
+  }
+  <div class="game-canvas-container">
+    <canvas
+      class="game-canvas"
+      #gameCanvas
+      [width]="canvasWidth"
+      [height]="canvasHeight"
+    ></canvas>
+  </div>
+  <div class="game-actions">
+    @if (game && !game.isFinished) {
+      @if (gameStarted) {
+        @if (game.isPaused) {
+          <button mat-raised-button (click)="pauseGame()">Reprendre la partie</button>
+        } @else {
+          <button mat-raised-button color="warn" (click)="pauseGame()">Pause</button>
+        }
+      } @else if (game && !game.isFinished) {
+        <button mat-raised-button (click)="startGame()">Démarrer la partie</button>
+      }
+    } @else if (game && game.isFinished) {
+      <button mat-raised-button routerLink="/games/pong">Nouvelle partie</button>
+    }
+  </div>
+</div>

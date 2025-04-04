@@ -1,0 +1,30 @@
+<div class="new-game-container">
+  <form
+    [formGroup]="newGameForm"
+    (ngSubmit)="onStartNewGame()"
+    class="new-game-form"
+  >
+    <h3>Choisir un adversaire</h3>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Adversaire</mat-label>
+      <mat-select formControlName="player2">
+        <mat-option value=""> Ordinateur </mat-option>
+        @for (user of users; track user._id) {
+          <mat-option [value]="user">
+            {{ user.displayName }}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      [disabled]="newGameForm.invalid"
+    >
+      Nouvelle partie
+    </button>
+  </form>
+</div>
