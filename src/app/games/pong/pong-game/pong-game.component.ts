@@ -207,19 +207,18 @@ export class PongGameComponent implements OnInit, AfterViewInit, OnDestroy {
     this.ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     this.ctx.fillStyle = 'white';
+    this.ctx.font = 'small-caps bold 48px/1 sans-serif';
 
     // Dessin des raquettes
     this.ctx.fillRect(
       0,
-      this.scale * this.game.player1RacketPosition.y -
-        (this.scale * racketHeight) / 2,
+      this.scale * (this.game.player1RacketPosition.y - (racketHeight / 2)),
       this.scale * racketWidth,
       this.scale * racketHeight
     );
     this.ctx.fillRect(
       canvas.width - this.scale * racketWidth,
-      this.scale * this.game.player2RacketPosition.y -
-        (this.scale * racketHeight) / 2,
+      this.scale * (this.game.player2RacketPosition.y - (racketHeight / 2)),
       this.scale * racketWidth,
       this.scale * racketHeight
     );
@@ -233,8 +232,6 @@ export class PongGameComponent implements OnInit, AfterViewInit, OnDestroy {
           : "L'ordinateur"
       } a gagné !`;
 
-      this.ctx.font = 'small-caps bold 48px/1 sans-serif';
-
       // Mesurer la largeur du texte
       const textWidth = this.ctx.measureText(text).width;
 
@@ -245,8 +242,6 @@ export class PongGameComponent implements OnInit, AfterViewInit, OnDestroy {
       // Dessiner le texte
       this.ctx.fillText(text, x, y);
     } else if (this.countdown != null) {
-      this.ctx.font = 'small-caps bold 48px/1 sans-serif';
-
       // Mesurer la largeur du texte
       const textWidth = this.ctx.measureText(this.countdown).width;
 
@@ -258,7 +253,6 @@ export class PongGameComponent implements OnInit, AfterViewInit, OnDestroy {
       this.ctx.fillText(this.countdown, x, y);
     } else if (this.gameStarted && this.game.isPaused) {
       const text = 'Jeu en pause';
-      this.ctx.font = 'small-caps bold 48px/1 sans-serif';
 
       // Mesurer la largeur du texte
       const textWidth = this.ctx.measureText(text).width;
@@ -295,18 +289,15 @@ export class PongGameComponent implements OnInit, AfterViewInit, OnDestroy {
     const rect = canvas.getBoundingClientRect();
 
     // Récupérer la position du curseur (en limitant au rectangle du canvas)
-    const halfRacket = (this.scale * racketHeight) / 2;
+    const halfRacket = this.scale * (racketHeight / 2);
     let newY = 0;
-    if (event.clientY <= rect.top) {
-      newY = rect.top + halfRacket;
-    } else if (event.clientY >= rect.bottom) {
-      newY = rect.bottom - halfRacket;
+    if (event.clientY <= rect.top + halfRacket) {
+      newY = racketHeight / 2;
+    } else if (event.clientY >= rect.bottom - halfRacket) {
+      newY = fieldSize.y - (racketHeight / 2);
     } else {
-      newY = event.clientY - rect.top;
+      newY = (event.clientY - rect.top) / this.scale;
     }
-
-    // Position de la raquête sur le plateau (mis à l'échelle)
-    newY /= this.scale;
 
     // Calcul de la vélocité
     const deltaY = Math.abs(newY - this.lastMouseY);
@@ -320,6 +311,12 @@ export class PongGameComponent implements OnInit, AfterViewInit, OnDestroy {
       );
     }
 
+
+    console.log(
+      `[${newMouseTime}] clientY: ${event.clientY}, rect.top: ${rect.top}, rect.bottom: ${rect.bottom}, halfRacket: ${halfRacket}, scale: ${this.scale}`
+    );
+
+
     console.log(
       `[${newMouseTime}]${
         this.game.isPaused ? ' (PAUSE)' : ''
@@ -331,6 +328,7 @@ export class PongGameComponent implements OnInit, AfterViewInit, OnDestroy {
     // Envoyer la mise à jour seulement si la raquette bouge ou si la vélocité change
     if (
       (deltaY !== 0 || velocity !== this.lastMouseVelocity) &&
+      !this.game.isFinished &&
       !this.game.isPaused &&
       this.gameStarted
     ) {
