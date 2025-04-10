@@ -1,6 +1,15 @@
 import { Injectable, inject } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import {
+  MatSnackBar,
+  MatSnackBarHorizontalPosition,
+  MatSnackBarVerticalPosition,
+} from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import {
+  NotificationComponent,
+  NotificationData,
+} from '../components/notification/notification.component';
+import { Pong } from '../models/pong';
 import { TicTacToe } from '../models/tic-tac-toe';
 import { User } from '../models/user';
 import { AuthService } from './auth.service';
@@ -37,47 +46,109 @@ export class NotificationService {
               user.mood?.name || 'la zone neutre'
             }`;
 
-            this.showNotification(message);
+            this.showNotification({
+              title: "Changement d'humeur",
+              image: user.mood?.image,
+              content: message,
+            });
             this.showSystemNotification(message, user.mood?.image);
           });
 
-        // S'abonner aux création de nouvelles parties
+        // S'abonner aux création de nouvelles parties de morpion
         console.debug('Souscription aux nouvelles parties de morpion');
         this.socketService
           .fromEvent<TicTacToe>('ticTacToeCreated')
           .subscribe((game) => {
-            const currentUser = this.authService.currentUser();
             // console.debug(game);
-            // On vérifie si l'utilisateur est concerné par la partie
-            if (
-              !currentUser ||
-              (currentUser._id !== game.playerX._id &&
-                (!game.playerO || currentUser._id !== game.playerO._id))
-            ) {
-              return;
-            }
 
             // On vérifie que ça n'est pas une partie contre l'ordinateur
             if (!game.playerO) return;
 
-            let message = 'Une partie de morpion a démarré';
-            if (game.playerO._id === currentUser._id) {
-              message = `${game.playerX.displayName} a démarré une partie de morpion avec vous`;
-            } else if (game.playerX._id === currentUser._id) {
-              message = `Vous avez démarré une partie de morpion avec ${game.playerO.displayName}`;
+            const currentUser = this.authService.currentUser();
+            // On vérifie si l'utilisateur est concerné par la partie
+            if (
+              !currentUser ||
+              (currentUser._id !== game.playerX._id &&
+                currentUser._id !== game.playerO._id)
+            ) {
+              return;
             }
 
-            this.showNotification(
-              message,
-              () => {
-                this.router.navigate(['/games', game._id]);
-              },
-              'Jouer'
-            );
+            let message = 'Une partie de morpion a démarré';
+            let image = 'assets/defaut-avatar.png';
+            if (game.playerO._id === currentUser._id) {
+              message = `${game.playerX.displayName} a démarré une partie de morpion avec vous`;
+              if (game.playerX.image) image = game.playerX.image;
+            } else if (game.playerX._id === currentUser._id) {
+              message = `Vous avez démarré une partie de morpion avec ${game.playerO.displayName}`;
+              if (game.playerO.image) image = game.playerO.image;
+            }
+
+            this.showNotification({
+              title: 'Moprion',
+              image,
+              content: message,
+              actions: [
+                {
+                  label: 'Jouer',
+                  icon: 'sports_esports',
+                  action: () => {
+                    this.router.navigate(['/games/tic-tac-toe', game._id]);
+                  },
+                },
+              ],
+            });
             this.showSystemNotification(message, undefined, () => {
-              this.router.navigate(['/games', game._id]);
+              this.router.navigate(['/games/tic-tac-toe', game._id]);
             });
           });
+
+        // S'abonner aux création de nouvelles parties de pong
+        console.debug('Souscription aux nouvelles parties de pong');
+        this.socketService.fromEvent<Pong>('pongCreated').subscribe((game) => {
+          // console.debug(game);
+
+          // On vérifie que ça n'est pas une partie contre l'ordinateur
+          if (!game.player2) return;
+
+          const currentUser = this.authService.currentUser();
+          // On vérifie si l'utilisateur est concerné par la partie
+          if (
+            !currentUser ||
+            (currentUser._id !== game.player1._id &&
+              currentUser._id !== game.player2._id)
+          ) {
+            return;
+          }
+
+          let message = 'Une partie de pong a démarré';
+          let image = 'assets/defaut-avatar.png';
+          if (game.player2._id === currentUser._id) {
+            message = `${game.player1.displayName} a démarré une partie de pong avec vous`;
+            if (game.player1.image) image = game.player1.image;
+          } else if (game.player1._id === currentUser._id) {
+            message = `Vous avez démarré une partie de pong avec ${game.player2.displayName}`;
+            if (game.player2.image) image = game.player2.image;
+          }
+
+          this.showNotification({
+            title: 'Pong',
+            image,
+            content: message,
+            actions: [
+              {
+                label: 'Jouer',
+                icon: 'sports_esports',
+                action: () => {
+                  this.router.navigate(['/games/pong', game._id]);
+                },
+              },
+            ],
+          });
+          this.showSystemNotification(message, undefined, () => {
+            this.router.navigate(['/games/pong', game._id]);
+          });
+        });
       }
     });
   }
@@ -96,32 +167,39 @@ export class NotificationService {
     }
   }
 
-  private showNotification(
-    message: string,
-    action?: () => void,
-    actionLabel = 'Fermer'
-  ) {
-    const snackBarRef = this.snackBar.open(message, actionLabel, {
-      duration: 5000,
-      horizontalPosition: 'end',
-      verticalPosition: 'top',
-      panelClass: ['notification'],
-    });
-
-    if (action != null) {
-      snackBarRef.onAction().subscribe(() => {
-        action();
-      });
-    }
+  isDocumentCurrentlyVisible(): boolean {
+    return typeof document !== 'undefined'
+      ? !document.hidden && document.hasFocus()
+      : true;
   }
 
-  private showSystemNotification(
+  showNotification(
+    data: NotificationData,
+    duration: number = 5000,
+    horizontalPosition: MatSnackBarHorizontalPosition = 'start',
+    verticalPosition: MatSnackBarVerticalPosition = 'bottom'
+  ) {
+    this.snackBar.openFromComponent(NotificationComponent, {
+      data,
+      duration,
+      horizontalPosition,
+      verticalPosition,
+    });
+  }
+
+  showSystemNotification(
     message: string,
     image?: string,
-    action?: () => void
+    action?: () => void,
+    doNotNotifyIfVisible: boolean = true
   ) {
     if (!('Notification' in window)) {
       console.error('Ce navigateur ne supporte pas les notifications système.');
+      return;
+    }
+
+    if (doNotNotifyIfVisible && this.isDocumentCurrentlyVisible()) {
+      console.info('La notification système a été annulée (page visible).');
       return;
     }
 

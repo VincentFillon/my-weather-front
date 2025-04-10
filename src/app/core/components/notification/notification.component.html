@@ -1,0 +1,35 @@
+<div class="notification-container" [ngClass]="{ 'notification-right': alignRight }">
+  @if (data.image) {
+  <div class="notification-image-container">
+    <img [src]="data.image" alt="Notification Image" class="notification-image" />
+  </div>
+  } @else if(data.icon) {
+  <mat-icon [fontIcon]="data.icon" class="notification-icon"></mat-icon>
+  }
+
+  <div class="notification-content">
+    @if (data.title) {
+    <h3 class="notification-title">{{ data.title }}</h3>
+    }
+    <div [innerHtml]="data.content"></div>
+  </div>
+
+  @if (data.actions && data.actions.length) {
+  <div class="notification-actions">
+    @for (action of data.actions; track $index) {
+    @if (action.iconOnly && action.icon) {
+    <button type="button" mat-icon-button (click)="action.action()" class="notification-action" [attr.aria-label]="action.label">
+      <mat-icon [fontIcon]="action.icon"></mat-icon>
+    </button>
+    } @else {
+    <button type="button" mat-button (click)="action.action()" class="notification-action" [attr.aria-label]="action.label">
+      @if (action.icon) {
+      <mat-icon [fontIcon]="action.icon"></mat-icon>
+      }
+      {{ action.label }}
+    </button>
+    }
+    }
+  </div>
+  }
+</div>

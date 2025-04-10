@@ -1,0 +1,261 @@
+@use "@angular/material" as mat;
+
+:host {
+  display: block; // Pour que la hauteur/largeur s'appliquent
+  min-height: 400px;
+  max-height: 60vh;
+  width: 400px; // Largeur fixe
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  border-radius: 8px 8px 0 0; // Coins arrondis en haut
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0; // Enlever padding de mat-card
+  border-radius: 0; // Le host gère les arrondis
+  box-shadow: none; // Le host gère l'ombre
+}
+
+.chat-panel-header {
+  flex-shrink: 0; // Ne pas rétrécir
+  border-radius: 8px 8px 0 0; // Doit correspondre au host
+
+  .spacer {
+    flex: 1 1 auto;
+  }
+
+  button {
+    margin-left: 8px;
+  }
+
+  mat-icon {
+    color: white;
+  }
+}
+.message-area {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 15px 10px; // Un peu plus de padding
+  background-color: #f5f5f5;
+  display: flex; // Permet aux enfants de gérer leur hauteur
+  flex-direction: column; // Empile les messages verticalement
+}
+
+.loading-older-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%; // Prend la hauteur de message-area
+  color: grey;
+  gap: 10px;
+}
+
+.no-messages {
+  text-align: center;
+  color: grey;
+  margin: auto; // Centrer verticalement et horizontalement si seul élément
+}
+
+// --- Styles pour chaque ligne de message ---
+.message-item-container {
+  display: flex;
+  width: 100%;
+  margin-bottom: 2px; // Très petit espace par défaut (pour les messages groupés)
+
+  // Espace plus grand uniquement APRES la fin d'un groupe
+  &.group-end {
+    margin-bottom: 15px;
+  }
+
+  .message-content-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    max-width: 80%; // Ajusté légèrement
+    position: relative; // Pour certains ajustements si nécessaire
+  }
+
+  // --- Wrapper Avatar ---
+  // Garde l'espace même si l'image est cachée par @if
+  .avatar-wrapper {
+    width: 35px;
+    height: 35px;
+    flex-shrink: 0;
+    // background-color: transparent; // Assure qu'il n'y a pas de fond si vide
+  }
+
+  .message-avatar {
+    width: 100%; // Prend la taille du wrapper
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .message-details {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0; // Reset margin
+  }
+
+  // --- Ajustement de l'alignement du texte si avatar/nom cachés ---
+  // Pour que le texte reste aligné avec le texte du message précédent (qui avait un avatar)
+  // S'applique aux messages qui ne sont PAS les premiers d'un groupe
+  &:not(.group-start) {
+    .message-details {
+      // Pas besoin de décaler si on cache juste l'avatar avec @if
+      // Le avatar-wrapper maintient l'espace.
+      // Si on n'utilisait pas de wrapper, il faudrait ajouter un margin ici :
+      // margin-left: calc(35px + 8px); /* avatar width + gap */
+    }
+  }
+  // Inversion pour my-message si besoin (si row-reverse appliqué au wrapper)
+  &.my-message:not(.group-start) {
+    .message-details {
+      // Pas besoin si avatar-wrapper maintient l'espace
+      // margin-right: calc(35px + 8px);
+    }
+  }
+
+  // On cache le nom si ce n'est pas le début du groupe (via @if dans le template)
+  .sender-name {
+    font-size: 0.8em;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 3px;
+  }
+
+  .message-bubble {
+    padding: 9px 13px;
+    border-radius: 18px; // Base radius for all corners
+    word-wrap: break-word;
+    line-height: 1.4;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    position: relative; // Pour d'éventuels ::before/::after (pointes de bulles)
+  }
+
+  // On cache le timestamp si ce n'est pas le dernier du groupe de minutes (via @if dans le template)
+  .message-timestamp {
+    font-size: 0.7em;
+    color: #999;
+    margin-top: 4px;
+    // Est affiché/caché par @if basé sur showTimestamp
+  }
+
+  // --- Styles pour les messages des AUTRES (alignés à GAUCHE) ---
+  &.other-message {
+    justify-content: flex-start;
+
+    .message-content-wrapper {
+      flex-direction: row;
+    }
+    .sender-name {
+      align-self: flex-start;
+      margin-left: 2px;
+    }
+    .message-bubble {
+      background-color: #ffffff;
+      color: #333;
+      border: 1px solid #eee;
+      align-self: flex-start;
+    }
+    .message-timestamp {
+      align-self: flex-start;
+      margin-left: 2px;
+    }
+
+    // Ajustement des coins pour le groupage
+    &.group-start .message-bubble {
+      border-top-left-radius: 6px;
+    } // Premier message
+    &.group-end .message-bubble {
+      border-bottom-left-radius: 6px;
+    } // Dernier message
+    &:not(.group-start):not(.group-end) .message-bubble {
+      // Messages du milieu
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 6px;
+    }
+    // Si un seul message dans le groupe (start ET end)
+    &.group-start.group-end .message-bubble {
+      border-top-left-radius: 6px; // Maintient le coin aplati du début
+      border-bottom-left-radius: 18px; // Rétablit l'arrondi normal en bas
+    }
+  }
+
+  // --- Styles pour MES messages (alignés à DROITE) ---
+  &.my-message {
+    justify-content: flex-end;
+
+    .message-content-wrapper {
+      flex-direction: row-reverse;
+    }
+    .sender-name {
+      align-self: flex-end;
+      margin-right: 2px;
+    }
+    .message-bubble {
+      background-color: #3f51b5;
+      color: white;
+      align-self: flex-end;
+    }
+    .message-timestamp {
+      align-self: flex-end;
+      margin-right: 2px;
+    }
+
+    // Ajustement des coins pour le groupage
+    &.group-start .message-bubble {
+      border-top-right-radius: 6px;
+    }
+    &.group-end .message-bubble {
+      border-bottom-right-radius: 6px;
+    }
+    &:not(.group-start):not(.group-end) .message-bubble {
+      border-top-right-radius: 6px;
+      border-bottom-right-radius: 6px;
+    }
+    // Si un seul message dans le groupe (start ET end)
+    &.group-start.group-end .message-bubble {
+      border-top-right-radius: 6px;
+      border-bottom-right-radius: 18px;
+    }
+  }
+}
+
+.message-input-area {
+  flex-shrink: 0;
+  padding: 8px;
+  border-top: 1px solid #ccc;
+  background-color: white;
+  display: flex;
+  align-items: center; // Centrer verticalement input et bouton
+
+  @include mat.form-field-overrides(
+    (
+      container-height: 40px,
+      container-vertical-padding: 6px,
+    )
+  );
+
+  .message-input-field {
+    flex-grow: 1; // Prendre l'espace disponible
+    margin-right: 8px; // Espace avant le bouton
+  }
+
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+}

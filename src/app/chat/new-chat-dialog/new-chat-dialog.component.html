@@ -1,0 +1,59 @@
+<h2 mat-dialog-title>Nouvelle conversation</h2>
+
+<mat-dialog-content>
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Rechercher un utilisateur</mat-label>
+    <input matInput #searchInput placeholder="Nom d'utilisateur..." [ngModel]="searchTerm$ | async" (input)="onSearchTermChange($event)" />
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+
+  @if (isLoading$ | async) {
+  <div class="spinner-container">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+  } @else if (error$ | async) {
+  <p class="error-message">{{ error$ | async }}</p>
+  } @else {
+  <mat-selection-list class="user-list" #userSelectionList (selectionChange)="onSelectionChange($event)">
+    @for (user of filteredUsers$ | async; track user._id) {
+    <mat-list-option class="user-list-item" [value]="user">
+      <img matListItemAvatar [src]="user.image || 'assets/default-avatar.png'" [alt]="user.displayName" />
+      <span matListItemTitle>{{ user.displayName }}</span>
+      <span matListItemLine>{{ user.username }}</span>
+    </mat-list-option>
+    <mat-divider></mat-divider>
+    } @empty {
+    <mat-list-item>
+      @if ((users$ | async)?.length === 0) {
+      <span>Aucun utilisateur disponible pour une nouvelle conversation.</span>
+      } @else {
+      <span>Aucun utilisateur ne correspond à votre recherche.</span>
+      }
+    </mat-list-item>
+    }
+  </mat-selection-list>
+
+  <mat-divider></mat-divider>
+
+  <mat-form-field appearance="outline" class="name-field">
+    <mat-label>Nom du groupe</mat-label>
+    <input matInput placeholder="Nouvelle conversation..." [(ngModel)]="chatRoomName" [ngModelOptions]="{ standalone: true }" required />
+  </mat-form-field>
+
+  <div class="image-preview">
+    <img [src]="imagePreview" alt="Avatar du groupe">
+  </div>
+
+  <mat-form-field appearance="outline" class="image-field">
+    <mat-label>Avatar du groupe</mat-label>
+    <input matInput placeholder="URL de l'avatar..." [(ngModel)]="chatRoomImage" [ngModelOptions]="{ standalone: true }" />
+  </mat-form-field>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-raised-button (click)="confirmSelection()" [disabled]="!chatRoomName || !selectedUsers.length">
+    Confirmer
+  </button>
+  <button mat-button (click)="closeDialog()">Annuler</button>
+</mat-dialog-actions>

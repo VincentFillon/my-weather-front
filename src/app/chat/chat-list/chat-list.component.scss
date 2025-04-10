@@ -1,0 +1,70 @@
+// src/app/features/chat/components/chat-list/chat-list.component.scss
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%; // Prendre toute la hauteur du conteneur popup
+}
+
+.chat-list-header {
+  flex-shrink: 0; // Empêcher le header de rétrécir
+
+  .spacer {
+    flex: 1 1 auto;
+  }
+
+  .toolbar-icon {
+    color: white;
+  }
+}
+
+.chat-room-list {
+  flex-grow: 1; // Prendre l'espace restant
+  overflow-y: auto; // Activer le scroll si nécessaire
+  padding-top: 0 !important; // Enlever le padding par défaut de mat-list
+}
+
+.chat-list-item {
+  cursor: pointer;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  &.has-unread {
+    font-weight: bold; // Indiquer les messages non lus
+  }
+
+  .chat-room-avatar {
+    object-fit: cover;
+  }
+
+  .last-message {
+    font-size: 0.9em;
+    color: grey;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .room-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 0.8em;
+    color: grey;
+    text-align: right;
+  }
+
+  .unread-indicator {
+    font-size: 12px; // Taille du point
+    width: 12px;
+    height: 12px;
+    margin-top: 4px;
+    // Alternative avec badge: positionner correctement le badge
+    // position: relative;
+    // .mat-badge-content { position: absolute; top: 5px; right: 5px; }
+  }
+}
+
+mat-divider {
+  margin: 0 16px; // Marge pour les séparateurs
+}
