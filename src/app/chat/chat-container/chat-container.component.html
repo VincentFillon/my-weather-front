@@ -1,0 +1,34 @@
+<div class="chat-container">
+  <div class="active-panels">
+    @for (chat of getOpenChats(); track chat.room._id) {
+      <app-chat-panel
+        [room]="chat.room"
+        [currentUser]="currentUser"
+        (closePanel)="closeChatPanel($event)"
+        (minimizePanel)="minimizeChatPanel($event)"
+        class="chat-panel-instance"
+        > </app-chat-panel>
+    }
+  </div>
+
+  <div class="chat-controls">
+      @for (chat of getMinimizedChats(); track chat.room._id) {
+         <button mat-raised-button (click)="openChatPanel(chat.room)" class="minimized-chat-tab" [matBadge]="chat.unreadCount" matBadgeColor="warn" [matBadgeHidden]="!chat.unreadCount">
+             {{ chat.room.name }}
+              <mat-icon fontIcon="close" class="close-minimized" (click)="$event.stopPropagation(); closeChatPanel(chat.room)"></mat-icon>
+         </button>
+       }
+
+      <button mat-fab color="primary" (click)="toggleChatList()" class="chat-toggle-button" [matBadge]="getTotalUnreadCount()" matBadgeColor="warn" [matBadgeHidden]="!getTotalUnreadCount()">
+        <mat-icon fontIcon="chat"></mat-icon>
+      </button>
+  </div>
+
+
+  @if (showChatList) {
+    <div class="chat-list-popup">
+        <app-chat-list [rooms]="rooms" (roomSelected)="openChatPanel($event)" (closeList)="toggleChatList()"></app-chat-list>
+    </div>
+  }
+
+</div>

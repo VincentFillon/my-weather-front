@@ -1,0 +1,66 @@
+<mat-card class="chat-panel">
+  <mat-toolbar color="primary" class="chat-panel-header">
+    <span>{{ room.name }}</span>
+    <span class="spacer"></span>
+    <button mat-icon-button (click)="minimize()" aria-label="Minimiser le chat">
+      <mat-icon fontIcon="remove"></mat-icon>
+    </button>
+    <button mat-icon-button (click)="close()" aria-label="Fermer le chat">
+      <mat-icon fontIcon="close"></mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <mat-card-content class="message-area" #messageContainer (scroll)="onScroll()">
+    @if (isLoadingOlder()) {
+    <div class="loading-older-spinner">
+      <mat-spinner diameter="30"></mat-spinner>
+    </div>
+    }
+
+    @if (isLoading()) {
+    <p>Chargement des messages...</p>
+    } @else {
+    @if (processedMessages().length === 0) {
+    <p class="no-messages"><i>Aucun message</i></p>
+    } @else {
+    @for (message of processedMessages(); track message._id) {
+    <div class="message-item-container" [class.my-message]="message.sender._id === currentUser?._id"
+         [class.other-message]="message.sender._id !== currentUser?._id" [class.group-start]="message.isGroupStart" [class.group-end]="message.isGroupEnd">
+
+      <div class="message-content-wrapper">
+        <div class="avatar-wrapper">
+          @if (message.showAvatarAndName) {
+          <img class="message-avatar" [src]="message.sender.image || 'assets/default-avatar.png'" [alt]="message.sender.displayName">
+          }
+        </div>
+
+        <div class="message-details">
+          @if (message.showAvatarAndName) {
+          <div class="sender-name">{{ message.sender.displayName }}</div>
+          }
+
+          <div class="message-bubble">
+            <span>{{ message.content }}</span>
+          </div>
+
+          @if (message.showTimestamp) {
+          <div class="message-timestamp">{{ message.createdAt | date:'shortTime' }}</div>
+          }
+        </div>
+      </div>
+    </div>
+    }
+    }
+    }
+  </mat-card-content>
+
+  <mat-card-actions class="message-input-area">
+    <mat-form-field appearance="outline" class="message-input-field">
+      <mat-label>Votre message...</mat-label>
+      <input matInput #messageInput [(ngModel)]="newMessageContent" (keyup.enter)="sendMessage()" placeholder="Écrivez quelque chose...">
+    </mat-form-field>
+    <button mat-icon-button color="primary" (click)="sendMessage()" [disabled]="!newMessageContent.trim()">
+      <mat-icon fontIcon="send"></mat-icon>
+    </button>
+  </mat-card-actions>
+</mat-card>

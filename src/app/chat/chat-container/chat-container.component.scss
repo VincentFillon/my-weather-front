@@ -1,0 +1,85 @@
+// src/app/features/chat/components/chat-container/chat-container.component.scss
+:host {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  z-index: 1000; // Au-dessus des autres éléments
+  display: flex; // Pour aligner les contrôles et les panneaux
+  align-items: flex-end; // Aligner en bas
+  pointer-events: none; // Permettre de cliquer à travers le conteneur global
+}
+
+.chat-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px; // Espace entre les panneaux et les contrôles
+  padding-right: 20px; // Marge du bord droit
+  padding-bottom: 10px; // Marge du bas (ou 0 si les éléments internes gèrent)
+  pointer-events: none; // Important pour ne pas bloquer les clics en dessous
+}
+
+.active-panels {
+  display: flex;
+  gap: 10px; // Espace entre les panneaux ouverts
+  pointer-events: auto; // Rétablir les clics pour les panneaux
+}
+
+.chat-panel-instance {
+  // Style pour chaque instance de panneau (largeur, hauteur max, etc.)
+  width: 320px; // Largeur typique
+  // max-height: 450px; // Hauteur max avant scroll interne
+  // Sera défini dans le composant chat-panel lui-même
+}
+
+.chat-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  pointer-events: auto; // Rétablir les clics pour les contrôles
+}
+
+.minimized-chat-tab {
+  // Styles pour les onglets minimisés
+  // background-color: #eee;
+  // border-top-left-radius: 5px;
+  // border-top-right-radius: 5px;
+  // padding: 5px 10px;
+  position: relative; // Pour positionner l'icône close
+
+  .close-minimized {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    margin-left: 5px;
+    cursor: pointer;
+    &:hover {
+      color: red;
+    }
+  }
+}
+
+.chat-toggle-button {
+  // Styles pour le bouton principal
+}
+
+.chat-list-popup {
+  position: absolute; // Positionné par rapport au :host ou .chat-container
+  bottom: 70px; // Au-dessus du bouton FAB (ajuster selon taille FAB)
+  right: 20px; // Alignè avec le bouton FAB
+  width: 400px;
+  max-height: 70vh;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  overflow: hidden; // Pour le contenu
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto; // Rétablir les clics pour la liste
+}
+
+// Styles pour les badges Material (si nécessaire)
+::ng-deep .mat-badge-content {
+  // Ajustements éventuels
+}
