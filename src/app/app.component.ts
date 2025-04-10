@@ -5,6 +5,7 @@ import { ChatContainerComponent } from './chat/chat-container/chat-container.com
 import { AuthService } from './core/services/auth.service';
 import { NotificationService } from './core/services/notification.service';
 import { SocketService } from './core/services/socket.service';
+import { AppUpdateService } from './core/services/update.service';
 
 @Component({
   standalone: true,
@@ -17,6 +18,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private socketService = inject(SocketService);
   private notificationService = inject(NotificationService);
+  private appUpdateService = inject(AppUpdateService);
   private router = inject(Router);
 
   private currentUserSubscription: Subscription | null = null;
@@ -25,6 +27,8 @@ export class AppComponent implements OnInit, OnDestroy {
   socketConnected = false;
 
   ngOnInit() {
+    this.appUpdateService.initUpdateListener();
+
     this.currentUserSubscription = this.authService.currentUser$.subscribe(
       (user) => {
         if (!user) {
