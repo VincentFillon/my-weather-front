@@ -38,6 +38,12 @@ export const routes: Routes = [
         canActivate: [AuthGuard]
     },
     {
+        path: 'polls',
+        title: 'Météo des humeurs - Sondage',
+        loadChildren: () => import('./polls/polls.routes').then(m => m.routes),
+        canActivate: [AuthGuard]
+    },
+    {
         path: '**',
         redirectTo: 'board'
     }

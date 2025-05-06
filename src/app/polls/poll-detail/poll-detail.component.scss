@@ -1,0 +1,143 @@
+.poll-detail-container {
+  max-width: 700px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+.back-button {
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.loading,
+.error,
+.no-poll-data {
+  text-align: center;
+  padding: 30px;
+  font-style: italic;
+}
+
+.error {
+  color: #dc3545;
+}
+
+h2 {
+  margin-top: 0;
+  color: #333;
+}
+
+.description {
+  color: #555;
+  margin-bottom: 15px;
+}
+
+.meta,
+.meta-choice {
+  font-size: 0.9em;
+  color: #777;
+  margin-bottom: 5px;
+}
+.meta .expired-label {
+  color: #dc3545;
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+.options-list {
+  margin-top: 25px;
+}
+
+.options-list h3 {
+  margin-bottom: 15px;
+}
+
+.option-item {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  background-color: #f9f9f9;
+}
+
+.option-item:not(.disabled):hover {
+  border-color: #007bff;
+  background-color: #f1f1f1;
+}
+
+.option-item.selected {
+  border-color: #28a745;
+  background-color: #e9f5ec;
+  font-weight: bold;
+}
+
+.option-item.disabled {
+  cursor: not-allowed;
+  background-color: #e9ecef;
+  opacity: 0.7;
+}
+
+.option-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.option-text {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+.option-votes {
+  font-size: 0.9em;
+  color: #555;
+}
+
+.option-bar-detail {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  height: 22px;
+  overflow: hidden;
+  position: relative;
+}
+
+.option-progress-detail {
+  background-color: #007bff; /* Bleu pour le détail */
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transition: width 0.4s ease-out;
+  display: flex;
+  align-items: center; /* Centre le label verticalement */
+}
+
+.percentage-label {
+  color: white;
+  font-size: 0.8em;
+  padding-left: 5px;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+}
+
+.submitting-vote,
+.vote-status {
+  margin-top: 20px;
+  padding: 10px;
+  text-align: center;
+  font-style: italic;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  color: #6c757d;
+}
+
+.poll-actions {
+  margin-top: 20px;
+  text-align: center;
+}
