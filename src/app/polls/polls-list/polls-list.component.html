@@ -1,0 +1,97 @@
+<div class="polls-container">
+  <div class="polls-header">
+    <button mat-raised-button (click)="goBack()">Retour</button>
+    <h2>Sondages en cours</h2>
+    <button mat-raised-button (click)="navigateToCreate()" color="primary">Créer un nouveau sondage</button>
+  </div>
+
+  <div class="polls-filters">
+    <mat-form-field appearance="outline">
+      <mat-label>Rechercher</mat-label>
+      <input matInput type="text" [(ngModel)]="filters.term" (ngModelChange)="applyFilters()" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Créé entre</mat-label>
+      <mat-date-range-input [rangePicker]="createdDatesRangePicker">
+        <input matStartDate placeholder="JJ/MM/AAAA" [(ngModel)]="filters.createdFrom" (ngModelChange)="applyFilters()">
+        <input matEndDate placeholder="JJ/MM/AAAA" [(ngModel)]="filters.createdTo" (ngModelChange)="applyFilters()">
+      </mat-date-range-input>
+      <mat-datepicker-toggle matIconSuffix [for]="createdDatesRangePicker"></mat-datepicker-toggle>
+      <mat-date-range-picker #createdDatesRangePicker></mat-date-range-picker>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Etat du sondage</mat-label>
+      <mat-select [(ngModel)]="filters.ended" (ngModelChange)="applyFilters()" canSelectNullableOptions>
+        <mat-option [value]="null">Indifférent</mat-option>
+        <mat-option [value]="true">Terminés</mat-option>
+        <mat-option [value]="false">En cours</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Trier par</mat-label>
+      <mat-select [(ngModel)]="filters.sort" (ngModelChange)="applyFilters()">
+        <mat-option value="createdAt">Date de création</mat-option>
+        <mat-option value="endDate">Date limite de vote</mat-option>
+        <mat-option value="title">Titre</mat-option>
+        <mat-option value="creator.displayName">Créateur</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Ordre</mat-label>
+      <mat-select [(ngModel)]="filters.order" (ngModelChange)="applyFilters()">
+        <mat-option value="asc">Croissant</mat-option>
+        <mat-option value="desc">Décroissant</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  @if (isLoading) {
+  <div class="loading">Chargement des sondages...</div>
+  }
+  @else if (error) {
+  <div class="error">{{ error }}</div>
+  }
+  @else {
+  <div class="polls-list">
+    @for (poll of polls$ | async; track poll._id) {
+    <div class="poll-item" (click)="navigateToDetail(poll._id)" [title]="poll.description || 'Voir les détails'">
+      <h3>{{ poll.title }}</h3>
+      <p class="poll-meta">Fin le: {{ poll.endDate | date:'dd/MM/yyyy HH:mm' }} | {{ poll.totalVotes }} vote(s)</p>
+
+      @if (poll.topOptions.length > 0) {
+      <div class="top-options-preview">
+        <ul>
+          @for (option of poll.topOptions; track option._id) {
+          <li>
+            <div class="option-bar">
+              <div class="option-progress" [style.width.%]="option.percentage"></div>
+              <span class="option-text">{{ option.text }} ({{ option.percentage | number:'1.0-1' }}%)</span>
+            </div>
+          </li>
+          }
+          @if (poll.options.length > 3) {
+          <li>
+            <span class="option-text">...</span>
+          </li>
+          }
+        </ul>
+      </div>
+      }
+      @if (poll.totalVotes === 0) {
+      <div class="no-votes-yet">
+        Aucun vote pour le moment.
+      </div>
+      }
+    </div>
+    } @empty {
+    <div class="no-polls">
+      Aucun sondage trouvé.
+    </div>
+    }
+  </div>
+  }
+</div>
