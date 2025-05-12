@@ -24,13 +24,6 @@
   pointer-events: auto; // Rétablir les clics pour les panneaux
 }
 
-.chat-panel-instance {
-  // Style pour chaque instance de panneau (largeur, hauteur max, etc.)
-  width: 320px; // Largeur typique
-  // max-height: 450px; // Hauteur max avant scroll interne
-  // Sera défini dans le composant chat-panel lui-même
-}
-
 .chat-controls {
   display: flex;
   align-items: flex-end;
@@ -59,10 +52,6 @@
   }
 }
 
-.chat-toggle-button {
-  // Styles pour le bouton principal
-}
-
 .chat-list-popup {
   position: absolute; // Positionné par rapport au :host ou .chat-container
   bottom: 70px; // Au-dessus du bouton FAB (ajuster selon taille FAB)
@@ -77,9 +66,4 @@
   display: flex;
   flex-direction: column;
   pointer-events: auto; // Rétablir les clics pour la liste
-}
-
-// Styles pour les badges Material (si nécessaire)
-::ng-deep .mat-badge-content {
-  // Ajustements éventuels
 }
