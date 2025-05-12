@@ -117,6 +117,28 @@ h2 {
   align-items: center; /* Centre le label verticalement */
 }
 
+.option-voters {
+  margin-top: 8px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  align-items: center;
+
+  .voter-avatar-wrapper {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+  }
+
+  .voter-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+}
+
 .percentage-label {
   color: white;
   font-size: 0.8em;

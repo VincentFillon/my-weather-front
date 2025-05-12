@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   BehaviorSubject,
@@ -28,12 +29,14 @@ import {
   UserVoteDto,
 } from '../../core/models/poll';
 import { Role } from '../../core/models/role.enum';
+import { User } from '../../core/models/user';
 import { AuthService } from '../../core/services/auth.service';
 import { PollService } from '../../core/services/poll.service';
 
 interface OptionWithResult extends PollOption {
   count: number;
   percentage: number;
+  voters: User[];
   isSelected: boolean; // Indique si l'utilisateur actuel a sélectionné cette option
 }
 
@@ -46,7 +49,7 @@ interface PollDetailView extends Poll {
 
 @Component({
   selector: 'app-poll-detail',
-  imports: [MatButtonModule, MatIconModule, AsyncPipe, DatePipe, DecimalPipe],
+  imports: [MatButtonModule, MatIconModule, MatTooltipModule, AsyncPipe, DatePipe, DecimalPipe],
   templateUrl: './poll-detail.component.html',
   styleUrl: './poll-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -147,22 +150,24 @@ export class PollDetailComponent implements OnInit, OnDestroy {
     userSelection: Set<string>
   ): PollDetailView {
     const totalVotes = votes.length;
-    const voteCounts: { [optionId: string]: number } = {};
-    poll.options.forEach((opt) => (voteCounts[opt._id] = 0));
+    const voteCounts: { [optionId: string]: { count: number; voters: User[]; } } = {};
+    poll.options.forEach((opt) => (voteCounts[opt._id] = { count: 0, voters: [] }));
 
     votes.forEach((vote) => {
       vote.selectedOptions.forEach((optionId) => {
         if (voteCounts[optionId] !== undefined) {
-          voteCounts[optionId]++;
+          voteCounts[optionId].count++;
+          voteCounts[optionId].voters.push(vote.user);
         }
       });
     });
 
     const optionsWithResults = poll.options.map((option) => ({
       ...option,
-      count: voteCounts[option._id],
+      count: voteCounts[option._id].count,
+      voters: voteCounts[option._id].voters,
       percentage:
-        totalVotes > 0 ? (voteCounts[option._id] / totalVotes) * 100 : 0,
+        totalVotes > 0 ? (voteCounts[option._id].count / totalVotes) * 100 : 0,
       isSelected: userSelection.has(option._id),
     }));
 

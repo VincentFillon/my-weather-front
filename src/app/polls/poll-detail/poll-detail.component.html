@@ -41,6 +41,13 @@
           <span class="percentage-label">{{ option.percentage | number:'1.0-1' }}%</span>
         </div>
       </div>
+      <div class="option-voters">
+        @for (voter of option.voters; track voter._id) {
+          <div class="voter-avatar-wrapper">
+            <img class="voter-avatar" [src]="voter.image || 'assets/default-avatar.png'" [alt]="voter.displayName" [matTooltip]="voter.displayName">
+          </div>
+        }
+      </div>
     </div>
     }
   </div>
