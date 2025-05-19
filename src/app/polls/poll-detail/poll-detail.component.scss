@@ -162,4 +162,10 @@ h2 {
 .poll-actions {
   margin-top: 20px;
   text-align: center;
+
+  button {
+    &:not(:last-child) {
+      margin-right: 10px;
+    }
+  }
 }

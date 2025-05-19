@@ -8,9 +8,21 @@ export default function minTwoOptionsValidator(): ValidationErrors | null {
     }
     const optionsArray = control as FormArray;
     // Compte les contrôles qui ont une valeur non vide (après trim)
-    const validOptionsCount = optionsArray.controls.filter(
-      (ctrl) => ctrl.value && ctrl.value.trim().length > 0
-    ).length;
+    const validOptionsCount = optionsArray.controls.filter((ctrl) => {
+      // Si le contrôle est un FormGroup, vérifier la propriété 'value' ou un champ spécifique
+      if (typeof ctrl.value === 'object') {
+        // Par exemple, vérifier si au moins un champ du FormGroup n'est pas vide
+        return Object.values(ctrl.value).some(
+          (val) =>
+            !!val && (typeof val === 'string' ? val.trim().length > 0 : true)
+        );
+      }
+      // Sinon, comportement classique (FormControl)
+      return (
+        !!ctrl.value &&
+        (typeof ctrl.value === 'string' ? ctrl.value.trim().length > 0 : true)
+      );
+    }).length;
 
     return validOptionsCount >= 2 ? null : { minOptions: true };
   };

@@ -91,14 +91,14 @@ export class PollDetailComponent implements OnInit, OnDestroy {
     const pollIdSub = this.route.params
       .pipe(
         tap((params) => {
-          this.pollId = params['id'];
+          this.pollId = params['pollId'];
           this.isLoading = true;
           this.error = null;
           this.cd.markForCheck();
         }),
         // Utilise switchMap pour chaîner les appels de service
         switchMap((params) => {
-          const id = params['id'];
+          const id = params['pollId'];
           if (!id) {
             this.error = 'Poll ID not found.';
             this.isLoading = false;
@@ -339,6 +339,11 @@ export class PollDetailComponent implements OnInit, OnDestroy {
     if (this.pollId) {
       this.pollService.removePoll(this.pollId);
     }
+  }
+
+  // Helper pour retourner à la liste
+  updatePoll(): void {
+    this.router.navigate(['/polls', this.pollId, 'edit']);
   }
 
   // Helper pour retourner à la liste

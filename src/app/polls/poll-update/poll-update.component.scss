@@ -1,0 +1,75 @@
+.poll-create-container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 25px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+/* Style de base pour les groupes de formulaire (similaire à Bootstrap) */
+.form-group {
+  width: 100%;
+  margin-bottom: 1.2rem;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 10px;
+
+    mat-form-field {
+      flex: 1;
+    }
+  }
+}
+
+/* Style de base pour les labels */
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: #555;
+}
+/* Section des options */
+.options-section label {
+  margin-bottom: 0.8rem;
+}
+.option-item {
+  display: flex;
+  align-items: flex-start; /* Aligne sur le haut pour les erreurs multilignes */
+  margin-bottom: 0.8rem;
+  position: relative; /* Pour positionner l'erreur de l'option */
+}
+
+/* Boutons d'action */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px; /* Espace entre les boutons */
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+/* Alertes (pour erreur de soumission) */
+.alert {
+  position: relative;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+}
+.alert-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}

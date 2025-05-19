@@ -39,7 +39,7 @@ export interface CreatePollDto {
 
   description?: string;
 
-  options: { text: string }[];
+  options: { _id?: string; text: string }[];
 
   endDate: Date; // La date et heure de fin du sondage
 

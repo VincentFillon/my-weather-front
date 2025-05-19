@@ -2,28 +2,33 @@ import { Component, inject, OnInit } from '@angular/core';
 import {
   FormArray,
   FormBuilder,
-  FormControl,
   FormGroup,
   ReactiveFormsModule,
-  Validators,
+  Validators
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
+import {
+  MAT_DATE_LOCALE,
+  provideNativeDateAdapter,
+} from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTimepickerModule } from '@angular/material/timepicker';
-import { Router } from '@angular/router';
-import { CreatePollDto } from '../../core/models/poll';
+import { ActivatedRoute, Router } from '@angular/router';
+import {
+  PollOption,
+  UpdatePollDto
+} from '../../core/models/poll';
 import { PollService } from '../../core/services/poll.service';
 import futureDateValidator from '../../core/validators/future-date.validator';
 import minTwoOptionsValidator from '../../core/validators/min-two-options.validator';
 
 @Component({
-  selector: 'app-poll-create',
+  selector: 'app-poll-update',
   imports: [
     ReactiveFormsModule,
     MatFormFieldModule,
@@ -35,23 +40,29 @@ import minTwoOptionsValidator from '../../core/validators/min-two-options.valida
     MatIconModule,
   ],
   providers: [
-    {provide: MAT_DATE_LOCALE, useValue: 'fr-FR'},
-    provideNativeDateAdapter()
+    { provide: MAT_DATE_LOCALE, useValue: 'fr-FR' },
+    provideNativeDateAdapter(),
   ],
-  templateUrl: './poll-create.component.html',
-  styleUrl: './poll-create.component.scss',
+  templateUrl: './poll-update.component.html',
+  styleUrl: './poll-update.component.scss',
 })
-export class PollCreateComponent implements OnInit {
+export class PollUpdateComponent implements OnInit {
   private fb = inject(FormBuilder);
   private pollService = inject(PollService);
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
+
+  private pollId!: string; // ID du sondage à mettre à jour
 
   pollForm!: FormGroup;
   isSubmitting = false;
   submitError: string | null = null;
 
   ngOnInit(): void {
+    this.pollId = this.route.snapshot.paramMap.get('pollId')!;
+
     this.pollForm = this.fb.group({
+      _id: ['', Validators.required],
       title: [
         '',
         [
@@ -69,6 +80,24 @@ export class PollCreateComponent implements OnInit {
       endDate: [this.getMinDate(), [Validators.required, futureDateValidator]],
       multipleChoice: [false, Validators.required], // Default à false
     });
+
+    this.pollService.findOnePoll(this.pollId).subscribe((poll) => {
+      if (poll) {
+        this.pollForm.patchValue({
+          _id: poll._id,
+          title: poll.title,
+          description: poll.description,
+          endDate: poll.endDate,
+          multipleChoice: poll.multipleChoice,
+        });
+
+        // Remplit le FormArray avec les options existantes
+        this.options.clear(); // Vide d'abord le FormArray
+        poll.options.forEach((option) => {
+          this.options.push(this.createOptionControl(option));
+        });
+      }
+    });
   }
 
   // Getter pratique pour accéder au FormArray des options dans le template
@@ -77,8 +106,11 @@ export class PollCreateComponent implements OnInit {
   }
 
   // Crée un FormControl pour une option (requis)
-  createOptionControl(): FormControl {
-    return this.fb.control('', Validators.required);
+  createOptionControl(option?: PollOption): FormGroup {
+    return this.fb.group({
+      _id: option?._id || '',
+      text: [option?.text || '', Validators.required],
+    });
   }
 
   // Ajoute une nouvelle option vide au FormArray
@@ -120,11 +152,10 @@ export class PollCreateComponent implements OnInit {
     }
 
     // Filtrer les options vides avant l'envoi
-    const optionsValue = this.options.value as string[];
+    const optionsValue = this.options.value as { _id?: string; text: string }[];
     const validOptions = optionsValue
-      .map((opt) => opt.trim()) // Enlève les espaces avant/après
-      .filter((opt) => opt.length > 0) // Garde seulement les non-vides
-      .map((optText) => ({ text: optText })); // Reformate pour le DTO
+      .map((opt) => ({ _id: opt._id, text: opt.text?.trim() })) // Enlève les espaces avant/après
+      .filter((opt) => opt.text && opt.text.length > 0); // Garde seulement les non-vides
 
     // Re-vérifie qu'il y a bien au moins 2 options *après* filtrage
     if (validOptions.length < 2) {
@@ -140,9 +171,10 @@ export class PollCreateComponent implements OnInit {
 
     this.isSubmitting = true;
 
-    const pollData: CreatePollDto = {
+    const pollData: UpdatePollDto = {
+      _id: this.pollId,
       title: this.pollForm.value.title.trim(),
-      description: this.pollForm.value.description?.trim() || undefined, // Envoie undefined si vide
+      description: this.pollForm.value.description,
       options: validOptions,
       endDate: new Date(this.pollForm.value.endDate),
       multipleChoice: this.pollForm.value.multipleChoice,
@@ -152,22 +184,22 @@ export class PollCreateComponent implements OnInit {
 
     try {
       // Utilise le service pour créer le sondage (via WebSocket)
-      this.pollService.createPoll(pollData);
+      this.pollService.updatePoll(pollData);
 
       // Comme la création est via WebSocket, on n'a pas de retour direct ici.
       // On pourrait écouter l'événement 'pollCreated' mais pour simplifier,
       // on navigue directement après l'émission. Le composant liste se mettra à jour.
       // Idéalement, attendre une confirmation ou gérer l'erreur si l'émission échoue.
 
-      console.log('Poll creation request sent.');
+      console.log('Poll update request sent.');
       // Navigue vers la liste après un court instant pour laisser le temps à l'émission
       setTimeout(() => {
-        this.router.navigate(['/polls']);
+        this.router.navigate(['/polls', this.pollId]);
       }, 300); // Petit délai
     } catch (error) {
-      console.error('Error sending poll creation request:', error);
+      console.error('Error sending poll update request:', error);
       this.submitError =
-        'Une erreur est survenue lors de la demande de création du sondage.';
+        'Une erreur est survenue lors de la modification du sondage.';
       this.isSubmitting = false;
     }
 
@@ -179,7 +211,7 @@ export class PollCreateComponent implements OnInit {
 
   // Navigation retour
   goBack(): void {
-    this.router.navigate(['/polls']);
+    this.router.navigate(['/polls', this.pollId]);
   }
 
   // --- Helpers pour l'affichage des erreurs dans le template ---
