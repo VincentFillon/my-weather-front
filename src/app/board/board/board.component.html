@@ -122,7 +122,7 @@
           >{{ today | date : "longDate" }}</a
         >,
         <span class="end-of-day-timer">
-          <app-timer></app-timer>
+          <app-timer [interruptions]="workdayInterruptions" [endTime]="endOfDay"></app-timer>
         </span>
         @if (nextPublicHoliday) {
         <span class="next-public-holiday">
