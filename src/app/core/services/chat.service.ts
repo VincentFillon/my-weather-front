@@ -2,7 +2,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Message, SendMessageDto } from '../models/message';
+import { Message, MessageReactionDto, SendMessageDto } from '../models/message';
 import {
   CreateRoomDto,
   JoinRoomDto,
@@ -22,6 +22,7 @@ export class ChatService {
 
   private roomCreatedObserver$?: Observable<Room>;
   private messageSentObserver$?: Observable<Message>;
+  private messageUpdatedObserver$?: Observable<Message>;
   private newMessageNotificationObserver$?: Observable<{
     roomId: string;
     message: Message;
@@ -71,6 +72,13 @@ export class ChatService {
     this.socketService.emit('sendMessage', messageData);
   }
 
+  addReaction(messageReactionData: MessageReactionDto): void {
+    this.socketService.emit('addReaction', messageReactionData);
+  }
+  removeReaction(messageReactionData: MessageReactionDto): void {
+    this.socketService.emit('removeReaction', messageReactionData);
+  }
+
   // --- Événements reçus DEPUIS le serveur ---
 
   onRoomCreated(): Observable<Room> {
@@ -97,6 +105,14 @@ export class ChatService {
       }>('newMessageNotification');
     }
     return this.newMessageNotificationObserver$;
+  }
+
+  onMessageUpdated(): Observable<Message> {
+    if (!this.messageUpdatedObserver$) {
+      this.messageUpdatedObserver$ =
+        this.socketService.fromEvent<Message>('messageUpdated');
+    }
+    return this.messageUpdatedObserver$;
   }
 
   onRoomUpdated(): Observable<Room> {
