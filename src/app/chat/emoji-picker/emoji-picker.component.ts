@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { PickerComponent } from '@ctrl/ngx-emoji-mart';
 
 // Exemple simplifié, tu peux remplacer par un import JSON de emojis enrichis (cf. emoji-mart, ...) :
 const EMOJI_LIST: { emoji: string; name: string; tags?: string[] }[] = [
@@ -20,13 +21,41 @@ const EMOJI_LIST: { emoji: string; name: string; tags?: string[] }[] = [
   selector: 'app-emoji-picker',
   templateUrl: './emoji-picker.component.html',
   styleUrls: ['./emoji-picker.component.scss'],
-  imports: [FormsModule],
+  imports: [FormsModule, PickerComponent],
 })
 export class EmojiPickerComponent {
   @Input() search: string = '';
   @Output() emojiSelected = new EventEmitter<string>();
 
   @Output() close = new EventEmitter<void>();
+
+  emoji18n = {
+    search: 'Rechercher',
+    emojilist: 'Liste des emoji',
+    notfound: 'Aucun emoji trouvé',
+    clear: 'Vider',
+    categories: {
+      search: 'Résultats de recherche',
+      recent: 'Utilisés récemment',
+      people: 'Smileys & Personnes',
+      nature: 'Animaux & Nature',
+      foods: 'Nourriture & Boisson',
+      activity: 'Activité',
+      places: 'Voyage & Lieux',
+      objects: 'Objets',
+      symbols: 'Symboles',
+      flags: 'Drapeaux',
+      custom: 'Personnalisé',
+    },
+    skintones: {
+      1: 'Teinte de peau par défaut',
+      2: 'Teinte de peau claire',
+      3: 'Teinte de peau moyenne-claire',
+      4: 'Teinte de peau moyenne',
+      5: 'Teinte de peau moyenne-foncée',
+      6: 'Teinte de peau foncée',
+    },
+  };
 
   filteredEmojis(): { emoji: string; name: string; tags?: string[] }[] {
     const query = this.search.toLowerCase().trim();
@@ -38,7 +67,8 @@ export class EmojiPickerComponent {
     );
   }
 
-  selectEmoji(emoji: string) {
-    this.emojiSelected.emit(emoji);
+  selectEmoji(emoji: any) {
+    // console.debug(emoji);
+    this.emojiSelected.emit(emoji.emoji.native);
   }
 }

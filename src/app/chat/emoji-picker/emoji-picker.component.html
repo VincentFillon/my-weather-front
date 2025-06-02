@@ -1,4 +1,4 @@
-<div class="emoji-picker">
+<!-- <div class="emoji-picker">
   <div class="picker-actions">
     <button class="emoji-picker-close-btn" type="button" (click)="close.emit()" title="Fermer">×</button>
     <input type="text" [(ngModel)]="search" placeholder="Rechercher un emoji..." class="emoji-search-input" />
@@ -8,4 +8,6 @@
     <button (click)="selectEmoji(item.emoji)" class="emoji-button" [title]="item.name">{{item.emoji}}</button>
     }
   </div>
-</div>
+</div> -->
+
+<emoji-mart (emojiSelect)="selectEmoji($event)" [darkMode]="false" [i18n]="emoji18n"></emoji-mart>
