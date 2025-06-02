@@ -6,8 +6,10 @@ import {
   DestroyRef,
   ElementRef,
   EventEmitter,
+  HostListener,
   inject,
   Input,
+  LOCALE_ID,
   OnDestroy,
   OnInit,
   Output,
@@ -34,6 +36,7 @@ import {
 import { Room } from '../../core/models/room';
 import { User } from '../../core/models/user';
 import { ChatService } from '../../core/services/chat.service';
+import { EmojiPickerComponent } from '../emoji-picker/emoji-picker.component';
 
 @Component({
   selector: 'app-chat-panel',
@@ -48,11 +51,18 @@ import { ChatService } from '../../core/services/chat.service';
     MatIconModule,
     MatToolbarModule,
     MatProgressSpinnerModule,
+    EmojiPickerComponent,
   ],
   templateUrl: './chat-panel.component.html',
   styleUrls: ['./chat-panel.component.scss'],
+  providers: [{ provide: LOCALE_ID, useValue: 'fr-FR' }],
 })
 export class ChatPanelComponent implements OnInit, OnDestroy {
+  @HostListener('document:keydown.escape', ['$event'])
+  onEscapeKey(event: KeyboardEvent) {
+    this.closeEmojiPicker();
+  }
+
   @Input({ required: true }) room!: Room;
   @Input({ required: true }) currentUser!: User | null;
   @Output() closePanel = new EventEmitter<Room>();
@@ -75,6 +85,8 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
   hasMoreMessages = signal(true); // Assumer qu'il y en a plus au début
   private readonly initialLoadLimit = 30;
   private readonly paginationLimit = 20;
+
+  showEmojiPickerFor: string | null = null;
 
   constructor() {
     this.processedMessages = computed(() => {
@@ -115,8 +127,19 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
         const showAvatarAndName = !isSameSenderAsPrevious;
         // Afficher l'heure si le message suivant n'est PAS du même auteur DANS la même minute
         const showTimestamp = !isSameMinuteAsNext;
-        const isGroupStart = !isSameSenderAsPrevious;
-        const isGroupEnd = !isSameSenderAsNext;
+        const isGroupStart = !isSameSenderAsPrevious || !isSameMinuteAsPrevious;
+        const isGroupEnd = !isSameSenderAsNext || !isSameMinuteAsNext;
+
+        // Affichage de la date si le jour a changé
+        const isDifferentDay = (() => {
+          if (!prevMsg) return true;
+          const prevDate = new Date(prevMsg.createdAt);
+          return (
+            msgDate.getFullYear() !== prevDate.getFullYear() ||
+            msgDate.getMonth() !== prevDate.getMonth() ||
+            msgDate.getDate() !== prevDate.getDate()
+          );
+        })();
 
         return {
           ...msg, // Copie les propriétés du message original
@@ -124,6 +147,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
           showTimestamp,
           isGroupStart,
           isGroupEnd,
+          showDateSeparator: isDifferentDay,
         };
       });
     });
@@ -186,6 +210,20 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
           // Scroll après la mise à jour du DOM
           queueMicrotask(() => this.scrollToBottom());
           this.markAsRead();
+        }
+      });
+    this.chatService
+      .onMessageUpdated()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((message) => {
+        if (message.room === this.room._id) {
+          const isOwnMessage = message.sender._id === this.currentUser?._id;
+          // Ajoute le nouveau message au signal existant
+          this.rawMessages.update((currentMessages) =>
+            currentMessages.map((msg) =>
+              msg._id === message._id ? message : msg
+            )
+          );
         }
       });
   }
@@ -276,6 +314,33 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
     this.scrollToBottom();
     // Focus sur l'input après envoi
     this.messageInput.nativeElement.focus();
+  }
+
+  openEmojiPicker(messageId: string) {
+    this.showEmojiPickerFor = messageId;
+  }
+
+  closeEmojiPicker() {
+    this.showEmojiPickerFor = null;
+  }
+
+  addReaction(messageId: string, emoji: string) {
+    // Appelle le service pour ajouter la réaction (optimiste possible)
+    this.chatService.addReaction({ messageId, emoji });
+  }
+
+  toggleReaction(messageId: string, emoji: string) {
+    if (!this.currentUser?._id) return;
+    // Si l'utilisateur a déjà réagi, retire la réaction, sinon ajoute
+    const message = this.rawMessages().find((msg) => msg._id === messageId);
+    const reaction = message?.reactions?.find((r) => r.emoji === emoji);
+    const alreadyReacted = reaction?.userIds.includes(this.currentUser._id);
+
+    if (alreadyReacted) {
+      this.chatService.removeReaction({ messageId, emoji });
+    } else {
+      this.chatService.addReaction({ messageId, emoji });
+    }
   }
 
   close(): void {

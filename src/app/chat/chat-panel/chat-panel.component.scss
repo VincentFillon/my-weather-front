@@ -120,21 +120,25 @@
   }
 
   .message-bubble {
-    padding: 9px 13px;
-    border-radius: 18px; // Base radius for all corners
+    padding: 6px 8px;
+    border-radius: 6px; // Base radius for all corners
     word-wrap: break-word;
     line-height: 1.4;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     position: relative; // Pour d'éventuels ::before/::after (pointes de bulles)
+    min-width: 65px; // Largeur minimale pour pouvoir afficher au moins deux réactions en dessous sur une seule ligne
     max-width: 100%;
   }
 
-  // On cache le timestamp si ce n'est pas le dernier du groupe de minutes (via @if dans le template)
+  &.group-end .message-bubble {
+    padding-bottom: 18px;
+  }
+
   .message-timestamp {
     font-size: 0.7em;
     color: #999;
-    margin-top: 4px;
-    // Est affiché/caché par @if basé sur showTimestamp
+    position: absolute;
+    bottom: 4px;
   }
 
   // --- Styles pour les messages des AUTRES (alignés à GAUCHE) ---
@@ -153,29 +157,30 @@
       color: #333;
       border: 1px solid #eee;
       align-self: flex-start;
-    }
-    .message-timestamp {
-      align-self: flex-start;
-      margin-left: 2px;
+
+      .message-timestamp {
+        left: 8px;
+      }
     }
 
     // Ajustement des coins pour le groupage
-    &.group-start .message-bubble {
-      border-top-left-radius: 6px;
-    } // Premier message
-    &.group-end .message-bubble {
-      border-bottom-left-radius: 6px;
-    } // Dernier message
-    &:not(.group-start):not(.group-end) .message-bubble {
-      // Messages du milieu
-      border-top-left-radius: 6px;
-      border-bottom-left-radius: 6px;
-    }
-    // Si un seul message dans le groupe (start ET end)
-    &.group-start.group-end .message-bubble {
-      border-top-left-radius: 6px; // Maintient le coin aplati du début
-      border-bottom-left-radius: 18px; // Rétablit l'arrondi normal en bas
-    }
+    // &.group-start .message-bubble {
+    //   border-top-left-radius: 6px;
+    // } // Premier message
+    // &.group-end .message-bubble {
+    //   border-bottom-left-radius: 6px;
+    // } // Dernier message
+    // &:not(.group-start) .message-bubble {
+    //   border-top-left-radius: 6px;
+    // }
+    // &:not(.group-end) .message-bubble {
+    //   border-bottom-left-radius: 6px;
+    // }
+    // // Si un seul message dans le groupe (start ET end)
+    // &.group-start.group-end .message-bubble {
+    //   border-top-left-radius: 6px; // Maintient le coin aplati du début
+    //   border-bottom-left-radius: 18px; // Rétablit l'arrondi normal en bas
+    // }
   }
 
   // --- Styles pour MES messages (alignés à DROITE) ---
@@ -195,27 +200,114 @@
       align-self: flex-end;
     }
     .message-timestamp {
-      align-self: flex-end;
-      margin-right: 2px;
+      right: 8px;
     }
 
     // Ajustement des coins pour le groupage
-    &.group-start .message-bubble {
-      border-top-right-radius: 6px;
-    }
-    &.group-end .message-bubble {
-      border-bottom-right-radius: 6px;
-    }
-    &:not(.group-start):not(.group-end) .message-bubble {
-      border-top-right-radius: 6px;
-      border-bottom-right-radius: 6px;
-    }
-    // Si un seul message dans le groupe (start ET end)
-    &.group-start.group-end .message-bubble {
-      border-top-right-radius: 6px;
-      border-bottom-right-radius: 18px;
+    // &.group-start .message-bubble {
+    //   border-top-right-radius: 6px;
+    // }
+    // &.group-end .message-bubble {
+    //   border-bottom-right-radius: 6px;
+    // }
+    // &:not(.group-start) .message-bubble {
+    //   border-top-right-radius: 6px;
+    // }
+    // &:not(.group-end) .message-bubble {
+    //   border-bottom-right-radius: 6px;
+    // }
+    // // Si un seul message dans le groupe (start ET end)
+    // &.group-start.group-end .message-bubble {
+    //   border-top-right-radius: 6px; // Maintient le coin aplati du début
+    //   border-bottom-right-radius: 18px;
+    // }
+
+    .message-details {
+      .add-reaction-wrapper {
+        left: -32px;
+      }
     }
   }
+
+  .date-separator {
+    text-align: center;
+    font-size: 12px;
+    font-style: italic;
+    color: #999;
+    border-top: 1px dashed #999;
+    padding-top: 4px;
+    margin: 10px 10px 15px;
+  }
+
+  .message-details {
+    position: relative;
+
+    .add-reaction-wrapper {
+      display: none;
+      position: absolute;
+      top: calc(50% - 14px);
+      right: -32px;
+
+      .add-reaction-btn {
+        min-width: 28px;
+        height: 28px;
+        cursor: pointer;
+        padding: 4px;
+        border: 1px solid transparent;
+        border-radius: 50%;
+        background-color: transparent;
+        color: #999;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.05);
+          border-color: rgba(0, 0, 0, 0.1);
+        }
+      }
+    }
+
+    .reactions-bar {
+      position: absolute;
+      top: 100%;
+      right: 6px;
+      left: 6px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+
+      .reaction-btn {
+        min-width: 22px;
+        height: 22px;
+        cursor: pointer;
+        padding: 0;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        background-color: transparent;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.05);
+          border-color: rgba(0, 0, 0, 0.1);
+        }
+      }
+    }
+  }
+
+  &:hover {
+    .message-details {
+      .add-reaction-wrapper {
+        display: block; // Affiche le bouton d'ajout de réaction au survol
+      }
+      .reactions-bar {
+        right: 10px;
+      }
+    }
+  }
+}
+
+.emoji-picker-popover {
+  z-index: 1;
+  margin-top: -10px;
+  margin-bottom: 10px;
 }
 
 .message-input-area {
