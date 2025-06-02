@@ -69,6 +69,16 @@
   margin: auto; // Centrer verticalement et horizontalement si seul élément
 }
 
+.date-separator {
+  text-align: center;
+  font-size: 12px;
+  font-style: italic;
+  color: #999;
+  border-top: 1px dashed #999;
+  padding-top: 4px;
+  margin: 10px 10px 15px;
+}
+
 // --- Styles pour chaque ligne de message ---
 .message-item-container {
   display: flex;
@@ -227,16 +237,6 @@
         left: -32px;
       }
     }
-  }
-
-  .date-separator {
-    text-align: center;
-    font-size: 12px;
-    font-style: italic;
-    color: #999;
-    border-top: 1px dashed #999;
-    padding-top: 4px;
-    margin: 10px 10px 15px;
   }
 
   .message-details {
