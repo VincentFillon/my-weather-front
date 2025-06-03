@@ -27,7 +27,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { finalize } from 'rxjs';
+import { of } from 'rxjs';
+import { catchError, finalize, tap } from 'rxjs/operators';
 import {
   Message,
   ProcessedMessage,
@@ -36,6 +37,7 @@ import {
 import { Room } from '../../core/models/room';
 import { User } from '../../core/models/user';
 import { ChatService } from '../../core/services/chat.service';
+import { UploadService } from '../../core/services/upload.service'; // Ajout
 import { EmojiPickerComponent } from '../emoji-picker/emoji-picker.component';
 
 @Component({
@@ -74,6 +76,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
   private messageInput!: ElementRef<HTMLInputElement>;
 
   private chatService = inject(ChatService);
+  private uploadService = inject(UploadService); // Ajout
   private destroyRef = inject(DestroyRef);
 
   private rawMessages = signal<Message[]>([]);
@@ -87,6 +90,14 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
   private readonly paginationLimit = 20;
 
   showEmojiPickerFor: string | null = null;
+
+  // Pour l'upload de fichiers
+  selectedFile: File | null = null;
+  previewUrl: string | ArrayBuffer | null = null;
+  isUploading = signal(false);
+  uploadError = signal<string | null>(null);
+  uploadedMediaUrl: string | null = null; // Changé de private à public
+  isDragging = signal(false);
 
   constructor() {
     this.processedMessages = computed(() => {
@@ -301,20 +312,157 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
   }
 
   sendMessage(): void {
-    if (!this.newMessageContent.trim() || !this.currentUser) return;
+    if (
+      (!this.newMessageContent.trim() && !this.uploadedMediaUrl) ||
+      !this.currentUser
+    ) {
+      return;
+    }
 
     const messageData: SendMessageDto = {
       room: this.room._id,
       content: this.newMessageContent,
       sender: this.currentUser,
+      mediaUrl: this.uploadedMediaUrl ?? undefined,
     };
 
     this.chatService.sendMessage(messageData);
     this.newMessageContent = '';
+    this.selectedFile = null;
+    this.previewUrl = null;
+    this.uploadedMediaUrl = null;
+    this.uploadError.set(null);
     this.scrollToBottom();
     // Focus sur l'input après envoi
     this.messageInput.nativeElement.focus();
   }
+
+  // --- Gestion de l'upload de fichiers ---
+
+  @HostListener('dragover', ['$event'])
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.dataTransfer?.items && event.dataTransfer.items.length > 0) {
+      this.isDragging.set(true);
+    }
+  }
+
+  @HostListener('dragleave', ['$event'])
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    // Vérifier si le curseur quitte vraiment la zone (et non un enfant)
+    const target = event.target as HTMLElement;
+    if (target === this.messageContainer.nativeElement || !this.messageContainer.nativeElement.contains(target)) {
+        this.isDragging.set(false);
+    }
+  }
+
+  @HostListener('drop', ['$event'])
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging.set(false);
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      this.handleFile(files[0]);
+      // Réinitialiser le dataTransfer pour éviter les problèmes
+      if (event.dataTransfer) {
+        event.dataTransfer.clearData();
+      }
+    }
+  }
+
+  onFileSelected(event: Event): void {
+    const element = event.target as HTMLInputElement;
+    const file = element.files?.[0];
+    if (file) {
+      this.handleFile(file);
+    }
+    // Réinitialiser l'input pour permettre de sélectionner le même fichier à nouveau
+    element.value = '';
+  }
+
+  private handleFile(file: File): void {
+    this.uploadError.set(null);
+    this.uploadedMediaUrl = null;
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    if (!allowedTypes.includes(file.type)) {
+      this.uploadError.set(
+        'Type de fichier non supporté. Veuillez sélectionner une image (jpg, png, webp) ou un GIF.'
+      );
+      this.selectedFile = null;
+      this.previewUrl = null;
+      return;
+    }
+
+    if (file.size > maxSize) {
+      this.uploadError.set('Le fichier est trop volumineux (max 5MB).');
+      this.selectedFile = null;
+      this.previewUrl = null;
+      return;
+    }
+
+    this.selectedFile = file;
+    this.previewUrl = null; // Réinitialiser au cas où
+
+    // Afficher l'aperçu
+    const reader = new FileReader();
+    reader.onload = (e) => (this.previewUrl = reader.result);
+    reader.readAsDataURL(file);
+
+    this.uploadFile(); // Lancer l'upload directement après la sélection
+  }
+
+  private uploadFile(): void {
+    if (!this.selectedFile || !this.currentUser) return;
+
+    this.isUploading.set(true);
+    this.uploadError.set(null);
+
+    this.uploadService
+      .uploadChatMedia(this.selectedFile)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        tap((response) => {
+          this.uploadedMediaUrl = response.url;
+          // Si l'utilisateur n'a pas tapé de texte, on peut envoyer directement le média
+          if (!this.newMessageContent.trim()) {
+            this.sendMessage();
+          }
+        }),
+        catchError((error) => {
+          console.error("Erreur d'upload:", error);
+          this.uploadError.set(
+            "Erreur lors de l'upload du fichier. Veuillez réessayer."
+          );
+          this.selectedFile = null;
+          this.previewUrl = null;
+          this.uploadedMediaUrl = null;
+          return of(null); // Gérer l'erreur et continuer
+        }),
+        finalize(() => {
+          this.isUploading.set(false);
+          // Ne pas réinitialiser selectedFile et previewUrl ici,
+          // car l'utilisateur pourrait vouloir ajouter du texte avant d'envoyer.
+          // Ils seront réinitialisés dans sendMessage.
+        })
+      )
+      .subscribe();
+  }
+
+  cancelUpload(): void {
+    this.selectedFile = null;
+    this.previewUrl = null;
+    this.uploadedMediaUrl = null;
+    this.uploadError.set(null);
+    this.isUploading.set(false);
+  }
+
+  // --- Fin de la gestion de l'upload ---
 
   openEmojiPicker(messageId: string) {
     this.showEmojiPickerFor = messageId;

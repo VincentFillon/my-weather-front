@@ -10,6 +10,7 @@ export interface Message {
   room: string; // ID de la room
   sender: User;
   content: string;
+  mediaUrl?: string;
   reactions: MessageReaction[];
   createdAt: Date;
 }
@@ -26,6 +27,7 @@ export interface SendMessageDto {
   room: string;
   sender: User;
   content: string;
+  mediaUrl?: string;
 }
 
 export interface MessageReactionDto {

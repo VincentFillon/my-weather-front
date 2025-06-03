@@ -10,7 +10,9 @@
     </button>
   </mat-toolbar>
 
-  <mat-card-content class="message-area" #messageContainer (scroll)="onScroll()">
+  <mat-card-content class="message-area" #messageContainer (scroll)="onScroll()"
+                    [class.drag-over]="isDragging()">
+    <div class="drop-indicator" *ngIf="isDragging()">Déposez votre fichier ici</div>
     @if (isLoadingOlder()) {
     <div class="loading-older-spinner">
       <mat-spinner diameter="30"></mat-spinner>
@@ -45,7 +47,16 @@
           }
 
           <div class="message-bubble">
+            <!-- Affichage du média -->
+            @if (message.mediaUrl) {
+            <div class="media-container">
+              <img [src]="message.mediaUrl" alt="Média partagé" class="chat-media">
+            </div>
+            }
+            <!-- Affichage du contenu texte -->
+            @if (message.content) {
             <span>{{ message.content }}</span>
+            }
 
             <div class="add-reaction-wrapper">
               <button class="add-reaction-btn" (click)="openEmojiPicker(message._id)">+</button>
@@ -81,12 +92,48 @@
     }
   </mat-card-content>
 
+  <!-- Zone d'upload et de prévisualisation -->
+  @if (previewUrl || isUploading() || uploadError()) {
+  <div class="upload-preview-area">
+    @if (isUploading()) {
+    <div class="upload-indicator">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Envoi en cours...</span>
+    </div>
+    } @else if (uploadError()) {
+    <div class="upload-error">
+      <mat-icon fontIcon="error_outline" color="warn"></mat-icon>
+      <span>{{ uploadError() }}</span>
+      <button mat-icon-button (click)="cancelUpload()" aria-label="Annuler l'erreur d'upload">
+        <mat-icon fontIcon="close"></mat-icon>
+      </button>
+    </div>
+    } @else if (previewUrl && selectedFile) {
+    <div class="preview-container">
+      <img [src]="previewUrl" [alt]="selectedFile.name" class="file-preview">
+      <div class="preview-info">
+        <span>{{ selectedFile.name }} ({{ selectedFile.size / 1024 | number:'1.0-2' }} KB)</span>
+      </div>
+      <button mat-icon-button (click)="cancelUpload()" class="cancel-preview-btn" aria-label="Annuler la sélection du fichier">
+        <mat-icon fontIcon="close"></mat-icon>
+      </button>
+    </div>
+    }
+  </div>
+  }
+
   <mat-card-actions class="message-input-area">
+    <!-- Bouton Joindre -->
+    <input type="file" #fileInput hidden (change)="onFileSelected($event)" accept="image/jpeg,image/png,image/gif,image/webp">
+    <button mat-icon-button (click)="fileInput.click()" aria-label="Joindre un fichier">
+      <mat-icon fontIcon="attachment"></mat-icon>
+    </button>
+
     <mat-form-field appearance="outline" class="message-input-field">
       <mat-label>Votre message...</mat-label>
       <input matInput #messageInput [(ngModel)]="newMessageContent" (keyup.enter)="sendMessage()" placeholder="Écrivez quelque chose...">
     </mat-form-field>
-    <button mat-icon-button color="primary" (click)="sendMessage()" [disabled]="!newMessageContent.trim()">
+    <button mat-icon-button color="primary" (click)="sendMessage()" [disabled]="(!newMessageContent.trim() && !uploadedMediaUrl) || isUploading()">
       <mat-icon fontIcon="send"></mat-icon>
     </button>
   </mat-card-actions>
