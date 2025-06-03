@@ -72,6 +72,7 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   today = new Date();
   todayWorldDay: WorldDay | undefined;
+  startOfDay: Date;
   endOfDay: Date;
   workdayInterruptions: Interruption[] = [
     {
@@ -138,6 +139,9 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   nextPublicHoliday: PublicHoliday | null = null;
 
+  gtaVIReleaseDateAnnouncement = new Date('2025-05-02T00:00:00Z');
+  gtaVIReleaseDate = new Date('2026-05-26T00:00:00Z');
+
   moods: Mood[] = [];
   moodsIds: string[] = [];
   medianMood: Mood | null = null;
@@ -156,6 +160,8 @@ export class BoardComponent implements OnInit, OnDestroy {
   private usersTimeout: any;
 
   constructor() {
+    this.startOfDay = new Date(this.today);
+      this.startOfDay.setHours(8, 30, 0, 0);
     this.endOfDay = new Date(this.today);
     if (this.today.getDay() === 5) {
       this.endOfDay.setHours(17, 0, 0, 0);

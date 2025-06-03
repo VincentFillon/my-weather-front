@@ -115,12 +115,18 @@ export class TimerComponent implements OnInit, OnDestroy {
    */
   @Input() labelAfterTimer: string = '';
 
+  /**
+   * (Optionnel) Si true, la durée des interruptions futures est déduite du temps restant affiché.
+   * Par défaut : false
+   */
+  @Input() excludeInterruptsFromTimeLeft: boolean = false;
+
   timeLeft: string = '00:00:00';
   color: string = 'red';
 
   ngOnInit() {
-    // this.startTimer();
-    this.simulateDay();
+    this.startTimer();
+    // this.simulateDay();
   }
 
   ngOnDestroy() {
@@ -131,10 +137,10 @@ export class TimerComponent implements OnInit, OnDestroy {
 
   private simulateDay() {
     const startOfDay = new Date();
-    startOfDay.setHours(8, 0, 0, 0); // 8h00
+    startOfDay.setHours(4, 0, 0, 0); // 04h00
 
     const endOfDay = new Date();
-    endOfDay.setHours(18, 30, 0, 0); // 18h30
+    endOfDay.setHours(20, 30, 0, 0); // 20h30
 
     let now = new Date(startOfDay.getTime());
     const interval = setInterval(() => {
@@ -192,6 +198,20 @@ export class TimerComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Vérifie si le pattern de date (année, mois, jour, jour de semaine) de la date courante correspond au pattern donné.
+   * Ne prend pas en compte les heures, minutes, secondes.
+   */
+  private matchDatePattern(now: Date, pattern: InterruptionDate): boolean {
+    const yearMatch = this.cronFieldMatches(pattern.year, now.getFullYear());
+    const monthMatch = this.cronFieldMatches(pattern.month, now.getMonth() + 1); // mois JS = 0-indexed
+    const dateMatch = this.cronFieldMatches(pattern.date, now.getDate());
+    const dayMatch = this.cronFieldMatches(pattern.day, now.getDay());
+    // console.log(`[matchDatePattern] now: ${now.toISOString()}, pattern:`, JSON.stringify(pattern));
+    // console.log(`[matchDatePattern] Results: year=${yearMatch}, month=${monthMatch}, date=${dateMatch}, day=${dayMatch}`);
+    return yearMatch && monthMatch && dateMatch && dayMatch;
+  }
+
+  /**
    * Crée une date JS à partir d'un InterruptionDate pour le contexte donné.
    */
   private buildDate(base: Date, d: InterruptionDate): Date {
@@ -210,19 +230,26 @@ export class TimerComponent implements OnInit, OnDestroy {
    * Détermine si on est dans une interruption, adapté à la syntaxe CRON/range.
    */
   private isInInterruption(now: Date, interruption: Interruption): boolean {
-    // On tente de matcher le motif "from" le plus proche de now (comme CRON).
-    if (!this.matchDate(now, interruption.from)) return false;
+    // On vérifie si le pattern de date (jour de la semaine, etc.) correspond.
+    // console.log(`[isInInterruption] now: ${now.toISOString()}, interruption.from:`, JSON.stringify(interruption.from));
+    const patternMatches = this.matchDatePattern(now, interruption.from);
+    // console.log(`[isInInterruption] matchDatePattern(from) result: ${patternMatches}`);
+    if (!patternMatches) return false;
 
     // Fabrique la date de début et de fin pour today.
     const fromDate = this.buildDate(now, interruption.from);
     const toDate = this.buildDate(now, interruption.to);
+    // console.log(`[isInInterruption] fromDate: ${fromDate.toISOString()}, toDate: ${toDate.toISOString()}`);
 
     if (toDate.getTime() < fromDate.getTime()) {
       // L'interruption déborde sur le lendemain
+      // console.log(`[isInInterruption] Interruption déborde sur le lendemain. now (${now.getTime()}) >= fromDate (${fromDate.getTime()}) || now (${now.getTime()}) <= toDate (${toDate.getTime()})`);
       if (now >= fromDate || now <= toDate) return true;
     } else {
+      // console.log(`[isInInterruption] Interruption dans la même journée. now (${now.getTime()}) >= fromDate (${fromDate.getTime()}) && now (${now.getTime()}) <= toDate (${toDate.getTime()})`);
       if (now >= fromDate && now <= toDate) return true;
     }
+    // console.log(`[isInInterruption] Aucune condition remplie, retour false.`);
     return false;
   }
 
@@ -237,16 +264,21 @@ export class TimerComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Mise à jour de la phase de la journée et du temps restant.
+   * Mise à jour du temps restant.
    */
   private updateTimer(now: Date = new Date()) {
+    // console.log(`[updateTimer] Called with now: ${now.toISOString()}`);
+    // console.log(`[updateTimer] this.interruptions:`, JSON.stringify(this.interruptions));
     this.interruption = null;
     for (const intr of this.interruptions) {
+      // console.log(`[updateTimer] Checking interruption:`, JSON.stringify(intr));
       if (this.isInInterruption(now, intr)) {
+        // console.log(`[updateTimer] Interruption found:`, JSON.stringify(intr));
         this.interruption = intr;
         break;
       }
     }
+    // console.log(`[updateTimer] Final this.interruption:`, JSON.stringify(this.interruption));
 
     const startTime =
       this.startTime ||
@@ -256,22 +288,124 @@ export class TimerComponent implements OnInit, OnDestroy {
       new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
 
     this.color = this.calculateColor(startTime, endTime, now);
-    const diff = endTime.getTime() - now.getTime();
+    let diff = endTime.getTime() - now.getTime();
+
+    if (this.excludeInterruptsFromTimeLeft && this.interruptions.length > 0) {
+      let interruptionsDurationToExclude = 0;
+      for (const intr of this.interruptions) {
+        // Vérifier d'abord si le pattern de date de l'interruption correspond au jour 'now'
+        if (!this.matchDatePattern(now, intr.from)) {
+          continue; // Passer à l'interruption suivante si le pattern de date ne correspond pas
+        }
+
+        // Construire les dates de début et de fin de l'interruption pour le contexte de 'now'
+        // afin de gérer correctement les interruptions qui s'étalent sur plusieurs jours par rapport à 'now'
+        const intrFromDateFull = this.buildDate(now, intr.from);
+        const intrToDateFull = this.buildDate(now, intr.to);
+
+        // Ajuster si l'interruption 'to' est avant 'from' (ex: interruption de 22h à 02h)
+        // et que 'now' est après minuit mais avant la fin de l'interruption.
+        if (intrToDateFull.getTime() < intrFromDateFull.getTime()) {
+          // Si 'now' est le jour J+1 et l'interruption a commencé le jour J et finit sur J+1
+          if (
+            now.getDate() !== intrFromDateFull.getDate() &&
+            now <= intrToDateFull
+          ) {
+            // L'interruption a commencé la veille, on prend le début de la journée de 'now' comme point de départ effectif
+            const startOfNowDay = new Date(now);
+            startOfNowDay.setHours(0, 0, 0, 0);
+            const durationPart1 = Math.max(
+              0,
+              Math.min(intrToDateFull.getTime(), endTime.getTime()) -
+                Math.max(startOfNowDay.getTime(), now.getTime())
+            );
+            if (durationPart1 > 0) {
+              // console.log(`[updateTimer] Adding to exclude (overflow, now is D+1): ${durationPart1 / 1000}s for interruption`, JSON.stringify(intr));
+              interruptionsDurationToExclude += durationPart1;
+            }
+          }
+          // Si 'now' est le jour J et l'interruption commence le jour J et finit sur J+1
+          else if (now >= intrFromDateFull) {
+            const durationPart1 = Math.max(
+              0,
+              Math.min(
+                new Date(intrFromDateFull).setHours(23, 59, 59, 999),
+                endTime.getTime()
+              ) - Math.max(intrFromDateFull.getTime(), now.getTime())
+            );
+            if (durationPart1 > 0) {
+              //  console.log(`[updateTimer] Adding to exclude (overflow, part on D): ${durationPart1 / 1000}s for interruption`, JSON.stringify(intr));
+              interruptionsDurationToExclude += durationPart1;
+            }
+            // Ajouter la partie du lendemain si applicable
+            const startOfNextDay = new Date(intrFromDateFull);
+            startOfNextDay.setDate(startOfNextDay.getDate() + 1);
+            startOfNextDay.setHours(0, 0, 0, 0);
+            if (intrToDateFull > startOfNextDay) {
+              // S'assurer que l'interruption se prolonge effectivement au lendemain
+              const effectiveSegmentStartForNextDay = startOfNextDay.getTime();
+              // On ne veut exclure que la portion de l'interruption qui est *après* 'now' et *avant* 'endTime'.
+              // Et aussi, cette portion doit être après le début effectif du segment du lendemain.
+              const actualStartForThisSegment = Math.max(
+                effectiveSegmentStartForNextDay,
+                now.getTime()
+              );
+              const durationNextDayPart = Math.max(
+                0,
+                Math.min(intrToDateFull.getTime(), endTime.getTime()) -
+                  actualStartForThisSegment
+              );
+
+              if (durationNextDayPart > 0) {
+                // console.log(`[updateTimer] Adding to exclude (overflow, part on D+1): ${durationNextDayPart / 1000}s for interruption`, JSON.stringify(intr));
+                interruptionsDurationToExclude += durationNextDayPart;
+              }
+            }
+          }
+        } else {
+          // Cas standard : interruption dans la même journée calendaire
+          const effectiveIntrStart = Math.max(
+            intrFromDateFull.getTime(),
+            now.getTime()
+          );
+          const effectiveIntrEnd = Math.min(
+            intrToDateFull.getTime(),
+            endTime.getTime()
+          );
+          if (effectiveIntrEnd > effectiveIntrStart) {
+            const durationAdded = effectiveIntrEnd - effectiveIntrStart;
+            // console.log(`[updateTimer] Adding to exclude (same day): ${durationAdded / 1000}s for interruption`, JSON.stringify(intr));
+            interruptionsDurationToExclude += durationAdded;
+          }
+        }
+      }
+      // console.log(`[updateTimer] Total interruption duration to exclude: ${interruptionsDurationToExclude / 1000}s`);
+      diff -= interruptionsDurationToExclude;
+    }
+
     if (diff > 0) {
-      const hoursLeft = Math.floor(diff / (1000 * 60 * 60));
+      const daysLeft = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hoursLeft = Math.floor(
+        (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      );
       const minutesLeft = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const secondsLeft = Math.floor((diff % (1000 * 60)) / 1000);
-      this.timeLeft = this.formatTime(hoursLeft, minutesLeft, secondsLeft);
+      this.timeLeft = this.formatTime(
+        daysLeft,
+        hoursLeft,
+        minutesLeft,
+        secondsLeft
+      );
     } else {
       this.timeLeft = '00:00:00';
     }
   }
 
   /**
-   * Calcule une couleur basée sur le temps restant jusqu'à la fin de la journée de travail.
-   * La couleur est un dégradé du rouge (début de la journée) au vert (fin de la journée).
-   * @param startTime L'heure du début de la journée de travail.
-   * @param endTime L'heure de fin de la journée de travail.
+   * Calcule une couleur basée sur le temps restant jusqu'à la fin du timer.
+   * La couleur est un dégradé du rouge (début du timer) au vert (fin du timer).
+   * @param startTime La date de du début du timer.
+   * @param endTime La date de fin du timer.
    * @param now L'heure actuelle.
    * @returns Une chaîne représentant la couleur au format RGB.
    */
@@ -320,12 +454,23 @@ export class TimerComponent implements OnInit, OnDestroy {
 
   /**
    * Formate une heure en heures, minutes et secondes en une chaîne 'HH:MM:SS'.
+   * @param days Le nombre de jours.
    * @param hours Le nombre d'heures.
    * @param minutes Le nombre de minutes.
    * @param seconds Le nombre de secondes.
    * @returns La chaîne de temps formatée.
    */
-  formatTime(hours: number, minutes: number, seconds: number): string {
+  formatTime(
+    days: number,
+    hours: number,
+    minutes: number,
+    seconds: number
+  ): string {
+    if (days > 0) {
+      return `${this.pad(days)}j ${this.pad(hours)}:${this.pad(
+        minutes
+      )}:${this.pad(seconds)}`;
+    }
     return `${this.pad(hours)}:${this.pad(minutes)}:${this.pad(seconds)}`;
   }
 
