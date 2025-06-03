@@ -24,6 +24,11 @@
     <p class="no-messages"><i>Aucun message</i></p>
     } @else {
     @for (message of processedMessages(); track message._id) {
+    @if (message.showDateSeparator) {
+    <div class="date-separator">
+      <span>{{ message.createdAt | date:'fullDate' }}</span>
+    </div>
+    }
     <div class="message-item-container" [class.my-message]="message.sender._id === currentUser?._id"
          [class.other-message]="message.sender._id !== currentUser?._id" [class.group-start]="message.isGroupStart" [class.group-end]="message.isGroupEnd">
 
@@ -41,14 +46,36 @@
 
           <div class="message-bubble">
             <span>{{ message.content }}</span>
+
+            <div class="add-reaction-wrapper">
+              <button class="add-reaction-btn" (click)="openEmojiPicker(message._id)">+</button>
+            </div>
+
+            @if (message.showTimestamp) {
+            <div class="message-timestamp">{{ message.createdAt | date:'shortTime' }}</div>
+            }
           </div>
 
-          @if (message.showTimestamp) {
-          <div class="message-timestamp">{{ message.createdAt | date:'shortTime' }}</div>
+          @if (message.reactions.length) {
+          <!-- Affichage des réactions sous chaque message -->
+          <div class="reactions-bar">
+            @for (reaction of message.reactions; track reaction.emoji) {
+            <button class="reaction-btn" [class.own-reaction]="currentUser && reaction.userIds.includes(currentUser._id)"
+                    (click)="toggleReaction(message._id, reaction.emoji)" [title]="reaction.userIds.length + ' personne(s) ont réagi'">
+              {{reaction.emoji}} <span>{{reaction.userIds.length > 1 ? reaction.userIds.length : ''}}</span>
+            </button>
+            }
+          </div>
           }
         </div>
       </div>
     </div>
+
+    @if (showEmojiPickerFor === message._id) {
+    <div class="emoji-picker-popover">
+      <app-emoji-picker (emojiSelected)="addReaction(message._id, $event); closeEmojiPicker()" (close)="closeEmojiPicker()"></app-emoji-picker>
+    </div>
+    }
     }
     }
     }
