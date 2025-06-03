@@ -428,7 +428,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         tap((response) => {
-          this.uploadedMediaUrl = response.url;
+          this.uploadedMediaUrl = '/api/data/' + response.url;
           // Si l'utilisateur n'a pas tapé de texte, on peut envoyer directement le média
           if (!this.newMessageContent.trim()) {
             this.sendMessage();
