@@ -27,7 +27,7 @@ import { MoodService } from '../../core/services/mood.service';
 import { PublicHolidaysService } from '../../core/services/public-holidays.service';
 import { UserService } from '../../core/services/user.service';
 import { WorldDaysService } from '../../core/services/world-days.service';
-import { TimerComponent } from '../timer/timer.component';
+import { Interruption, TimerComponent } from '../timer/timer.component';
 
 @Component({
   selector: 'app-board',
@@ -72,7 +72,75 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   today = new Date();
   todayWorldDay: WorldDay | undefined;
+  startOfDay: Date;
+  endOfDay: Date;
+  workdayInterruptions: Interruption[] = [
+    {
+      from: {
+        day: '1-5', // Du lundi au vendredi
+        hour: 0,
+        minute: 0,
+        second: 0,
+      },
+      to: {
+        day: '1-5', // Du lundi au vendredi
+        hour: 8,
+        minute: 30,
+        second: 0,
+      },
+      label: "la journée n'a pas commencé 😴",
+    },
+    {
+      from: {
+        day: '1-5', // Du lundi au vendredi
+        hour: 12,
+        minute: 30,
+        second: 0,
+      },
+      to: {
+        day: '1-5', // Du lundi au vendredi
+        hour: 14,
+        minute: 0,
+        second: 0,
+      },
+      label: "c'est l'heure de la pause 🌭",
+    },
+    {
+      from: {
+        day: '1-4', // Du lundi au jeudi
+        hour: 18,
+        minute: 0,
+        second: 0,
+      },
+      to: {
+        day: '1-4', // Du lundi au jeudi
+        hour: 23,
+        minute: 59,
+        second: 59,
+      },
+      label: 'la journée est terminée 🎉',
+    },
+    {
+      from: {
+        day: 5, // Vendredi
+        hour: 17,
+        minute: 0,
+        second: 0,
+      },
+      to: {
+        day: 0, // Dimanche
+        hour: 23,
+        minute: 59,
+        second: 59,
+      },
+      label: "c'est le weekend ! 🥳🍾🍻",
+    },
+  ];
+
   nextPublicHoliday: PublicHoliday | null = null;
+
+  gtaVIReleaseDateAnnouncement = new Date('2025-05-02T00:00:00Z');
+  gtaVIReleaseDate = new Date('2026-05-26T00:00:00Z');
 
   moods: Mood[] = [];
   moodsIds: string[] = [];
@@ -90,6 +158,17 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   private moodsTimeout: any;
   private usersTimeout: any;
+
+  constructor() {
+    this.startOfDay = new Date(this.today);
+      this.startOfDay.setHours(8, 30, 0, 0);
+    this.endOfDay = new Date(this.today);
+    if (this.today.getDay() === 5) {
+      this.endOfDay.setHours(17, 0, 0, 0);
+    } else {
+      this.endOfDay.setHours(18, 0, 0, 0);
+    }
+  }
 
   private setMoods(moods: Mood[]) {
     if (this.moodsTimeout) {

@@ -1,13 +1,7 @@
-@switch (phase) { @case ('weekend') {
-<span>c'est le weekend 🍻</span>
-} @case ('beforeWork') {
-<span>la journée n'a pas commencé 😴</span>
-} @case ('break') {
-<span>c'est l'heure de la pause 🌭</span>
-} @case ('afterWork') {
-<span>la journée est terminée 🎉</span>
-} @default {
-<span>
-  encore <strong [style.color]="color">{{ timeLeft }}</strong>
+@if (interruption) {
+<span [style.color]="interruption.color || 'inherit'">{{ interruption.label }}</span>
+} @else {
+<span class="timer">
+  {{ labelBeforeTimer }}<strong [style.color]="color" class="timer-time">{{ timeLeft }}</strong>{{ labelAfterTimer }}
 </span>
-} }
+}

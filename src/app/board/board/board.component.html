@@ -1,4 +1,4 @@
-<div class="board-container" >
+<div class="board-container">
   <!-- Zone neutre -->
   <div class="neutral-zone">
     <div class="neutral-header">
@@ -8,12 +8,9 @@
       </button>
       <mat-menu #userMenu="matMenu">
         <div class="user-menu-header">
-          <div
-            class="user-avatar"
-            [style.backgroundImage]="
+          <div class="user-avatar" [style.backgroundImage]="
               'url(' + (currentUser?.image || 'assets/default-avatar.png') + ')'
-            "
-          ></div>
+            "></div>
           <p>Connecté en tant que</p>
           <h3>{{ currentUser?.displayName }}</h3>
           <p>{{ currentUser?.username }}</p>
@@ -46,33 +43,15 @@
       </mat-menu>
       <h2>{{ currentUser?.displayName }}</h2>
     </div>
-    <div
-      class="user-list"
-      cdkDropList
-      id="neutral"
-      [cdkDropListData]="'neutral'"
-      (cdkDropListDropped)="onUserDrop($event)"
-      [cdkDropListConnectedTo]="moodsIds"
-    >
+    <div class="user-list" cdkDropList id="neutral" [cdkDropListData]="'neutral'" (cdkDropListDropped)="onUserDrop($event)" [cdkDropListConnectedTo]="moodsIds">
       <h2 class="neutral-zone-title">Zone Neutre</h2>
       @for (user of getUsersByMood(); track user._id) {
-      <div
-        class="user-card"
-        cdkDrag
-        cdkDragBoundary=".board-container"
-        [cdkDragDisabled]="!canMoveUser(user._id)"
-        [cdkDragData]="user._id"
-        [class.cannot-move]="!canMoveUser(user._id)"
-        (mouseenter)="toggleUserFocus(user, true)"
-        (mouseleave)="toggleUserFocus(user, false)"
-      >
+      <div class="user-card" cdkDrag cdkDragBoundary=".board-container" [cdkDragDisabled]="!canMoveUser(user._id)" [cdkDragData]="user._id"
+           [class.cannot-move]="!canMoveUser(user._id)" (mouseenter)="toggleUserFocus(user, true)" (mouseleave)="toggleUserFocus(user, false)">
         <div class="user-card-title">
-          <div
-            class="user-avatar"
-            [style.backgroundImage]="
+          <div class="user-avatar" [style.backgroundImage]="
               'url(' + (user.image || 'assets/default-avatar.png') + ')'
-            "
-          ></div>
+            "></div>
           <h3>{{ user.displayName }}</h3>
         </div>
       </div>
@@ -82,12 +61,9 @@
     <div class="focused-user-container">
       @if (focusedUser) {
       <div class="focused-user-card" @fadeOutShrink>
-        <div
-          class="user-avatar"
-          [style.backgroundImage]="
+        <div class="user-avatar" [style.backgroundImage]="
             'url(' + (focusedUser.image || 'assets/default-avatar.png') + ')'
-          "
-        ></div>
+          "></div>
         <h3>{{ focusedUser.displayName }}</h3>
         <p>{{ focusedUser.username }}</p>
       </div>
@@ -114,23 +90,20 @@
     <!-- Date du jour -->
     <div class="date-container">
       <h2 class="today-date">
-        <a
-          class="today-world-day"
-          [attr.href]="todayWorldDay?.link"
-          target="_blank"
-          [matTooltip]="todayWorldDay?.title"
-          >{{ today | date : "longDate" }}</a
-        >,
+        <a class="today-world-day" [attr.href]="todayWorldDay?.link" target="_blank" [matTooltip]="todayWorldDay?.title">{{ today | date : "longDate" }}</a>,
         <span class="end-of-day-timer">
-          <app-timer></app-timer>
+          <app-timer [interruptions]="workdayInterruptions" [startTime]="startOfDay" [endTime]="endOfDay" [excludeInterruptsFromTimeLeft]="true"></app-timer>
         </span>
         @if (nextPublicHoliday) {
         <span class="next-public-holiday">
           ( Prochain jour férié :
-          <strong>{{ nextPublicHoliday.date | date : "fullDate" }}</strong
-          >, <i>&laquo;{{ nextPublicHoliday.name }}&raquo;</i> )
+          <strong>{{ nextPublicHoliday.date | date : "fullDate" }}</strong>, <i>&laquo;{{ nextPublicHoliday.name }}&raquo;</i> )
         </span>
         }
+        <span class="gta-vi-timer">
+          <img class="gta-vi-logo" src="https://upload.wikimedia.org/wikipedia/fr/thumb/6/61/GTA_VI_logo.svg/1200px-GTA_VI_logo.svg.png" alt="GTA VI"
+               title="GTA VI"><app-timer labelBeforeTimer="sort dans " [startTime]="gtaVIReleaseDateAnnouncement" [endTime]="gtaVIReleaseDate"></app-timer>
+        </span>
       </h2>
     </div>
 
@@ -146,45 +119,21 @@
             {{ mood.name }}
 
             @if (mood.sound) {
-            <button
-              mat-icon-button
-              class="sound-button"
-              [color]="isPlaying(mood._id) ? 'warn' : 'primary'"
-              (click)="toggleSound(mood, $event)"
-            >
-              <mat-icon
-                [fontIcon]="isPlaying(mood._id) ? 'stop' : 'play_arrow'"
-              ></mat-icon>
+            <button mat-icon-button class="sound-button" [color]="isPlaying(mood._id) ? 'warn' : 'primary'" (click)="toggleSound(mood, $event)">
+              <mat-icon [fontIcon]="isPlaying(mood._id) ? 'stop' : 'play_arrow'"></mat-icon>
             </button>
             }
           </h2>
         </div>
-        <div
-          class="user-list"
-          cdkDropList
-          [id]="mood._id"
-          [cdkDropListData]="mood._id"
-          (cdkDropListDropped)="onUserDrop($event)"
-          [cdkDropListConnectedTo]="getOtherMoodsIds(mood._id)"
-        >
+        <div class="user-list" cdkDropList [id]="mood._id" [cdkDropListData]="mood._id" (cdkDropListDropped)="onUserDrop($event)"
+             [cdkDropListConnectedTo]="getOtherMoodsIds(mood._id)">
           @for (user of getUsersByMood(mood._id); track user._id) {
-          <div
-            class="user-card"
-            cdkDrag
-            cdkDragBoundary=".board-container"
-            [cdkDragDisabled]="!canMoveUser(user._id)"
-            [cdkDragData]="user._id"
-            [class.cannot-move]="!canMoveUser(user._id)"
-            (mouseenter)="toggleUserFocus(user, true)"
-            (mouseleave)="toggleUserFocus(user, false)"
-          >
+          <div class="user-card" cdkDrag cdkDragBoundary=".board-container" [cdkDragDisabled]="!canMoveUser(user._id)" [cdkDragData]="user._id"
+               [class.cannot-move]="!canMoveUser(user._id)" (mouseenter)="toggleUserFocus(user, true)" (mouseleave)="toggleUserFocus(user, false)">
             <div class="user-card-title">
-              <div
-                class="user-avatar"
-                [style.backgroundImage]="
+              <div class="user-avatar" [style.backgroundImage]="
                   'url(' + (user.image || 'assets/default-avatar.png') + ')'
-                "
-              ></div>
+                "></div>
               <h3>{{ user.displayName }}</h3>
             </div>
           </div>
