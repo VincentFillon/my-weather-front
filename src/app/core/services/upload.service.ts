@@ -32,6 +32,12 @@ export class UploadService {
     return this.http.post<Media>(`${this.API_URL}/sound/mood`, formData);
   }
 
+  uploadChatMedia(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<{ url: string }>(`${this.API_URL}/media`, formData);
+  }
+
   removeMedia(media: Media) {
     return this.http.delete<string>(`${this.API_URL}/${media._id}`);
   }
