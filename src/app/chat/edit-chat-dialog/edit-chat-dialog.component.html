@@ -1,17 +1,17 @@
-<h2 mat-dialog-title>Modifier la conversation</h2>
+<h2 mat-dialog-title>Modifier le groupe</h2>
 
 <mat-dialog-content>
   <mat-form-field appearance="outline" class="name-field">
-    <mat-label>Nom de la conversation</mat-label>
-    <input matInput placeholder="Nom de la conversation..." [(ngModel)]="chatRoomName" [ngModelOptions]="{ standalone: true }" required />
+    <mat-label>Nom de le groupe</mat-label>
+    <input matInput placeholder="Nom de le groupe..." [(ngModel)]="chatRoomName" [ngModelOptions]="{ standalone: true }" required />
   </mat-form-field>
 
   <div class="image-preview">
-    <img [src]="imagePreview" alt="Avatar de la conversation">
+    <img [src]="imagePreview" alt="Avatar de le groupe">
   </div>
 
   <mat-form-field appearance="outline" class="image-field">
-    <mat-label>Avatar de la conversation</mat-label>
+    <mat-label>Avatar de le groupe</mat-label>
     <input matInput placeholder="URL de l'avatar..." [(ngModel)]="chatRoomImage" (ngModelChange)="imagePreview = chatRoomImage || 'assets/default-group-avatar.png'" [ngModelOptions]="{ standalone: true }" />
   </mat-form-field>
 
@@ -46,6 +46,10 @@
     }
   </mat-selection-list>
   }
+
+  <mat-divider></mat-divider>
+
+  <button mat-button color="warn" (click)="removeRoom()">Supprimer le groupe</button>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
