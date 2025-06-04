@@ -2,6 +2,10 @@
   <mat-toolbar color="primary" class="chat-panel-header">
     <span>{{ room.name }}</span>
     <span class="spacer"></span>
+    <!-- Bouton Paramètres -->
+    <button mat-icon-button *ngIf="currentUser && room.creator && currentUser._id === room.creator._id" (click)="openEditRoomDialog()" aria-label="Modifier la conversation">
+      <mat-icon fontIcon="settings"></mat-icon>
+    </button>
     <button mat-icon-button (click)="minimize()" aria-label="Minimiser le chat">
       <mat-icon fontIcon="remove"></mat-icon>
     </button>
