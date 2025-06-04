@@ -12,8 +12,8 @@ import { User } from '../../core/models/user';
 import { AuthService } from '../../core/services/auth.service';
 import { ChatService } from '../../core/services/chat.service';
 import {
-  NewChatDialogComponent,
-  NewChatDialogResult,
+    NewChatDialogComponent,
+    NewChatDialogResult,
 } from '../new-chat-dialog/new-chat-dialog.component';
 
 @Component({
@@ -86,7 +86,7 @@ export class ChatListComponent {
         const createRoomDto: CreateRoomDto = {
           name: newChatResult.name || 'Nouvelle conversation',
           image: newChatResult.image,
-          usersIds: [currentUser._id, ...newChatResult.userIds],
+          userIds: [currentUser._id, ...newChatResult.userIds],
         };
 
         // Appeler le service socket pour créer la room

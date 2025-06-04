@@ -6,6 +6,7 @@ export interface Room {
   name: string;
   image?: string;
   users: User[];
+  creator: User; // Ajout du créateur de la room
   createdAt?: Date | string;
   updatedAt?: Date | string;
   lastMessage?: Message; // Dernier message envoyé dans la room (pour affichage dans la liste des rooms)
@@ -15,7 +16,7 @@ export interface Room {
 export interface CreateRoomDto {
   name: string;
   image?: string;
-  usersIds: string[];
+  userIds: string[];
 }
 
 export interface JoinRoomDto {
@@ -27,4 +28,5 @@ export interface UpdateRoomDto {
   roomId: string;
   name?: string;
   image?: string;
+  userIds: string[];
 }

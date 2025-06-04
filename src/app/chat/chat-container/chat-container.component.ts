@@ -60,6 +60,7 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
   maxOpenPanels = 3; // Limite de panneaux ouverts simultanément
 
   private roomsSubscription: Subscription | null = null;
+  private roomUpdatedSubscription: Subscription | null = null;
   private messageSubscription: Subscription | null = null;
   // Ajouter des subscriptions pour les autres événements (roomCreated, userJoined, etc.) si nécessaire pour mettre à jour `this.rooms`
 
@@ -110,11 +111,21 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
           }
         }
       });
+
+    this.roomUpdatedSubscription = this.chatService.onRoomUpdated().subscribe({
+      next: (room) => {
+        this.rooms = this.rooms.map((r) =>
+          r._id === room._id ? { ...room, unreadCount: 0 } : r
+        );
+      },
+      error: (err) => console.error('Error loading room updates:', err),
+    });
   }
 
   ngOnDestroy(): void {
     // Normalement géré par takeUntilDestroyed, mais au cas où pour les subs manuelles
     this.roomsSubscription?.unsubscribe();
+    this.roomUpdatedSubscription?.unsubscribe();
     this.messageSubscription?.unsubscribe();
     // messageSubscription est géré par takeUntilDestroyed
     this.cleanup();
@@ -131,7 +142,6 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
     this.roomsSubscription = this.chatService.getMyRooms().subscribe({
       next: (rooms) => {
         this.rooms = rooms.map((r) => ({ ...r, unreadCount: 0 })); // Initialiser unreadCount
-        // Pré-charger les messages non lus si l'info vient du backend
       },
       error: (err) => console.error('Error loading rooms:', err),
     });

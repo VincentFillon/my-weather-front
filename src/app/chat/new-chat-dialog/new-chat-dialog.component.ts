@@ -26,6 +26,7 @@ export interface NewChatDialogResult {
   name: string;
   image?: string;
   userIds: string[];
+  creatorId: string;
 }
 
 @Component({
@@ -137,12 +138,22 @@ export class NewChatDialogComponent implements OnInit, OnDestroy {
   }
 
   confirmSelection(): void {
-    if (!this.chatRoomName || this.selectedUsers.length < 1) return;
+    const currentUser = this.authService.currentUser();
+    if (!this.chatRoomName || this.selectedUsers.length < 1 || !currentUser?._id) {
+      // Gérer le cas où l'utilisateur actuel n'est pas défini, bien que peu probable ici
+      console.error('Current user not found or invalid selection for room creation.');
+      return;
+    }
+
     const result: NewChatDialogResult = {
       name: this.chatRoomName,
       image: this.chatRoomImage || this.imagePreview,
       userIds: this.selectedUsers.map((user) => user._id),
+      creatorId: currentUser._id,
     };
+    // Note: Le dialogRef.close(result) est correct.
+    // C'est le composant qui ouvre ce dialogue qui appellera chatService.createRoom
+    // avec les données de 'result'.
     this.dialogRef.close(result);
   }
 

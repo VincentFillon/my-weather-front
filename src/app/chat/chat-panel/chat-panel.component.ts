@@ -21,6 +21,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -34,10 +35,14 @@ import {
   ProcessedMessage,
   SendMessageDto,
 } from '../../core/models/message';
-import { Room } from '../../core/models/room';
+import { Room, UpdateRoomDto } from '../../core/models/room';
 import { User } from '../../core/models/user';
 import { ChatService } from '../../core/services/chat.service';
 import { UploadService } from '../../core/services/upload.service'; // Ajout
+import {
+  EditChatDialogComponent,
+  EditChatDialogResult,
+} from '../edit-chat-dialog/edit-chat-dialog.component';
 import { EmojiPickerComponent } from '../emoji-picker/emoji-picker.component';
 
 @Component({
@@ -54,6 +59,7 @@ import { EmojiPickerComponent } from '../emoji-picker/emoji-picker.component';
     MatToolbarModule,
     MatProgressSpinnerModule,
     EmojiPickerComponent,
+    MatDialogModule, // Ajout pour MatDialog
   ],
   templateUrl: './chat-panel.component.html',
   styleUrls: ['./chat-panel.component.scss'],
@@ -77,6 +83,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
 
   private chatService = inject(ChatService);
   private uploadService = inject(UploadService); // Ajout
+  private dialog = inject(MatDialog);
   private destroyRef = inject(DestroyRef);
 
   private rawMessages = signal<Message[]>([]);
@@ -237,6 +244,16 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
           );
         }
       });
+
+    this.chatService
+      .onRoomUpdated()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (room) => {
+          this.room = room;
+        },
+        error: (err) => console.error('Error loading room updates:', err),
+      });
   }
 
   private markAsRead() {
@@ -354,8 +371,11 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     // Vérifier si le curseur quitte vraiment la zone (et non un enfant)
     const target = event.target as HTMLElement;
-    if (target === this.messageContainer.nativeElement || !this.messageContainer.nativeElement.contains(target)) {
-        this.isDragging.set(false);
+    if (
+      target === this.messageContainer.nativeElement ||
+      !this.messageContainer.nativeElement.contains(target)
+    ) {
+      this.isDragging.set(false);
     }
   }
 
@@ -511,5 +531,46 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
         console.error('Could not scroll to bottom:', err);
       }
     }, 0);
+  }
+
+  openEditRoomDialog(): void {
+    if (
+      !this.room ||
+      !this.currentUser ||
+      this.room.creator?._id !== this.currentUser._id
+    ) {
+      console.warn('Only the room creator can edit the room.');
+      // Optionnel: Afficher une notification à l'utilisateur
+      return;
+    }
+
+    const dialogRef = this.dialog.open(EditChatDialogComponent, {
+      width: '500px', // ou la largeur souhaitée
+      data: { room: this.room },
+      disableClose: true, // Empêcher la fermeture en cliquant à l'extérieur ou avec Echap
+    });
+
+    dialogRef
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((result: EditChatDialogResult | undefined) => {
+        if (result && this.room) {
+          const updateDto: UpdateRoomDto = {
+            roomId: this.room._id,
+            name: result.name,
+            image: result.image,
+            userIds: result.userIds,
+          };
+          // Le service backend attend l'ID de l'utilisateur qui fait la requête pour la vérification des droits.
+          // Dans un vrai scénario, cela viendrait du token. Ici, nous le passons explicitement.
+          // Note: La méthode updateRoom du service socket n'est pas conçue pour passer le requestingUserId.
+          // Il faudrait soit modifier le backend pour le prendre du socket.handshake.auth,
+          // soit créer une nouvelle méthode HTTP pour cela, ou adapter l'event socket.
+          // Pour l'instant, on va supposer que le backend le gère via le token de l'utilisateur connecté au socket.
+          this.chatService.updateRoom(updateDto);
+          // Idéalement, attendre la confirmation de la mise à jour via un événement socket 'roomUpdated'
+          // et mettre à jour this.room localement.
+        }
+      });
   }
 }

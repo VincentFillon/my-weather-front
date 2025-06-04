@@ -1,0 +1,68 @@
+.search-field {
+  width: 100%;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 150px; // Pour que le spinner soit visible
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+  padding: 20px;
+}
+
+.user-list {
+  max-height: 400px; // Limiter la hauteur et activer le scroll
+  overflow-y: auto;
+  margin-bottom: 15px;
+}
+
+.user-list-item {
+  cursor: pointer;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+  &.mat-list-option[aria-disabled="true"] {
+    cursor: default;
+    opacity: 0.6;
+    &:hover {
+      background-color: transparent;
+    }
+  }
+}
+
+.name-field,
+.image-field {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.image-preview {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 15px;
+
+  img {
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 200px; // Limiter la hauteur de l'image
+    object-fit: cover; // Pour garder le ratio de l'image
+    border-radius: 4px; // Un peu d'arrondi
+  }
+}
+
+mat-divider {
+  margin: 10px 0; // Ajuster les marges pour les séparateurs
+}
+
+h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
