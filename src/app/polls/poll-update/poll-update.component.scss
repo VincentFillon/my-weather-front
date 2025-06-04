@@ -2,15 +2,15 @@
   max-width: 600px;
   margin: 20px auto;
   padding: 25px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--mat-sys-outline-variant);
   border-radius: 8px;
-  background-color: #fff;
+  background-color: var(--mat-sys-surface);
 }
 
 h2 {
   text-align: center;
   margin-bottom: 25px;
-  color: #333;
+  color: var(--mat-sys-on-surface);
 }
 
 /* Style de base pour les groupes de formulaire (similaire à Bootstrap) */
@@ -37,7 +37,7 @@ label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: bold;
-  color: #555;
+  color: var(--mat-sys-on-surface-variant);
 }
 /* Section des options */
 .options-section label {
@@ -57,7 +57,7 @@ label {
   gap: 10px; /* Espace entre les boutons */
   margin-top: 25px;
   padding-top: 20px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--mat-sys-outline-variant);
 }
 
 /* Alertes (pour erreur de soumission) */
@@ -69,7 +69,7 @@ label {
   border-radius: 0.25rem;
 }
 .alert-danger {
-  color: #721c24;
-  background-color: #f8d7da;
-  border-color: #f5c6cb;
+  color: var(--mat-sys-on-error-container);
+  background-color: var(--mat-sys-error-container);
+  border-color: var(--mat-sys-error-container);
 }

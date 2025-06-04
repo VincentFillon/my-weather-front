@@ -350,7 +350,7 @@
 .message-input-area {
   flex-shrink: 0;
   padding: 8px;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid var(--mat-sys-outline);
   background-color: white;
   display: flex;
   align-items: center; // Centrer verticalement input et bouton

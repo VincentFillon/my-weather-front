@@ -1,11 +1,11 @@
 h2 {
-  color: #f44336;
+  color: var(--mat-sys-error);
 }
 
 mat-dialog-content {
   p {
     margin-bottom: 1rem;
-    color: #666;
+    // color: var(--mat-sys-on-surface-variant);
   }
 }
 

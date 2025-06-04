@@ -9,7 +9,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #f5f5f5;
+  background: var(--mat-sys-surface-container-low);
   padding: 15px;
   border-radius: 8px;
 
@@ -19,7 +19,7 @@
     .game-item {
       padding: 10px;
       margin: 5px 0;
-      background: white;
+      background: var(--mat-sys-surface);
       border-radius: 4px;
       cursor: pointer;
       transition: background-color 0.2s;
@@ -28,11 +28,11 @@
       align-items: center;
 
       &:hover {
-        background: #eee;
+        background: var(--mat-sys-surface-container);
       }
 
       &.selected {
-        background: #e0e0e0;
+        background: var(--mat-sys-surface-container-high);
       }
     }
   }
@@ -48,7 +48,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #f5f5f5;
+  background: var(--mat-sys-surface-container-low);
   padding: 15px;
   border-radius: 8px;
 
@@ -63,7 +63,7 @@
       td {
         padding: 8px;
         text-align: center;
-        border-bottom: 1px solid #ddd;
+        border-bottom: 1px solid var(--mat-sys-outline-variant);
       }
 
       .recent-games {
@@ -74,17 +74,17 @@
           font-size: 0.9em;
 
           &.v {
-            background: #4caf50;
-            color: white;
+            background: var(--mat-sys-primary);
+            color: var(--mat-sys-on-primary);
           }
 
           &.n {
-            background: #ffc107;
+            background: var(--mat-sys-tertiary-container);
           }
 
           &.d {
-            background: #f44336;
-            color: white;
+            background: var(--mat-sys-error);
+            color: var(--mat-sys-on-error);
           }
         }
       }
@@ -97,13 +97,13 @@
     .player-option {
       padding: 10px;
       margin: 5px 0;
-      background: white;
+      background: var(--mat-sys-surface);
       border-radius: 4px;
       cursor: pointer;
       transition: background-color 0.2s;
 
       &:hover {
-        background: #eee;
+        background: var(--mat-sys-surface-container);
       }
     }
   }

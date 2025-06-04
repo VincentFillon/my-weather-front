@@ -15,6 +15,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle'; // Ajout de l'import
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subscription } from 'rxjs';
 import { Mood } from '../../core/models/mood';
@@ -25,6 +26,7 @@ import { WorldDay } from '../../core/models/world-day';
 import { AuthService } from '../../core/services/auth.service';
 import { MoodService } from '../../core/services/mood.service';
 import { PublicHolidaysService } from '../../core/services/public-holidays.service';
+import { ThemeService } from '../../core/services/theme.service'; // Ajout de l'import
 import { UserService } from '../../core/services/user.service';
 import { WorldDaysService } from '../../core/services/world-days.service';
 import { Interruption, TimerComponent } from '../timer/timer.component';
@@ -43,6 +45,7 @@ import { Interruption, TimerComponent } from '../timer/timer.component';
     DatePipe,
     TimerComponent,
     MatTooltipModule,
+    MatSlideToggleModule, // Ajout du module
   ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss'],
@@ -66,6 +69,7 @@ export class BoardComponent implements OnInit, OnDestroy {
   private userService = inject(UserService);
   private worldDaysService = inject(WorldDaysService);
   private publicHolidaysService = inject(PublicHolidaysService);
+  public themeService = inject(ThemeService); // Injection et public pour le template
 
   currentUser: User | null = null;
   isAdmin = false;

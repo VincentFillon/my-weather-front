@@ -47,7 +47,7 @@
     margin-left: 5px;
     cursor: pointer;
     &:hover {
-      color: red;
+      color: var(--mat-sys-error);
     }
   }
 }
@@ -58,8 +58,7 @@
   right: 20px; // Alignè avec le bouton FAB
   width: 400px;
   max-height: 70vh;
-  background-color: white;
-  border: 1px solid #ccc;
+  border: 1px solid var(--mat-sys-outline);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   border-radius: 8px;
   overflow: hidden; // Pour le contenu

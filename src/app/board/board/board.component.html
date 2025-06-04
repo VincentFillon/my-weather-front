@@ -36,6 +36,16 @@
         </button>
         }
         <mat-divider class="user-menu-divider"></mat-divider>
+        <div mat-menu-item class="theme-toggle-container" (click)="$event.stopPropagation();">
+          <mat-slide-toggle
+            [checked]="themeService.isDarkMode"
+            (change)="themeService.toggleTheme()"
+            aria-label="Changer de thème">
+            <mat-icon fontIcon="brightness_4"></mat-icon>
+            <span class="theme-toggle-label">{{ themeService.isDarkMode ? 'Sombre' : 'Clair' }}</span>
+          </mat-slide-toggle>
+        </div>
+        <mat-divider class="user-menu-divider"></mat-divider>
         <button mat-menu-item (click)="logout()">
           <mat-icon fontIcon="exit_to_app" color="warn"></mat-icon>
           <span>Déconnexion</span>

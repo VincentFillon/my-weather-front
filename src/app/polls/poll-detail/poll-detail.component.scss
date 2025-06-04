@@ -2,9 +2,9 @@
   max-width: 700px;
   margin: 20px auto;
   padding: 20px;
-  border: 1px solid #eee;
+  border: 1px solid var(--mat-sys-outline-variant);
   border-radius: 8px;
-  background-color: #fff;
+  background-color: var(--mat-sys-surface);
 }
 
 .back-button {
@@ -21,27 +21,27 @@
 }
 
 .error {
-  color: #dc3545;
+  color: var(--mat-sys-error);
 }
 
 h2 {
   margin-top: 0;
-  color: #333;
+  color: var(--mat-sys-on-surface);
 }
 
 .description {
-  color: #555;
+  color: var(--mat-sys-on-surface-variant);
   margin-bottom: 15px;
 }
 
 .meta,
 .meta-choice {
   font-size: 0.9em;
-  color: #777;
+  color: var(--mat-sys-outline);
   margin-bottom: 5px;
 }
 .meta .expired-label {
-  color: #dc3545;
+  color: var(--mat-sys-error);
   font-weight: bold;
   margin-left: 5px;
 }
@@ -55,29 +55,29 @@ h2 {
 }
 
 .option-item {
-  border: 1px solid #ccc;
+  border: 1px solid var(--mat-sys-outline-variant);
   border-radius: 5px;
   padding: 10px 15px;
   margin-bottom: 10px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
-  background-color: #f9f9f9;
+  background-color: var(--mat-sys-surface-container-lowest);
 }
 
 .option-item:not(.disabled):hover {
-  border-color: #007bff;
-  background-color: #f1f1f1;
+  border-color: var(--mat-sys-primary);
+  background-color: var(--mat-sys-surface-container-low);
 }
 
 .option-item.selected {
-  border-color: #28a745;
-  background-color: #e9f5ec;
+  border-color: var(--mat-sys-primary);
+  background-color: var(--mat-sys-primary-container);
   font-weight: bold;
 }
 
 .option-item.disabled {
   cursor: not-allowed;
-  background-color: #e9ecef;
+  background-color: var(--mat-sys-surface-container);
   opacity: 0.7;
 }
 
@@ -95,11 +95,11 @@ h2 {
 
 .option-votes {
   font-size: 0.9em;
-  color: #555;
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .option-bar-detail {
-  background-color: #e0e0e0;
+  background-color: var(--mat-sys-surface-container-high);
   border-radius: 4px;
   height: 22px;
   overflow: hidden;
@@ -107,7 +107,7 @@ h2 {
 }
 
 .option-progress-detail {
-  background-color: #007bff; /* Bleu pour le détail */
+  background-color: var(--mat-sys-primary); /* Bleu pour le détail */
   height: 100%;
   position: absolute;
   left: 0;
@@ -140,7 +140,7 @@ h2 {
 }
 
 .percentage-label {
-  color: white;
+  color: var(--mat-sys-on-primary);
   font-size: 0.8em;
   padding-left: 5px;
   font-weight: bold;
@@ -154,9 +154,9 @@ h2 {
   padding: 10px;
   text-align: center;
   font-style: italic;
-  background-color: #f8f9fa;
+  background-color: var(--mat-sys-surface-container-lowest);
   border-radius: 4px;
-  color: #6c757d;
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .poll-actions {

@@ -13,7 +13,7 @@
   }
 
   .toolbar-icon {
-    color: white;
+    color: var(--mat-sys-on-surface);
   }
 }
 
@@ -39,7 +39,7 @@
 
   .last-message {
     font-size: 0.9em;
-    color: grey;
+    color: var(--mat-sys-on-surface);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -50,7 +50,7 @@
     flex-direction: column;
     align-items: flex-end;
     font-size: 0.8em;
-    color: grey;
+    color: var(--mat-sys-on-surface);
     text-align: right;
   }
 
