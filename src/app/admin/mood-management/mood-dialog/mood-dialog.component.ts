@@ -1,10 +1,20 @@
 import { Component, inject } from '@angular/core';
 
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
+import { ColorPickerDirective } from 'ngx-color-picker';
 import { Mood } from '../../../core/models/mood';
 
 interface DialogData {
@@ -20,10 +30,11 @@ interface DialogData {
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule
-],
+    MatButtonModule,
+    ColorPickerDirective,
+  ],
   templateUrl: './mood-dialog.component.html',
-  styleUrls: ['./mood-dialog.component.scss']
+  styleUrls: ['./mood-dialog.component.scss'],
 })
 export class MoodDialogComponent {
   private fb = inject(FormBuilder);
@@ -40,8 +51,16 @@ export class MoodDialogComponent {
     this.form = this.fb.group({
       name: [data.mood?.name || '', [Validators.required]],
       image: [data.mood?.image || '', [Validators.required]],
-      sound: [data.mood?.sound || '']
+      color: [data.mood?.color || ''],
+      sound: [data.mood?.sound || ''],
     });
+  }
+
+  public get moodColor(): string {
+    return this.form.controls['color'].value;
+  }
+  public set moodColor(value: string) {
+    this.form.controls['color'].setValue(value);
   }
 
   onSubmit() {

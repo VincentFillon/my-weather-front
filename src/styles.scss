@@ -1,53 +1,31 @@
 @use "@angular/material" as mat;
-@use "app/styles/theme-colors" as theme;
-@use "app/styles/dark-mode/theme-colors" as theme-dark;
+@use "src/theme/theming" as theming;
 
 @import "https://fonts.googleapis.com/icon?family=Material+Icons";
 
-// html {
-//   color-scheme: light dark;
-//   @include mat.theme(
-//     (
-//       color: theme.$primary-palette,
-//       typography: Roboto,
-//       density: 0,
-//     )
-//   );
-
-//   body {
-//     color-scheme: light;
-//     background: var(--mat-sys-primary-container);
-//     color: var(--mat-sys-on-primary-container);
-//     font: var(--mat-sys-body-large);
-
-//     &.dark-mode {
-//       color-scheme: dark;
-//     }
-//   }
-// }
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
 
 html {
-  color-scheme: light dark;
-  @include mat.theme(
-    (
-      color: (
-        primary: theme.$primary-palette,
-        tertiary: theme.$tertiary-palette,
-      ),
-      typography: Roboto,
-      density: 0,
-    )
-  );
+  @include theming.apply-light-theme;
 
   body {
-    color-scheme: light;
-    background: var(--mat-sys-surface-container-lowest);
+    background-color: var(--mat-sys-surface-container-lowest);
     color: var(--mat-sys-on-surface);
     font-family: Roboto, "Helvetica Neue", sans-serif;
-    font: var(--mat-sys-body-medium);
 
     &.dark-mode {
-      color-scheme: dark;
+      @include theming.apply-dark-theme;
+    }
+
+    h1 {
+      font: var(--mat-sys-headline-large);
+    }
+
+    h2 {
+      font: var(--mat-sys-headline-medium);
     }
   }
 }
@@ -55,11 +33,6 @@ html {
 html,
 body {
   height: 100%;
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
 }
 
 .mat-mdc-menu-content {

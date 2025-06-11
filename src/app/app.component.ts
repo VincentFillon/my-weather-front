@@ -5,7 +5,7 @@ import { ChatContainerComponent } from './chat/chat-container/chat-container.com
 import { AuthService } from './core/services/auth.service';
 import { NotificationService } from './core/services/notification.service';
 import { SocketService } from './core/services/socket.service';
-import { ThemeService } from './core/services/theme.service'; // Ajout de l'import
+import { ThemeService } from './core/services/theme.service';
 import { AppUpdateService } from './core/services/update.service';
 
 @Component({
@@ -21,16 +21,19 @@ export class AppComponent implements OnInit, OnDestroy {
   private notificationService = inject(NotificationService);
   private appUpdateService = inject(AppUpdateService);
   private router = inject(Router);
-  private themeService = inject(ThemeService); // Injection du service
+  private themeService = inject(ThemeService);
 
   private currentUserSubscription: Subscription | null = null;
   private socketSubscription: Subscription | null = null;
 
   socketConnected = false;
 
-  ngOnInit() {
+  constructor() {
     // L'initialisation du thème se fait maintenant dans le constructeur du ThemeService
     // this.themeService.initTheme(); // Plus nécessaire ici si initTheme est appelé dans le constructeur du service
+  }
+
+  ngOnInit() {
     this.appUpdateService.initUpdateListener();
 
     this.currentUserSubscription = this.authService.currentUser$.subscribe(

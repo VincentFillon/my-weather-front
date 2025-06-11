@@ -165,7 +165,7 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   constructor() {
     this.startOfDay = new Date(this.today);
-      this.startOfDay.setHours(8, 30, 0, 0);
+    this.startOfDay.setHours(8, 30, 0, 0);
     this.endOfDay = new Date(this.today);
     if (this.today.getDay() === 5) {
       this.endOfDay.setHours(17, 0, 0, 0);
@@ -212,7 +212,9 @@ export class BoardComponent implements OnInit, OnDestroy {
     }
 
     // Créer une carte des humeurs pour un accès rapide à l'ordre
-    const moodsMap = new Map<string, Mood>(moods.map((mood) => [mood._id, mood]));
+    const moodsMap = new Map<string, Mood>(
+      moods.map((mood) => [mood._id, mood])
+    );
 
     // Trier les utilisateurs par l'ordre de leur humeur
     usersWithMood.sort((a, b) => {
@@ -331,7 +333,13 @@ export class BoardComponent implements OnInit, OnDestroy {
   // Obtenir les utilisateurs pour une humeur donnée
   getUsersByMood(moodId?: string): User[] {
     // console.debug('Refresh users for mood', moodId);
-    return this.users.filter((user) => user.mood?._id === moodId);
+    return this.users
+      .filter((user) => user.mood?._id === moodId)
+      .sort((a, b) => {
+        const dateA = a.moodUpdatedAt ? new Date(a.moodUpdatedAt).getTime() : 0;
+        const dateB = b.moodUpdatedAt ? new Date(b.moodUpdatedAt).getTime() : 0;
+        return dateA - dateB;
+      });
   }
 
   // Gérer le drop d'un utilisateur
@@ -371,6 +379,13 @@ export class BoardComponent implements OnInit, OnDestroy {
         this.focusedUser = null;
       }, 2000);
     }
+  }
+
+  hexToRgb(hex: string, alpha: number = 1): string | null {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+      ? `rgba(${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}, ${alpha})`
+      : null;
   }
 
   toggleSound(mood: Mood, event: Event) {

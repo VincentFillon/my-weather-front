@@ -12,9 +12,9 @@
 }
 
 .neutral-zone {
-  min-width: 300px;
+  min-width: 350px;
   max-width: 500px;
-  background-color: rgba(var(--mat-sys-outline), 0.5);
+  background: var(--mat-sys-surface-bright);
   padding: 15px;
   display: flex;
   flex-direction: column;
@@ -36,6 +36,7 @@
   }
 
   .user-list {
+    margin-top: 5px;
     margin-bottom: 15px;
   }
 
@@ -84,11 +85,21 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-bottom: 20px;
 
     .mood-icon-container {
       width: 75px;
       height: 75px;
+      img {
+        width: auto;
+        height: auto;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+    }
+
+    h3 {
+      margin: 0;
     }
   }
 }
@@ -129,7 +140,7 @@
 }
 
 .date-container {
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 
   .today-date {
     display: flex;
@@ -138,6 +149,16 @@
     justify-content: center;
     flex-wrap: wrap;
     margin: 0;
+
+    .today-world-day {
+      text-decoration: none;
+      color: var(--mat-sys-primary);
+
+      &:hover {
+        font-weight: bold;
+        color: var(--mat-sys-tertiary);
+      }
+    }
 
     .end-of-day-timer {
       margin-left: 15px;
@@ -177,36 +198,38 @@
 
   .date-container {
     height: 30px;
-    margin: 10px 0;
+    margin: 10px 0 20px;
   }
 
   .board-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     gap: 5px;
     overflow-y: auto;
     max-height: calc(100vh - 50px); // date-container height + margin x2
     padding: 0 10px;
+    margin: 10px 0 10px;
   }
 }
 
 .mood-column {
   display: flex;
   flex-direction: column;
-  background: white;
-  border-radius: 12px;
-  padding: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  // background: var(--mat-sys-surface-container-low);
+  border: 1px solid var(--mat-sys-secondary-container);
+  border-radius: 2px;
+  box-shadow: 2px 2px 6px rgba(var(--mat-sys-outline), 0.4);
   min-width: 0; // Pour permettre le text-overflow
 }
 
 .mood-header {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  // gap: 12px;
-  margin-bottom: 10px;
+  padding: 12px;
   text-align: center;
+  background: var(--mat-sys-surface-container-lowest);
+  border-top: 4px solid var(--mat-sys-primary);
 
   .mood-icon-container {
     width: 50px;
@@ -214,7 +237,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 8px;
 
     .mood-icon {
       max-width: 100%;
@@ -223,19 +245,21 @@
     }
   }
 
-  h2 {
+  h3 {
+    flex: 1;
     margin: 0;
     color: var(--mat-sys-on-surface);
-    font-size: 1.2rem;
+    // font-size: 1.2rem;
     font-weight: 500;
     overflow: hidden;
     text-align: center;
     display: flex;
+    // flex-direction: column;
     align-items: center;
     justify-content: center;
 
     .sound-button {
-      margin-left: 15px;
+      margin-left: 10px;
       --mdc-icon-button-state-layer-size: 30px;
       padding: 2px;
       border: 1px solid var(--mat-sys-outline);
@@ -245,11 +269,11 @@
 
 .user-list {
   flex: 1;
-  min-height: 112px;
-  height: fit-content;
-  border: 2px dashed var(--mat-sys-outline);
-  border-radius: 8px;
-  padding: 12px;
+  min-height: 108px;
+  background: var(--mat-sys-surface-container);
+  border: 1px dashed var(--mat-sys-secondary-container);
+  border-radius: 4px;
+  padding: 6px;
   overflow-y: auto;
 
   .neutral-zone-title {
@@ -260,13 +284,20 @@
   }
 }
 
-.user-card {
+.mood-list-container {
+  flex: 1;
+  display: flex;
   padding: 6px;
+}
+
+.user-card {
+  padding: 2px;
   margin-bottom: 4px;
   cursor: move;
-  border-radius: 8px;
+  border-radius: 22px;
   transition: transform 0.2s, box-shadow 0.2s;
-  border: 1px solid var(--mat-sys-outline);
+  border: 1px solid var(--mat-sys-secondary-container);
+  background: var(--mat-sys-surface-container-lowest);
   box-sizing: border-box;
 
   &:last-child {
@@ -326,8 +357,8 @@
 
 // Style pour la zone de drop active
 .cdk-drop-list-dragging {
-  border-color: #2196f3;
-  background-color: rgba(33, 150, 243, 0.05);
+  border-color: var(--mat-sys-primary);
+  background-color: var(--mat-sys-primary-container);
 }
 
 .theme-toggle-container {
@@ -335,11 +366,6 @@
   align-items: center;
   padding: 0 16px; // Correspond au padding des mat-menu-item standards
   cursor: default; // Pour éviter le curseur "pointer" sur le conteneur
-
-  mat-slide-toggle {
-    // Ajuster la marge si nécessaire pour l'alignement vertical
-    // margin-bottom: -4px; // Exemple d'ajustement
-  }
 
   .theme-toggle-label {
     margin-left: 16px; // Espace entre l'icône et le label
