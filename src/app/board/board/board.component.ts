@@ -211,10 +211,15 @@ export class BoardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Trier les utilisateurs par l'ID de leur humeur pour regrouper les mêmes humeurs
-    usersWithMood.sort((a, b) =>
-      (a.mood?._id || '').localeCompare(b.mood?._id || '')
-    );
+    // Créer une carte des humeurs pour un accès rapide à l'ordre
+    const moodsMap = new Map<string, Mood>(moods.map((mood) => [mood._id, mood]));
+
+    // Trier les utilisateurs par l'ordre de leur humeur
+    usersWithMood.sort((a, b) => {
+      const orderA = moodsMap.get(a.mood?._id || '')?.order || 0;
+      const orderB = moodsMap.get(b.mood?._id || '')?.order || 0;
+      return orderA - orderB;
+    });
 
     // Trouver l'index médian
     // la médiane est volontairement pessimiste et va récupérer l'élément supérieur en cas de nombre impair

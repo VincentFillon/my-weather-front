@@ -1,110 +1,88 @@
-.games-container {
-  display: grid;
-  grid-template-columns: 250px 1fr 300px;
-  gap: 20px;
-  height: 100%;
-}
-
-.active-games {
+.game-container {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  background: var(--mat-sys-surface-container-low);
-  padding: 15px;
-  border-radius: 8px;
-
-  .games-list {
-    overflow-y: auto;
-
-    .game-item {
-      padding: 10px;
-      margin: 5px 0;
-      background: var(--mat-sys-surface);
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      &:hover {
-        background: var(--mat-sys-surface-container);
-      }
-
-      &.selected {
-        background: var(--mat-sys-surface-container-high);
-      }
-    }
-  }
-}
-
-.game-area {
-  display: flex;
-  justify-content: center;
   align-items: center;
-}
-
-.leaderboard-container {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: var(--mat-sys-surface-container-low);
-  padding: 15px;
+  justify-content: center;
+  padding: 20px;
+  background-color: #f0f0f0;
   border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: fit-content;
+  margin: 20px auto;
 
-  .leaderboard {
-    overflow-y: auto;
+  h2 {
+    color: #333;
+    margin-bottom: 15px;
+  }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
+  .status-message {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #e0e0e0;
+    color: #555;
+    text-align: center;
+    width: 100%;
+  }
 
-      th,
-      td {
-        padding: 8px;
-        text-align: center;
-        border-bottom: 1px solid var(--mat-sys-outline-variant);
-      }
+  &.won .status-message {
+    background-color: #d4edda;
+    color: #28a745;
+  }
 
-      .recent-games {
-        span {
-          margin: 0 2px;
-          padding: 2px 4px;
-          border-radius: 3px;
-          font-size: 0.9em;
+  &.lost .status-message {
+    background-color: #f8d7da;
+    color: #dc3545;
+  }
 
-          &.v {
-            background: var(--mat-sys-primary);
-            color: var(--mat-sys-on-primary);
-          }
+  &.draw .status-message {
+    background-color: #fff3cd;
+    color: #ffc107;
+  }
 
-          &.n {
-            background: var(--mat-sys-tertiary-container);
-          }
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    gap: 5px;
+    background-color: #333;
+    border: 5px solid #333;
+    border-radius: 5px;
+  }
 
-          &.d {
-            background: var(--mat-sys-error);
-            color: var(--mat-sys-on-error);
-          }
-        }
-      }
+  .cell {
+    width: 100px;
+    height: 100px;
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3em;
+    font-weight: bold;
+    cursor: default;
+    transition: background-color 0.3s ease;
+    color: #333; /* Default color for empty cells */
+  }
+
+  .cell.clickable {
+    cursor: pointer;
+
+    &:hover {
+      background-color: #e0e0e0;
     }
   }
-}
 
-.new-game-form {
-  .players-list {
-    .player-option {
-      padding: 10px;
-      margin: 5px 0;
-      background: var(--mat-sys-surface);
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.2s;
+  .cell.x {
+    color: #dc3545; /* Red for X */
+  }
 
-      &:hover {
-        background: var(--mat-sys-surface-container);
-      }
-    }
+  .cell.o {
+    color: #007bff; /* Blue for O */
+  }
+
+  button {
+    margin-top: 20px;
   }
 }

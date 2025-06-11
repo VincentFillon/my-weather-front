@@ -555,21 +555,26 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((result: EditChatDialogResult | undefined) => {
         if (result && this.room) {
-          const updateDto: UpdateRoomDto = {
-            roomId: this.room._id,
-            name: result.name,
-            image: result.image,
-            userIds: result.userIds,
-          };
-          // Le service backend attend l'ID de l'utilisateur qui fait la requête pour la vérification des droits.
-          // Dans un vrai scénario, cela viendrait du token. Ici, nous le passons explicitement.
-          // Note: La méthode updateRoom du service socket n'est pas conçue pour passer le requestingUserId.
-          // Il faudrait soit modifier le backend pour le prendre du socket.handshake.auth,
-          // soit créer une nouvelle méthode HTTP pour cela, ou adapter l'event socket.
-          // Pour l'instant, on va supposer que le backend le gère via le token de l'utilisateur connecté au socket.
-          this.chatService.updateRoom(updateDto);
-          // Idéalement, attendre la confirmation de la mise à jour via un événement socket 'roomUpdated'
-          // et mettre à jour this.room localement.
+          if (result.delete) {
+            this.chatService.deleteRoom(this.room._id);
+            this.close();
+          } else {
+            const updateDto: UpdateRoomDto = {
+              roomId: this.room._id,
+              name: result.name,
+              image: result.image,
+              userIds: result.userIds,
+            };
+            // Le service backend attend l'ID de l'utilisateur qui fait la requête pour la vérification des droits.
+            // Dans un vrai scénario, cela viendrait du token. Ici, nous le passons explicitement.
+            // Note: La méthode updateRoom du service socket n'est pas conçue pour passer le requestingUserId.
+            // Il faudrait soit modifier le backend pour le prendre du socket.handshake.auth,
+            // soit créer une nouvelle méthode HTTP pour cela, ou adapter l'event socket.
+            // Pour l'instant, on va supposer que le backend le gère via le token de l'utilisateur connecté au socket.
+            this.chatService.updateRoom(updateDto);
+            // Idéalement, attendre la confirmation de la mise à jour via un événement socket 'roomUpdated'
+            // et mettre à jour this.room localement.
+          }
         }
       });
   }

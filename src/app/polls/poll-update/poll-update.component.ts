@@ -4,7 +4,7 @@ import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
-  Validators
+  Validators,
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 
@@ -19,10 +19,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { ActivatedRoute, Router } from '@angular/router';
-import {
-  PollOption,
-  UpdatePollDto
-} from '../../core/models/poll';
+import { PollOption, UpdatePollDto } from '../../core/models/poll';
 import { PollService } from '../../core/services/poll.service';
 import futureDateValidator from '../../core/validators/future-date.validator';
 import minTwoOptionsValidator from '../../core/validators/min-two-options.validator';
@@ -154,7 +151,10 @@ export class PollUpdateComponent implements OnInit {
     // Filtrer les options vides avant l'envoi
     const optionsValue = this.options.value as { _id?: string; text: string }[];
     const validOptions = optionsValue
-      .map((opt) => ({ _id: opt._id, text: opt.text?.trim() })) // Enlève les espaces avant/après
+      .map((opt) => ({
+        _id: opt._id === '' ? undefined : opt._id,
+        text: opt.text?.trim(),
+      })) // Enlève les espaces avant/après et met _id à undefined si vide
       .filter((opt) => opt.text && opt.text.length > 0); // Garde seulement les non-vides
 
     // Re-vérifie qu'il y a bien au moins 2 options *après* filtrage
@@ -180,8 +180,6 @@ export class PollUpdateComponent implements OnInit {
       multipleChoice: this.pollForm.value.multipleChoice,
     };
 
-    console.log('Submitting poll data:', pollData);
-
     try {
       // Utilise le service pour créer le sondage (via WebSocket)
       this.pollService.updatePoll(pollData);
@@ -191,7 +189,6 @@ export class PollUpdateComponent implements OnInit {
       // on navigue directement après l'émission. Le composant liste se mettra à jour.
       // Idéalement, attendre une confirmation ou gérer l'erreur si l'émission échoue.
 
-      console.log('Poll update request sent.');
       // Navigue vers la liste après un court instant pour laisser le temps à l'émission
       setTimeout(() => {
         this.router.navigate(['/polls', this.pollId]);

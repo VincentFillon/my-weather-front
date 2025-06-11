@@ -32,6 +32,7 @@ export interface EditChatDialogResult {
   name: string;
   image?: string;
   userIds: string[];
+  delete?: boolean;
 }
 
 @Component({
@@ -178,6 +179,22 @@ export class EditChatDialogComponent implements OnInit, OnDestroy {
       userIds: finalUserIds,
     };
     this.dialogRef.close(result);
+  }
+
+  removeRoom(): void {
+    if (!this.data.room || !this.data.room._id) {
+      console.error('Cannot remove room without a valid ID.');
+      return;
+    }
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce groupe ?')) {
+      const result: EditChatDialogResult = {
+        name: '',
+        image: undefined,
+        userIds: [],
+        delete: true,
+      };
+      this.dialogRef.close(result);
+    }
   }
 
   closeDialog(): void {
