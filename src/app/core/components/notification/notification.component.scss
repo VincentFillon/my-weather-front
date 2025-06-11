@@ -18,7 +18,7 @@
     }
 
     .notification-icon {
-      color: #fff;
+      color: var(--mat-sys-on-surface);
       transform: scale(2);
     }
   }
@@ -43,7 +43,7 @@
     align-items: center;
 
     .notification-action {
-      color: #fff;
+      color: var(--mat-sys-on-surface);
     }
   }
 

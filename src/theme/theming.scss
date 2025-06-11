@@ -1,0 +1,32 @@
+@use "@angular/material" as mat;
+
+@use "./light-theme-mc" as light-theme;
+@use "./dark-theme-mc" as dark-theme;
+
+@mixin apply-light-theme {
+  @include mat.theme(
+    (
+      color: (
+        primary: light-theme.$primary-palette,
+        tertiary: light-theme.$tertiary-palette,
+        theme-type: light,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+@mixin apply-dark-theme {
+  @include mat.theme(
+    (
+      color: (
+        primary: dark-theme.$primary-palette,
+        tertiary: dark-theme.$tertiary-palette,
+        theme-type: dark,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}

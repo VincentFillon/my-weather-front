@@ -15,6 +15,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle'; // Ajout de l'import
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subscription } from 'rxjs';
 import { Mood } from '../../core/models/mood';
@@ -25,6 +26,7 @@ import { WorldDay } from '../../core/models/world-day';
 import { AuthService } from '../../core/services/auth.service';
 import { MoodService } from '../../core/services/mood.service';
 import { PublicHolidaysService } from '../../core/services/public-holidays.service';
+import { ThemeService } from '../../core/services/theme.service'; // Ajout de l'import
 import { UserService } from '../../core/services/user.service';
 import { WorldDaysService } from '../../core/services/world-days.service';
 import { Interruption, TimerComponent } from '../timer/timer.component';
@@ -43,6 +45,7 @@ import { Interruption, TimerComponent } from '../timer/timer.component';
     DatePipe,
     TimerComponent,
     MatTooltipModule,
+    MatSlideToggleModule, // Ajout du module
   ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss'],
@@ -66,6 +69,7 @@ export class BoardComponent implements OnInit, OnDestroy {
   private userService = inject(UserService);
   private worldDaysService = inject(WorldDaysService);
   private publicHolidaysService = inject(PublicHolidaysService);
+  public themeService = inject(ThemeService); // Injection et public pour le template
 
   currentUser: User | null = null;
   isAdmin = false;
@@ -161,7 +165,7 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   constructor() {
     this.startOfDay = new Date(this.today);
-      this.startOfDay.setHours(8, 30, 0, 0);
+    this.startOfDay.setHours(8, 30, 0, 0);
     this.endOfDay = new Date(this.today);
     if (this.today.getDay() === 5) {
       this.endOfDay.setHours(17, 0, 0, 0);
@@ -208,7 +212,9 @@ export class BoardComponent implements OnInit, OnDestroy {
     }
 
     // Créer une carte des humeurs pour un accès rapide à l'ordre
-    const moodsMap = new Map<string, Mood>(moods.map((mood) => [mood._id, mood]));
+    const moodsMap = new Map<string, Mood>(
+      moods.map((mood) => [mood._id, mood])
+    );
 
     // Trier les utilisateurs par l'ordre de leur humeur
     usersWithMood.sort((a, b) => {
@@ -327,7 +333,13 @@ export class BoardComponent implements OnInit, OnDestroy {
   // Obtenir les utilisateurs pour une humeur donnée
   getUsersByMood(moodId?: string): User[] {
     // console.debug('Refresh users for mood', moodId);
-    return this.users.filter((user) => user.mood?._id === moodId);
+    return this.users
+      .filter((user) => user.mood?._id === moodId)
+      .sort((a, b) => {
+        const dateA = a.moodUpdatedAt ? new Date(a.moodUpdatedAt).getTime() : 0;
+        const dateB = b.moodUpdatedAt ? new Date(b.moodUpdatedAt).getTime() : 0;
+        return dateA - dateB;
+      });
   }
 
   // Gérer le drop d'un utilisateur
@@ -367,6 +379,13 @@ export class BoardComponent implements OnInit, OnDestroy {
         this.focusedUser = null;
       }, 2000);
     }
+  }
+
+  hexToRgb(hex: string, alpha: number = 1): string | null {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+      ? `rgba(${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}, ${alpha})`
+      : null;
   }
 
   toggleSound(mood: Mood, event: Event) {

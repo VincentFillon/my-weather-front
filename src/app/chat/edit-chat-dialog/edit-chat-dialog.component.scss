@@ -12,7 +12,7 @@
 }
 
 .error-message {
-  color: red;
+  color: var(--mat-sys-error);
   text-align: center;
   padding: 20px;
 }
@@ -63,6 +63,6 @@ mat-divider {
 }
 
 h3 {
-    margin-top: 20px;
-    margin-bottom: 10px;
+  margin-top: 20px;
+  margin-bottom: 10px;
 }

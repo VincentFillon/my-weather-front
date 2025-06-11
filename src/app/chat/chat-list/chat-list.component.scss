@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 // src/app/features/chat/components/chat-list/chat-list.component.scss
 :host {
   display: flex;
@@ -8,12 +10,19 @@
 .chat-list-header {
   flex-shrink: 0; // Empêcher le header de rétrécir
 
+  @include mat.toolbar-overrides(
+    (
+      container-background-color: var(--mat-sys-primary),
+      container-text-color: var(--mat-sys-on-primary),
+    )
+  );
+
   .spacer {
     flex: 1 1 auto;
   }
 
   .toolbar-icon {
-    color: white;
+    color: var(--mat-sys-on-primary);
   }
 }
 
@@ -39,7 +48,7 @@
 
   .last-message {
     font-size: 0.9em;
-    color: grey;
+    color: var(--mat-sys-on-surface);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -50,7 +59,7 @@
     flex-direction: column;
     align-items: flex-end;
     font-size: 0.8em;
-    color: grey;
+    color: var(--mat-sys-on-surface);
     text-align: right;
   }
 

@@ -10,6 +10,7 @@ export interface User {
     mood?: Mood;
     createdAt?: Date;
     updatedAt?: Date;
+    moodUpdatedAt?: Date;
     _v?: number;
 }
 

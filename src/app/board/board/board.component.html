@@ -36,6 +36,13 @@
         </button>
         }
         <mat-divider class="user-menu-divider"></mat-divider>
+        <div mat-menu-item class="theme-toggle-container" (click)="$event.stopPropagation();">
+          <mat-slide-toggle [checked]="themeService.isDarkMode" (change)="themeService.toggleTheme()" aria-label="Changer de thème">
+            <mat-icon fontIcon="brightness_4"></mat-icon>
+            <span class="theme-toggle-label">{{ themeService.isDarkMode ? 'Sombre' : 'Clair' }}</span>
+          </mat-slide-toggle>
+        </div>
+        <mat-divider class="user-menu-divider"></mat-divider>
         <button mat-menu-item (click)="logout()">
           <mat-icon fontIcon="exit_to_app" color="warn"></mat-icon>
           <span>Déconnexion</span>
@@ -73,15 +80,13 @@
     @if (medianMood) {
     <!-- Humeur médiane -->
     <div class="median-mood-column">
-      <div class="mood-header">
+      <!-- <div class="mood-header"> -->
         <h3>Humeur médiane :</h3>
         <div class="mood-icon-container">
           <img [src]="medianMood.image" alt="Image" class="mood-icon" />
         </div>
-        <h2>
-          {{ medianMood.name }}
-        </h2>
-      </div>
+        <h3>{{ medianMood.name }}</h3>
+      <!-- </div> -->
     </div>
     }
   </div>
@@ -111,33 +116,34 @@
       <!-- Colonnes des humeurs -->
       @for (mood of moods; track mood._id) {
       <div class="mood-column">
-        <div class="mood-header">
+        <div class="mood-header" [style]="{'border-top-color': mood.color ? mood.color : null }">
           <div class="mood-icon-container">
             <img [src]="mood.image" alt="Image" class="mood-icon" />
           </div>
-          <h2>
+          <h3>
             {{ mood.name }}
-
             @if (mood.sound) {
             <button mat-icon-button class="sound-button" [color]="isPlaying(mood._id) ? 'warn' : 'primary'" (click)="toggleSound(mood, $event)">
               <mat-icon [fontIcon]="isPlaying(mood._id) ? 'stop' : 'play_arrow'"></mat-icon>
             </button>
             }
-          </h2>
+          </h3>
         </div>
-        <div class="user-list" cdkDropList [id]="mood._id" [cdkDropListData]="mood._id" (cdkDropListDropped)="onUserDrop($event)"
-             [cdkDropListConnectedTo]="getOtherMoodsIds(mood._id)">
-          @for (user of getUsersByMood(mood._id); track user._id) {
-          <div class="user-card" cdkDrag cdkDragBoundary=".board-container" [cdkDragDisabled]="!canMoveUser(user._id)" [cdkDragData]="user._id"
-               [class.cannot-move]="!canMoveUser(user._id)" (mouseenter)="toggleUserFocus(user, true)" (mouseleave)="toggleUserFocus(user, false)">
-            <div class="user-card-title">
-              <div class="user-avatar" [style.backgroundImage]="
+        <div class="mood-list-container">
+          <div class="user-list" cdkDropList [id]="mood._id" [cdkDropListData]="mood._id" (cdkDropListDropped)="onUserDrop($event)"
+               [cdkDropListConnectedTo]="getOtherMoodsIds(mood._id)" [style]="{'background-color': mood.color ? hexToRgb(mood.color, 0.03) : null }">
+            @for (user of getUsersByMood(mood._id); track user._id) {
+            <div class="user-card" cdkDrag cdkDragBoundary=".board-container" [cdkDragDisabled]="!canMoveUser(user._id)" [cdkDragData]="user._id"
+                 [class.cannot-move]="!canMoveUser(user._id)" (mouseenter)="toggleUserFocus(user, true)" (mouseleave)="toggleUserFocus(user, false)">
+              <div class="user-card-title">
+                <div class="user-avatar" [style.backgroundImage]="
                   'url(' + (user.image || 'assets/default-avatar.png') + ')'
                 "></div>
-              <h3>{{ user.displayName }}</h3>
+                <h3>{{ user.displayName }}</h3>
+              </div>
             </div>
+            }
           </div>
-          }
         </div>
       </div>
       }

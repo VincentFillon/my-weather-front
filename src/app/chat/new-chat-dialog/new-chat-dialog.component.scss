@@ -12,7 +12,7 @@
 }
 
 .error-message {
-  color: red;
+  color: var(--mat-sys-error);
   text-align: center;
   padding: 20px;
 }

@@ -3,6 +3,7 @@ export interface Mood {
     name: string;
     order: number;
     image: string;
+    color: string;
     sound?: string;
     createdAt?: Date;
     updatedAt?: Date;
@@ -13,6 +14,7 @@ export interface CreateMoodDto {
     name: string;
     order: number;
     image: string;
+    color?: string;
     sound?: string;
 }
 
@@ -21,5 +23,6 @@ export interface UpdateMoodDto {
     name?: string;
     order?: number;
     image?: string;
+    color?: string;
     sound?: string;
 }
