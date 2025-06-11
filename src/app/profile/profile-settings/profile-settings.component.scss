@@ -13,18 +13,18 @@
 .settings-card {
   width: fit-content;
   max-width: 80vw;
-  background: rgba(255, 255, 255, 0.95);
+  // background: var(--mat-sys-surface-container-high);
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  // border: 1px solid var(--mat-sys-outline-variant);
 
   mat-card-header {
     margin-bottom: 1rem;
 
     mat-card-title {
       font-size: 1.5rem;
-      color: #37474f;
+      // color: var(--mat-sys-on-surface);
       margin: 1rem 0;
     }
   }
@@ -71,13 +71,13 @@
   padding: 2rem;
 
   h3 {
-    color: #f44336;
+    color: var(--mat-sys-error);
     margin-bottom: 1rem;
   }
 
   p {
     margin-bottom: 2rem;
-    color: #666;
+    // color: var(--mat-sys-on-surface-variant);
   }
 
   button {
