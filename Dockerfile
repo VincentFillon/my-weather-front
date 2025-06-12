@@ -24,7 +24,7 @@ FROM nginx:latest
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy the build output to replace the default nginx contents.
-COPY --from=build /usr/src/app/dist/meteo-front /usr/share/nginx/html
+COPY --from=build /usr/src/app/dist/meteo-front/browser /usr/share/nginx/html
 
 # Expose the port the app runs on
 ARG PORT=3006
