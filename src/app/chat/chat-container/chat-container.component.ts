@@ -1,5 +1,5 @@
 // src/app/features/chat/components/chat-container/chat-container.component.ts
-import { CommonModule } from '@angular/common';
+
 import {
   ChangeDetectorRef,
   Component,
@@ -34,14 +34,13 @@ interface ActiveChat {
 @Component({
   selector: 'app-chat-container',
   imports: [
-    CommonModule,
     MatListModule,
     MatBadgeModule,
     MatIconModule,
     MatButtonModule,
-    ChatPanelComponent, // Importer le composant panneau
-    ChatListComponent, // Importer le composant liste
-  ],
+    ChatPanelComponent,
+    ChatListComponent
+],
   templateUrl: './chat-container.component.html',
   styleUrls: ['./chat-container.component.scss'],
 })
