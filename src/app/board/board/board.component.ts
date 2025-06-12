@@ -30,6 +30,7 @@ import { ThemeService } from '../../core/services/theme.service'; // Ajout de l'
 import { UserService } from '../../core/services/user.service';
 import { WorldDaysService } from '../../core/services/world-days.service';
 import { Interruption, TimerComponent } from '../timer/timer.component';
+import { WeatherWidgetComponent } from '../weather-widget/weather-widget.component';
 
 @Component({
   selector: 'app-board',
@@ -46,6 +47,7 @@ import { Interruption, TimerComponent } from '../timer/timer.component';
     TimerComponent,
     MatTooltipModule,
     MatSlideToggleModule, // Ajout du module
+    WeatherWidgetComponent,
   ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss'],

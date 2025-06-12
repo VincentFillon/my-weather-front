@@ -1,0 +1,21 @@
+<div class="weather-widget-container">
+  @if (loading) {
+  <p>Chargement de la météo...</p>
+  } @else if (error) {
+  <p class="error-message">{{ error }}</p>
+  } @else if (weatherData) {
+  <div class="weather-info">
+    <div class="weather-icon">
+      <img
+        [src]="getWeatherIconUrl(weatherData.current.weathercode, weatherData.current.is_day)"
+        alt="Icône météo"
+      />
+    </div>
+    <div class="weather-details">
+      <h3>Météo actuelle</h3>
+      <p class="temperature">{{ weatherData.current.temperature_2m | number : '1.0-0' }}°C</p>
+      <p class="description">{{ getWeatherDescription(weatherData.current.weathercode) }}</p>
+    </div>
+  </div>
+  }
+</div>
