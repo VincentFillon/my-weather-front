@@ -1,5 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard';
-import { CommonModule } from '@angular/common';
+
 import { Component, inject, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -14,12 +14,11 @@ import { UploadService } from '../../core/services/upload.service';
   selector: 'app-media',
   standalone: true,
   imports: [
-    CommonModule,
     MatButtonModule,
     MatIconModule,
     MatCardModule,
-    MatTabsModule,
-  ],
+    MatTabsModule
+],
   templateUrl: './media.component.html',
   styleUrls: ['./media.component.scss'],
 })
