@@ -105,7 +105,7 @@
 }
 
 .user-menu-button {
-  --mdc-icon-button-state-layer-size: 40px;
+  --mat-icon-button-state-layer-size: 40px;
   padding: 0;
   border-radius: 50%;
   background-color: transparent;
@@ -260,7 +260,7 @@
 
     .sound-button {
       margin-left: 10px;
-      --mdc-icon-button-state-layer-size: 30px;
+      --mat-icon-button-state-layer-size: 30px;
       padding: 2px;
       border: 1px solid var(--mat-sys-outline);
     }
