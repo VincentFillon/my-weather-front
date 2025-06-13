@@ -1,3 +1,4 @@
+import { MessageType } from './message-type.enum'; // Import de MessageType
 import { User } from './user';
 
 export interface MessageReaction {
@@ -8,9 +9,10 @@ export interface MessageReaction {
 export interface Message {
   _id: string;
   room: string; // ID de la room
-  sender: User;
+  sender: User | null;
   content: string;
   mediaUrl?: string;
+  type?: MessageType; // Ajout du type de message
   reactions: MessageReaction[];
   createdAt: Date;
 }
@@ -21,6 +23,7 @@ export interface ProcessedMessage extends Message {
   isGroupStart: boolean;
   isGroupEnd: boolean;
   showDateSeparator: boolean;
+  isBotMessage?: boolean; // Ajout du flag pour les messages du bot
 }
 
 export interface SendMessageDto {
@@ -28,6 +31,7 @@ export interface SendMessageDto {
   sender: User;
   content: string;
   mediaUrl?: string;
+  type?: MessageType; // Ajout du type de message
 }
 
 export interface MessageReactionDto {

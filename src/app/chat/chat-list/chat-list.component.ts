@@ -12,8 +12,8 @@ import { User } from '../../core/models/user';
 import { AuthService } from '../../core/services/auth.service';
 import { ChatService } from '../../core/services/chat.service';
 import {
-    NewChatDialogComponent,
-    NewChatDialogResult,
+  NewChatDialogComponent,
+  NewChatDialogResult,
 } from '../new-chat-dialog/new-chat-dialog.component';
 
 @Component({
@@ -45,6 +45,9 @@ export class ChatListComponent {
   filteredUsers: User[] = [];
 
   getRoomAvatar(room: Room): string {
+    if (room.isChatBot) {
+      return 'assets/bot-avatar.png'; // Un avatar spécifique pour le bot
+    }
     let avatar: string = 'assets/default-avatar.png';
     if (room.image) {
       avatar = room.image;

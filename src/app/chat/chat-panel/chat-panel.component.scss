@@ -277,6 +277,37 @@
     }
   }
 
+  // --- Styles pour les messages du BOT ---
+  &.bot-message {
+    justify-content: flex-start; // Les messages du bot sont toujours à gauche
+
+    .message-content-wrapper {
+      flex-direction: row; // Avatar à gauche, contenu à droite
+    }
+
+    .sender-name {
+      align-self: flex-start;
+      margin-left: 2px;
+      color: var(--mat-sys-color-tertiary); // Couleur distincte pour le nom du bot
+    }
+
+    .message-bubble {
+      background-color: var(--mat-sys-color-tertiary-container); // Couleur de fond distincte
+      color: var(--mat-sys-color-on-tertiary-container);
+      border: 1px solid var(--mat-sys-color-tertiary);
+      align-self: flex-start;
+
+      .message-timestamp {
+        left: 8px;
+      }
+    }
+
+    // Le bouton de réaction n'apparaît pas pour les messages du bot
+    .add-reaction-wrapper {
+      display: none !important;
+    }
+  }
+
   .message-details {
     position: relative;
 
@@ -362,6 +393,21 @@
   background-color: var(--mat-sys-color-surface);
   display: flex;
   align-items: center; // Centrer verticalement input et bouton
+
+  &.disabled-input {
+    background-color: var(--mat-sys-color-surface-container-lowest); // Arrière-plan grisé
+    cursor: not-allowed; // Curseur "interdit"
+    pointer-events: none; // Désactive les interactions de la souris
+    opacity: 0.7; // Légèrement transparent
+  }
+
+  .bot-room-message {
+    flex-grow: 1;
+    text-align: center;
+    color: var(--mat-sys-color-on-surface-variant);
+    font-style: italic;
+    padding: 8px;
+  }
 
   @include mat.form-field-overrides(
     (
