@@ -76,6 +76,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
   @Output() closePanel = new EventEmitter<Room>();
   @Output() minimizePanel = new EventEmitter<Room>(); // Ou juste close
 
+
   @ViewChild('messageContainer')
   private messageContainer!: ElementRef<HTMLElement>;
   @ViewChild('messageInput')
@@ -117,47 +118,57 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
         const prevMsg = index > 0 ? arr[index - 1] : null;
         const nextMsg = index < arr.length - 1 ? arr[index + 1] : null;
 
-        const isSameSenderAsPrevious =
-          !!prevMsg && prevMsg.sender._id === msg.sender._id;
-        const isSameSenderAsNext =
-          !!nextMsg && nextMsg.sender._id === msg.sender._id;
+        const isBotMessage = msg.sender === null;
 
-        // Comparaison précise de la minute (ignorant secondes/ms)
+        let showAvatarAndName: boolean;
+        let showTimestamp: boolean;
+        let isGroupStart: boolean;
+        let isGroupEnd: boolean;
+        let showDateSeparator: boolean;
+
         const msgDate = new Date(msg.createdAt);
-        const getMinutesKey = (date: Date | null) =>
-          date
-            ? `<span class="math-inline">\{date\.getFullYear\(\)\}\-</span>{date.getMonth()}-<span class="math-inline">\{date\.getDate\(\)\}\_</span>{date.getHours()}:${date.getMinutes()}`
-            : null;
-        const msgMinuteKey = getMinutesKey(msgDate);
-        const prevMsgMinuteKey = getMinutesKey(
-          prevMsg ? new Date(prevMsg.createdAt) : null
-        );
-        const nextMsgMinuteKey = getMinutesKey(
-          nextMsg ? new Date(nextMsg.createdAt) : null
-        );
+        let prevDate: Date | null = null;
 
-        const isSameMinuteAsPrevious =
-          isSameSenderAsPrevious && msgMinuteKey === prevMsgMinuteKey;
-        const isSameMinuteAsNext =
-          isSameSenderAsNext && msgMinuteKey === nextMsgMinuteKey;
+        if (isBotMessage) {
+          showAvatarAndName = true;
+          showTimestamp = true;
+          isGroupStart = true;
+          isGroupEnd = true;
+          showDateSeparator = true;
+        } else {
+          const isSameSenderAsPrevious = !!prevMsg && prevMsg.sender!._id === msg.sender!._id;
+          const isSameSenderAsNext = !!nextMsg && nextMsg.sender!._id === msg.sender!._id;
 
-        // Déterminer l'affichage
-        const showAvatarAndName = !isSameSenderAsPrevious;
-        // Afficher l'heure si le message suivant n'est PAS du même auteur DANS la même minute
-        const showTimestamp = !isSameMinuteAsNext;
-        const isGroupStart = !isSameSenderAsPrevious || !isSameMinuteAsPrevious;
-        const isGroupEnd = !isSameSenderAsNext || !isSameMinuteAsNext;
-
-        // Affichage de la date si le jour a changé
-        const isDifferentDay = (() => {
-          if (!prevMsg) return true;
-          const prevDate = new Date(prevMsg.createdAt);
-          return (
-            msgDate.getFullYear() !== prevDate.getFullYear() ||
-            msgDate.getMonth() !== prevDate.getMonth() ||
-            msgDate.getDate() !== prevDate.getDate()
+          const getMinutesKey = (date: Date | null) =>
+            date
+              ? `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}_${date.getHours()}:${date.getMinutes()}`
+              : null;
+          const msgMinuteKey = getMinutesKey(msgDate);
+          const prevMsgMinuteKey = getMinutesKey(
+            prevMsg ? new Date(prevMsg.createdAt) : null
           );
-        })();
+          const nextMsgMinuteKey = getMinutesKey(
+            nextMsg ? new Date(nextMsg.createdAt) : null
+          );
+
+          const isSameMinuteAsPrevious = isSameSenderAsPrevious && msgMinuteKey === prevMsgMinuteKey;
+          const isSameMinuteAsNext = isSameSenderAsNext && msgMinuteKey === nextMsgMinuteKey;
+
+          showAvatarAndName = !isSameSenderAsPrevious;
+          showTimestamp = !isSameMinuteAsNext;
+          isGroupStart = !isSameSenderAsPrevious || !isSameMinuteAsPrevious;
+          isGroupEnd = !isSameSenderAsNext || !isSameMinuteAsNext;
+
+          showDateSeparator = (() => {
+            if (!prevMsg) return true;
+            prevDate = new Date(prevMsg.createdAt);
+            return (
+              msgDate.getFullYear() !== prevDate.getFullYear() ||
+              msgDate.getMonth() !== prevDate.getMonth() ||
+              msgDate.getDate() !== prevDate.getDate()
+            );
+          })();
+        }
 
         return {
           ...msg, // Copie les propriétés du message original
@@ -165,7 +176,8 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
           showTimestamp,
           isGroupStart,
           isGroupEnd,
-          showDateSeparator: isDifferentDay,
+          showDateSeparator,
+          isBotMessage,
         };
       });
     });
@@ -219,7 +231,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((message) => {
         if (message.room === this.room._id) {
-          const isOwnMessage = message.sender._id === this.currentUser?._id;
+          const isOwnMessage = message.sender?._id === this.currentUser?._id;
           // Ajoute le nouveau message au signal existant
           this.rawMessages.update((currentMessages) => [
             ...currentMessages,
@@ -235,7 +247,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((message) => {
         if (message.room === this.room._id) {
-          const isOwnMessage = message.sender._id === this.currentUser?._id;
+          const isOwnMessage = message.sender?._id === this.currentUser?._id;
           // Ajoute le nouveau message au signal existant
           this.rawMessages.update((currentMessages) =>
             currentMessages.map((msg) =>

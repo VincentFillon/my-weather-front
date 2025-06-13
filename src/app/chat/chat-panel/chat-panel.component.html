@@ -39,19 +39,33 @@
               <span>{{ message.createdAt | date:'fullDate' }}</span>
             </div>
           }
-          <div class="message-item-container" [class.my-message]="message.sender._id === currentUser?._id"
-            [class.other-message]="message.sender._id !== currentUser?._id" [class.group-start]="message.isGroupStart" [class.group-end]="message.isGroupEnd">
+          <div class="message-item-container"
+            [class.my-message]="message.sender?._id === currentUser?._id && !message.isBotMessage"
+            [class.other-message]="message.sender?._id !== currentUser?._id && !message.isBotMessage"
+            [class.bot-message]="message.isBotMessage"
+            [class.group-start]="message.isGroupStart"
+            [class.group-end]="message.isGroupEnd">
 
             <div class="message-content-wrapper">
               <div class="avatar-wrapper">
                 @if (message.showAvatarAndName) {
-                  <img class="message-avatar" [src]="message.sender.image || 'assets/default-avatar.png'" [alt]="message.sender.displayName">
+                  @if (message.isBotMessage) {
+                    <img class="message-avatar" src="assets/bot-avatar.png" alt="MoodBot">
+                  } @else {
+                    <img class="message-avatar" [src]="message.sender!.image || 'assets/default-avatar.png'" [alt]="message.sender!.displayName">
+                  }
                 }
               </div>
 
               <div class="message-details">
                 @if (message.showAvatarAndName) {
-                  <div class="sender-name">{{ message.sender.displayName }}</div>
+                  <div class="sender-name">
+                    @if (message.isBotMessage) {
+                      {{ room.name }}
+                    } @else {
+                      {{ message.sender!.displayName }}
+                    }
+                  </div>
                 }
 
                 <div class="message-bubble">
@@ -130,19 +144,25 @@
     </div>
   }
 
-  <mat-card-actions class="message-input-area">
-    <!-- Bouton Joindre -->
-    <input type="file" #fileInput hidden (change)="onFileSelected($event)" accept="image/jpeg,image/png,image/gif,image/webp">
-    <button mat-icon-button (click)="fileInput.click()" aria-label="Joindre un fichier">
-      <mat-icon fontIcon="attachment"></mat-icon>
-    </button>
+  <mat-card-actions class="message-input-area" [class.disabled-input]="room.isChatBot">
+    @if (!room.isChatBot) {
+      <!-- Bouton Joindre -->
+      <input type="file" #fileInput hidden (change)="onFileSelected($event)" accept="image/jpeg,image/png,image/gif,image/webp">
+      <button mat-icon-button (click)="fileInput.click()" aria-label="Joindre un fichier">
+        <mat-icon fontIcon="attachment"></mat-icon>
+      </button>
 
-    <mat-form-field appearance="outline" class="message-input-field">
-      <mat-label>Votre message...</mat-label>
-      <input matInput #messageInput [(ngModel)]="newMessageContent" (keyup.enter)="sendMessage()" placeholder="Écrivez quelque chose...">
-    </mat-form-field>
-    <button mat-icon-button color="primary" (click)="sendMessage()" [disabled]="(!newMessageContent.trim() && !uploadedMediaUrl) || isUploading()">
-      <mat-icon fontIcon="send"></mat-icon>
-    </button>
+      <mat-form-field appearance="outline" class="message-input-field">
+        <mat-label>Votre message...</mat-label>
+        <input matInput #messageInput [(ngModel)]="newMessageContent" (keyup.enter)="sendMessage()" placeholder="Écrivez quelque chose...">
+      </mat-form-field>
+      <button mat-icon-button color="primary" (click)="sendMessage()" [disabled]="(!newMessageContent.trim() && !uploadedMediaUrl) || isUploading()">
+        <mat-icon fontIcon="send"></mat-icon>
+      </button>
+    } @else {
+      <div class="bot-room-message">
+        Vous ne pouvez pas envoyer de messages dans cette conversation.
+      </div>
+    }
   </mat-card-actions>
 </mat-card>

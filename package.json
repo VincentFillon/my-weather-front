@@ -1,6 +1,6 @@
 {
   "name": "meteo-front",
-  "version": "2.8.0",
+  "version": "2.9.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -28,6 +28,7 @@
     "@angular/service-worker": "^20.0.3",
     "@angular/ssr": "^20.0.2",
     "@ctrl/ngx-emoji-mart": "^9.2.0",
+    "@modelcontextprotocol/sdk": "^1.12.2",
     "ngx-color-picker": "^19.0.0",
     "rxjs": "~7.8.1",
     "socket.io-client": "^4.8.1",

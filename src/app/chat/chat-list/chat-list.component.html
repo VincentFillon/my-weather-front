@@ -15,7 +15,13 @@
       @for (room of rooms; track room._id; let last = $last) {
         <mat-list-item (click)="selectRoom(room)" class="chat-list-item" [class.has-unread]="room.unreadCount && room.unreadCount > 0">
           <img matListItemAvatar [src]="getRoomAvatar(room)" alt="Avatar" class="chat-room-avatar" />
-          <span matListItemTitle>{{ room.name }}</span>
+          <span matListItemTitle>
+            @if (room.isChatBot) {
+              MoodBot
+            } @else {
+              {{ room.name }}
+            }
+          </span>
           <span matListItemLine class="last-message">
             @if (room.lastMessage) {
               {{ room.lastMessage.content | slice : 0 : 30 }}{{ (room.lastMessage.content.length || 0) > 30 ? "..." : "" }}

@@ -197,14 +197,16 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
         // Afficher une notification
         const notifImage =
           this.rooms[roomIndex].image ||
-          message.sender.image ||
+          message.sender?.image ||
           'assets/default-avatar.png';
         const notifAction = () => {
           this.openChatPanel(this.rooms[roomIndex]); // Ouvre le panel si on clique sur l'action
         };
+        const senderName = message.sender?.displayName || this.rooms[roomIndex].name;
+
         this.notificationService.showNotification(
           {
-            title: message.sender.displayName,
+            title: senderName,
             content:
               message.content.slice(0, 30) +
               (message.content.length > 30 ? '...' : ''),
@@ -219,7 +221,7 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
           10000
         );
         this.notificationService.showSystemNotification(
-          `Nouveau message de ${message.sender.displayName} dans ${this.rooms[roomIndex].name}`,
+          `Nouveau message de ${senderName} dans ${this.rooms[roomIndex].name}`,
           notifImage,
           notifAction
         );

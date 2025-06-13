@@ -7,6 +7,7 @@ export interface Room {
   image?: string;
   users: User[];
   creator: User; // Ajout du créateur de la room
+  isChatBot?: boolean; // Indique si la room est une conversation avec le bot
   createdAt?: Date | string;
   updatedAt?: Date | string;
   lastMessage?: Message; // Dernier message envoyé dans la room (pour affichage dans la liste des rooms)
