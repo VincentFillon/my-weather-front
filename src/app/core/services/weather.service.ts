@@ -91,7 +91,7 @@ export class WeatherService {
         iconName = isDay === 1 ? 'mostly_sunny' : 'mostly_clear';
         break;
       case 2: // Partly cloudy
-        iconName = isDay === 1 ? 'partly_cloudy' : 'partly_clear';
+        iconName = isDay === 1 ? 'party_cloudy' : 'party_clear';
         break;
       case 3: // Overcast
         iconName = 'cloudy';
