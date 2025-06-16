@@ -28,6 +28,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { NgScrollbar, NgScrollbarModule } from 'ngx-scrollbar';
+import { NgScrollReached } from 'ngx-scrollbar/reached-event';
 import { of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import {
@@ -59,7 +61,9 @@ import { EmojiPickerComponent } from '../emoji-picker/emoji-picker.component';
     MatToolbarModule,
     MatProgressSpinnerModule,
     EmojiPickerComponent,
-    MatDialogModule, // Ajout pour MatDialog
+    MatDialogModule,
+    NgScrollbarModule,
+    NgScrollReached,
   ],
   templateUrl: './chat-panel.component.html',
   styleUrls: ['./chat-panel.component.scss'],
@@ -76,9 +80,8 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
   @Output() closePanel = new EventEmitter<Room>();
   @Output() minimizePanel = new EventEmitter<Room>(); // Ou juste close
 
-
   @ViewChild('messageContainer')
-  private messageContainer!: ElementRef<HTMLElement>;
+  private messageContainer!: NgScrollbar;
   @ViewChild('messageInput')
   private messageInput!: ElementRef<HTMLInputElement>;
 
@@ -96,6 +99,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
   hasMoreMessages = signal(true); // Assumer qu'il y en a plus au début
   private readonly initialLoadLimit = 30;
   private readonly paginationLimit = 20;
+  readonly scrollThreshold = 100;
 
   showEmojiPickerFor: string | null = null;
 
@@ -135,8 +139,10 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
           isGroupStart = true;
           isGroupEnd = true;
         } else {
-          const isSameSenderAsPrevious = !!prevMsg && prevMsg.sender!._id === msg.sender!._id;
-          const isSameSenderAsNext = !!nextMsg && nextMsg.sender!._id === msg.sender!._id;
+          const isSameSenderAsPrevious =
+            !!prevMsg && prevMsg.sender!._id === msg.sender!._id;
+          const isSameSenderAsNext =
+            !!nextMsg && nextMsg.sender!._id === msg.sender!._id;
 
           const getMinutesKey = (date: Date | null) =>
             date
@@ -150,8 +156,10 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
             nextMsg ? new Date(nextMsg.createdAt) : null
           );
 
-          const isSameMinuteAsPrevious = isSameSenderAsPrevious && msgMinuteKey === prevMsgMinuteKey;
-          const isSameMinuteAsNext = isSameSenderAsNext && msgMinuteKey === nextMsgMinuteKey;
+          const isSameMinuteAsPrevious =
+            isSameSenderAsPrevious && msgMinuteKey === prevMsgMinuteKey;
+          const isSameMinuteAsNext =
+            isSameSenderAsNext && msgMinuteKey === nextMsgMinuteKey;
 
           showAvatarAndName = !isSameSenderAsPrevious;
           showTimestamp = !isSameMinuteAsNext;
@@ -281,8 +289,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
       : undefined;
 
     // Sauvegarder l'état du scroll avant de charger
-    const element = this.messageContainer.nativeElement;
-    const oldScrollHeight = element.scrollHeight;
+    // const oldScrollHeight = (this.messageContainer.contentDimension().height || 50) - this.scrollThreshold;
     // const oldScrollTop = element.scrollTop; // scrollTop est proche de 0
 
     this.chatService
@@ -311,13 +318,16 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
           );
 
           // Restaurer la position de scroll après mise à jour du DOM
-          queueMicrotask(() => {
-            try {
-              element.scrollTop = element.scrollHeight - oldScrollHeight;
-            } catch (e) {
-              console.error('Scroll restoration failed', e);
-            }
-          });
+          // queueMicrotask(() => {
+          //   try {
+          //     this.messageContainer.scrollTo({
+          //       bottom: oldScrollHeight,
+          //       duration: 500,
+          //     });
+          //   } catch (e) {
+          //     console.error('Scroll restoration failed', e);
+          //   }
+          // });
         },
         error: (err) =>
           console.error(
@@ -332,11 +342,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
       return; // Ne rien faire si déjà en chargement ou si tout est chargé
     }
 
-    const element = this.messageContainer.nativeElement;
-    // Déclencher légèrement avant d'atteindre le sommet
-    if (element.scrollTop < 50) {
-      this.loadOlderMessages();
-    }
+    this.loadOlderMessages();
   }
 
   sendMessage(): void {
@@ -535,8 +541,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       try {
         if (this.messageContainer) {
-          this.messageContainer.nativeElement.scrollTop =
-            this.messageContainer.nativeElement.scrollHeight;
+          this.messageContainer.scrollTo({ bottom: 0, duration: 500 });
         }
       } catch (err) {
         console.error('Could not scroll to bottom:', err);

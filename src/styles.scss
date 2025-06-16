@@ -38,3 +38,11 @@ body {
 .mat-mdc-menu-content {
   min-width: 250px;
 }
+
+.my-weather-scrollbar {
+  --scrollbar-thickness: 8;
+  --scrollbar-offset: 2;
+  --scrollbar-border-radius: 4px;
+  --scrollbar-thumb-color: var(--mat-sys-outline-variant);
+  --scrollbar-thumb-hover-color: var(--mat-sys-outline);
+}

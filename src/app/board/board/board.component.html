@@ -51,18 +51,20 @@
       <h2>{{ currentUser?.displayName }}</h2>
     </div>
     <div class="user-list" cdkDropList id="neutral" [cdkDropListData]="'neutral'" (cdkDropListDropped)="onUserDrop($event)" [cdkDropListConnectedTo]="moodsIds">
-      <h2 class="neutral-zone-title">Zone Neutre</h2>
-      @for (user of getUsersByMood(); track user._id) {
-      <div class="user-card" cdkDrag cdkDragBoundary=".board-container" [cdkDragDisabled]="!canMoveUser(user._id)" [cdkDragData]="user._id"
-           [class.cannot-move]="!canMoveUser(user._id)" (mouseenter)="toggleUserFocus(user, true)" (mouseleave)="toggleUserFocus(user, false)">
-        <div class="user-card-title">
-          <div class="user-avatar" [style.backgroundImage]="
-              'url(' + (user.image || 'assets/default-avatar.png') + ')'
-            "></div>
-          <h3>{{ user.displayName }}</h3>
+      <ng-scrollbar class="my-weather-scrollbar">
+        <h2 class="neutral-zone-title">Zone Neutre</h2>
+        @for (user of getUsersByMood(); track user._id) {
+        <div class="user-card" cdkDrag cdkDragBoundary=".board-container" [cdkDragDisabled]="!canMoveUser(user._id)" [cdkDragData]="user._id"
+             [class.cannot-move]="!canMoveUser(user._id)" (mouseenter)="toggleUserFocus(user, true)" (mouseleave)="toggleUserFocus(user, false)">
+          <div class="user-card-title">
+            <div class="user-avatar" [style.backgroundImage]="
+                  'url(' + (user.image || 'assets/default-avatar.png') + ')'
+                "></div>
+            <h3>{{ user.displayName }}</h3>
+          </div>
         </div>
-      </div>
-      }
+        }
+      </ng-scrollbar>
     </div>
 
     <div class="focused-user-container">
@@ -81,11 +83,11 @@
     <!-- Humeur médiane -->
     <div class="median-mood-column">
       <!-- <div class="mood-header"> -->
-        <h3>Humeur médiane :</h3>
-        <div class="mood-icon-container">
-          <img [src]="medianMood.image" alt="Image" class="mood-icon" />
-        </div>
-        <h3>{{ medianMood.name }}</h3>
+      <h3>Humeur médiane :</h3>
+      <div class="mood-icon-container">
+        <img [src]="medianMood.image" alt="Image" class="mood-icon" />
+      </div>
+      <h3>{{ medianMood.name }}</h3>
       <!-- </div> -->
     </div>
     }
@@ -94,6 +96,7 @@
 
     <app-weather-widget></app-weather-widget>
   </div>
+
 
   <div class="board-grid-container">
     <!-- Date du jour -->
@@ -116,41 +119,43 @@
       </h2>
     </div>
 
-    <div class="board-grid">
-      <!-- Colonnes des humeurs -->
-      @for (mood of moods; track mood._id) {
-      <div class="mood-column">
-        <div class="mood-header" [style]="{'border-top-color': mood.color ? mood.color : null }">
-          <div class="mood-icon-container">
-            <img [src]="mood.image" alt="Image" class="mood-icon" />
-          </div>
-          <h3>
-            {{ mood.name }}
-            @if (mood.sound) {
-            <button mat-icon-button class="sound-button" [color]="isPlaying(mood._id) ? 'warn' : 'primary'" (click)="toggleSound(mood, $event)">
-              <mat-icon [fontIcon]="isPlaying(mood._id) ? 'stop' : 'play_arrow'"></mat-icon>
-            </button>
-            }
-          </h3>
-        </div>
-        <div class="mood-list-container">
-          <div class="user-list" cdkDropList [id]="mood._id" [cdkDropListData]="mood._id" (cdkDropListDropped)="onUserDrop($event)"
-               [cdkDropListConnectedTo]="getOtherMoodsIds(mood._id)" [style]="{'background-color': mood.color ? hexToRgb(mood.color, 0.03) : null }">
-            @for (user of getUsersByMood(mood._id); track user._id) {
-            <div class="user-card" cdkDrag cdkDragBoundary=".board-container" [cdkDragDisabled]="!canMoveUser(user._id)" [cdkDragData]="user._id"
-                 [class.cannot-move]="!canMoveUser(user._id)" (mouseenter)="toggleUserFocus(user, true)" (mouseleave)="toggleUserFocus(user, false)">
-              <div class="user-card-title">
-                <div class="user-avatar" [style.backgroundImage]="
-                  'url(' + (user.image || 'assets/default-avatar.png') + ')'
-                "></div>
-                <h3>{{ user.displayName }}</h3>
-              </div>
+    <ng-scrollbar class="my-weather-scrollbar">
+      <div class="board-grid">
+        <!-- Colonnes des humeurs -->
+        @for (mood of moods; track mood._id) {
+        <div class="mood-column">
+          <div class="mood-header" [style]="{'border-top-color': mood.color ? mood.color : null }">
+            <div class="mood-icon-container">
+              <img [src]="mood.image" alt="Image" class="mood-icon" />
             </div>
-            }
+            <h3>
+              {{ mood.name }}
+              @if (mood.sound) {
+              <button mat-icon-button class="sound-button" [color]="isPlaying(mood._id) ? 'warn' : 'primary'" (click)="toggleSound(mood, $event)">
+                <mat-icon [fontIcon]="isPlaying(mood._id) ? 'stop' : 'play_arrow'"></mat-icon>
+              </button>
+              }
+            </h3>
+          </div>
+          <div class="mood-list-container">
+            <div class="user-list" cdkDropList [id]="mood._id" [cdkDropListData]="mood._id" (cdkDropListDropped)="onUserDrop($event)"
+                 [cdkDropListConnectedTo]="getOtherMoodsIds(mood._id)" [style]="{'background-color': mood.color ? hexToRgb(mood.color, 0.03) : null }">
+              @for (user of getUsersByMood(mood._id); track user._id) {
+              <div class="user-card" cdkDrag cdkDragBoundary=".board-container" [cdkDragDisabled]="!canMoveUser(user._id)" [cdkDragData]="user._id"
+                   [class.cannot-move]="!canMoveUser(user._id)" (mouseenter)="toggleUserFocus(user, true)" (mouseleave)="toggleUserFocus(user, false)">
+                <div class="user-card-title">
+                  <div class="user-avatar" [style.backgroundImage]="
+                    'url(' + (user.image || 'assets/default-avatar.png') + ')'
+                  "></div>
+                  <h3>{{ user.displayName }}</h3>
+                </div>
+              </div>
+              }
+            </div>
           </div>
         </div>
+        }
       </div>
-      }
-    </div>
+    </ng-scrollbar>
   </div>
 </div>

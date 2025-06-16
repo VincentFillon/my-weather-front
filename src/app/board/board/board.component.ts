@@ -17,6 +17,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'; // Ajout de l'import
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { NgScrollbarModule } from 'ngx-scrollbar';
 import { Subscription } from 'rxjs';
 import { Mood } from '../../core/models/mood';
 import { PublicHoliday } from '../../core/models/public-holiday';
@@ -48,6 +49,7 @@ import { WeatherWidgetComponent } from '../weather-widget/weather-widget.compone
     MatTooltipModule,
     MatSlideToggleModule, // Ajout du module
     WeatherWidgetComponent,
+    NgScrollbarModule,
   ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss'],
@@ -386,7 +388,10 @@ export class BoardComponent implements OnInit, OnDestroy {
   hexToRgb(hex: string, alpha: number = 1): string | null {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
-      ? `rgba(${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}, ${alpha})`
+      ? `rgba(${parseInt(result[1], 16)}, ${parseInt(
+          result[2],
+          16
+        )}, ${parseInt(result[3], 16)}, ${alpha})`
       : null;
   }
 

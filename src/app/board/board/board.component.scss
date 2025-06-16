@@ -204,20 +204,26 @@
 
 .board-grid-container {
   flex: 1;
+  display: flex;
+  flex-direction: column;
 
   .date-container {
     height: 30px;
-    margin: 10px 0 20px;
+    margin: 10px 0;
   }
 
-  .board-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 5px;
-    overflow-y: auto;
-    max-height: calc(100vh - 50px); // date-container height + margin x2
-    padding: 0 10px;
-    margin: 10px 0 10px;
+  .my-weather-scrollbar {
+    flex: 1;
+
+    .board-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 5px;
+      // overflow-y: auto;
+      // max-height: calc(100vh - 50px); // date-container height + margin x2
+      padding: 0 10px;
+      margin: 10px 0 10px;
+    }
   }
 }
 

@@ -7,6 +7,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { NgScrollbarModule } from 'ngx-scrollbar';
 import { CreateRoomDto, Room } from '../../core/models/room';
 import { User } from '../../core/models/user';
 import { AuthService } from '../../core/services/auth.service';
@@ -26,6 +27,8 @@ import {
     MatBadgeModule,
     MatToolbarModule,
     MatDialogModule,
+    NgScrollbarModule,
+
   ],
   templateUrl: './chat-list.component.html',
   styleUrls: ['./chat-list.component.scss'],
