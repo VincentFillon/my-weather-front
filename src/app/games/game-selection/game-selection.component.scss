@@ -28,18 +28,19 @@
     border-radius: 15px;
     color: white;
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    background: var(--mat-sys-surface);
 
     &:hover {
-      transform: scale(1.05);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      background: var(--mat-sys-surface-variant);
+      box-shadow: var(--mat-sys-level5);
     }
   }
 
-  .tic-tac-toe {
-    background: var(--mat-sys-surface);
-  }
+  // .tic-tac-toe {
+  //   background: var(--mat-sys-surface);
+  // }
 
-  .pong {
-    background: var(--mat-sys-surface);
-  }
+  // .pong {
+  //   background: var(--mat-sys-surface);
+  // }
 }

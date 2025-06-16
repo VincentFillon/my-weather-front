@@ -19,8 +19,8 @@
 
 .mood-table {
   width: 100%;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: var(--mat-sys-surface-container);
+  box-shadow: var(--mat-sys-level2);
   border-radius: 4px;
 
   .mood-icon {
@@ -31,7 +31,7 @@
 
   th.mat-header-cell {
     font-weight: 500;
-    color: rgba(0, 0, 0, 0.87);
+    color: var(--mat-sys-outline);
   }
 
   td.mat-cell {
@@ -53,10 +53,8 @@
 .cdk-drag-preview {
   box-sizing: border-box;
   border-radius: 4px;
-  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
-              0 8px 10px 1px rgba(0, 0, 0, 0.14),
-              0 3px 14px 2px rgba(0, 0, 0, 0.12);
-  background-color: white;
+  box-shadow: var(--mat-sys-level4);
+  background-color: var(--mat-sys-surface-container-high);
 
   td {
     padding: 12px 8px;

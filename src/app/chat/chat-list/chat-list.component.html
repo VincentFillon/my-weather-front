@@ -13,7 +13,7 @@
       <mat-list-item>Aucune conversation</mat-list-item>
     } @else {
       @for (room of rooms; track room._id; let last = $last) {
-        <mat-list-item (click)="selectRoom(room)" class="chat-list-item" [class.has-unread]="room.unreadCount && room.unreadCount > 0">
+        <mat-list-item lines="2" (click)="selectRoom(room)" class="chat-list-item" [class.has-unread]="room.unreadCount && room.unreadCount > 0">
           <img matListItemAvatar [src]="getRoomAvatar(room)" alt="Avatar" class="chat-room-avatar" />
           <span matListItemTitle>
             @if (room.isChatBot) {

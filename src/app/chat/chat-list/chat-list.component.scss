@@ -30,13 +30,18 @@
   flex-grow: 1; // Prendre l'espace restant
   overflow-y: auto; // Activer le scroll si nécessaire
   padding-top: 0 !important; // Enlever le padding par défaut de mat-list
-  background-color: var(--mat-sys-color-surface);
+  background-color: var(--mat-sys-surface-container);
+
+  @include mat.list-overrides((
+    list-item-container-color: var(--mat-sys-surface-container),
+    list-item-leading-icon-start-space: 12px,
+  ));
 }
 
 .chat-list-item {
-  cursor: pointer;
+  cursor: pointer !important;
   &:hover {
-    background-color: rgba(0, 0, 0, 0.04);
+    background-color: rgba(0, 0, 0, 0.14);
   }
 
   &.has-unread {

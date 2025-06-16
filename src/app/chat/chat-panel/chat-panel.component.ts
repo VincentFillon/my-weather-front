@@ -134,7 +134,6 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
           showTimestamp = true;
           isGroupStart = true;
           isGroupEnd = true;
-          showDateSeparator = true;
         } else {
           const isSameSenderAsPrevious = !!prevMsg && prevMsg.sender!._id === msg.sender!._id;
           const isSameSenderAsNext = !!nextMsg && nextMsg.sender!._id === msg.sender!._id;
@@ -158,17 +157,17 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
           showTimestamp = !isSameMinuteAsNext;
           isGroupStart = !isSameSenderAsPrevious || !isSameMinuteAsPrevious;
           isGroupEnd = !isSameSenderAsNext || !isSameMinuteAsNext;
-
-          showDateSeparator = (() => {
-            if (!prevMsg) return true;
-            prevDate = new Date(prevMsg.createdAt);
-            return (
-              msgDate.getFullYear() !== prevDate.getFullYear() ||
-              msgDate.getMonth() !== prevDate.getMonth() ||
-              msgDate.getDate() !== prevDate.getDate()
-            );
-          })();
         }
+
+        showDateSeparator = (() => {
+          if (!prevMsg) return true;
+          prevDate = new Date(prevMsg.createdAt);
+          return (
+            msgDate.getFullYear() !== prevDate.getFullYear() ||
+            msgDate.getMonth() !== prevDate.getMonth() ||
+            msgDate.getDate() !== prevDate.getDate()
+          );
+        })();
 
         return {
           ...msg, // Copie les propriétés du message original
