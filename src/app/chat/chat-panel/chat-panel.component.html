@@ -33,13 +33,14 @@
         @if (processedMessages().length === 0) {
           <p class="no-messages"><i>Aucun message</i></p>
         } @else {
-          @for (message of processedMessages(); track message._id) {
+          @for (message of processedMessages(); track message._id; let i = $index) {
             @if (message.showDateSeparator) {
               <div class="date-separator">
                 <span>{{ message.createdAt | date:'fullDate' }}</span>
               </div>
             }
-            <div class="message-item-container"
+            <div [attr.id]="'message-' + i"
+              class="message-item-container"
               [class.my-message]="message.sender?._id === currentUser?._id && !message.isBotMessage"
               [class.other-message]="message.sender?._id !== currentUser?._id && !message.isBotMessage"
               [class.bot-message]="message.isBotMessage"
@@ -72,7 +73,7 @@
                     <!-- Affichage du média -->
                     @if (message.mediaUrl) {
                       <div class="media-container">
-                        <img [src]="message.mediaUrl" alt="Média partagé" class="chat-media">
+                        <img [src]="message.mediaUrl" alt="Média partagé" class="chat-media" (click)="openFullScreenMedia(message.mediaUrl)">
                       </div>
                     }
                     <!-- Affichage du contenu texte -->
@@ -115,51 +116,54 @@
     </ng-scrollbar>
   </mat-card-content>
 
-  <!-- Zone d'upload et de prévisualisation -->
-  @if (previewUrl || isUploading() || uploadError()) {
-    <div class="upload-preview-area">
-      @if (isUploading()) {
-        <div class="upload-indicator">
-          <mat-spinner diameter="40"></mat-spinner>
-          <span>Envoi en cours...</span>
-        </div>
-      } @else if (uploadError()) {
-        <div class="upload-error">
-          <mat-icon fontIcon="error_outline" color="warn"></mat-icon>
-          <span>{{ uploadError() }}</span>
-          <button mat-icon-button (click)="cancelUpload()" aria-label="Annuler l'erreur d'upload">
-            <mat-icon fontIcon="close"></mat-icon>
-          </button>
-        </div>
-      } @else if (previewUrl && selectedFile) {
-        <div class="preview-container">
-          <img [src]="previewUrl" [alt]="selectedFile.name" class="file-preview">
-          <div class="preview-info">
-            <span>{{ selectedFile.name }} ({{ selectedFile.size / 1024 | number:'1.0-2' }} KB)</span>
-          </div>
-          <button mat-icon-button (click)="cancelUpload()" class="cancel-preview-btn" aria-label="Annuler la sélection du fichier">
-            <mat-icon fontIcon="close"></mat-icon>
-          </button>
-        </div>
-      }
-    </div>
-  }
-
   <mat-card-actions class="message-input-area" [class.disabled-input]="room.isChatBot">
     @if (!room.isChatBot) {
-      <!-- Bouton Joindre -->
-      <input type="file" #fileInput hidden (change)="onFileSelected($event)" accept="image/jpeg,image/png,image/gif,image/webp">
-      <button mat-icon-button (click)="fileInput.click()" aria-label="Joindre un fichier">
-        <mat-icon fontIcon="attachment"></mat-icon>
-      </button>
+      <!-- Zone d'upload et de prévisualisation -->
+      @if (showPreview()) {
+        <div class="upload-preview-area">
+          @if (isUploading()) {
+            <div class="upload-indicator">
+              <mat-spinner diameter="40"></mat-spinner>
+              <span>Envoi en cours...</span>
+            </div>
+          } @else if (uploadError()) {
+            <div class="upload-error">
+              <mat-icon fontIcon="error_outline" color="warn"></mat-icon>
+              <span>{{ uploadError() }}</span>
+              <button mat-icon-button (click)="cancelFileSelection()" aria-label="Annuler l'erreur d'upload">
+                <mat-icon fontIcon="close"></mat-icon>
+              </button>
+            </div>
+          } @else if (previewUrl && selectedFile) {
+            <div class="preview-container">
+              <button mat-icon-button (click)="cancelFileSelection()" class="cancel-preview-btn" aria-label="Annuler la sélection du fichier">
+                <mat-icon fontIcon="close"></mat-icon>
+              </button>
+              <img [src]="previewUrl" [alt]="selectedFile.name" class="file-preview">
+              <!-- <div class="preview-info">
+                <span>{{ selectedFile.name }} ({{ selectedFile.size / 1024 | number:'1.0-2' }} KB)</span>
+              </div> -->
+              <button mat-icon-button color="primary" (click)="confirmAndSendFile()" [disabled]="isUploading()">
+                <mat-icon fontIcon="send"></mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      } @else {
+        <!-- Bouton Joindre -->
+        <input type="file" #fileInput hidden (change)="onFileSelected($event)" accept="image/jpeg,image/png,image/gif,image/webp">
+        <button mat-icon-button (click)="fileInput.click()" aria-label="Joindre un fichier">
+          <mat-icon fontIcon="attachment"></mat-icon>
+        </button>
 
-      <mat-form-field appearance="outline" class="message-input-field">
-        <mat-label>Votre message...</mat-label>
-        <input matInput #messageInput [(ngModel)]="newMessageContent" (keyup.enter)="sendMessage()" placeholder="Écrivez quelque chose...">
-      </mat-form-field>
-      <button mat-icon-button color="primary" (click)="sendMessage()" [disabled]="(!newMessageContent.trim() && !uploadedMediaUrl) || isUploading()">
-        <mat-icon fontIcon="send"></mat-icon>
-      </button>
+        <mat-form-field appearance="outline" class="message-input-field">
+          <mat-label>Votre message...</mat-label>
+          <input matInput #messageInput [(ngModel)]="newMessageContent" (keyup.enter)="sendMessage()" placeholder="Écrivez quelque chose...">
+        </mat-form-field>
+        <button mat-icon-button color="primary" (click)="sendMessage()" [disabled]="(!newMessageContent.trim() && !uploadedMediaUrl && !fileToUpload) || isUploading()">
+          <mat-icon fontIcon="send"></mat-icon>
+        </button>
+      }
     } @else {
       <div class="bot-room-message">
         Vous ne pouvez pas envoyer de messages dans cette conversation.

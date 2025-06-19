@@ -46,3 +46,25 @@ body {
   --scrollbar-thumb-color: var(--mat-sys-outline-variant);
   --scrollbar-thumb-hover-color: var(--mat-sys-outline);
 }
+
+// Styles pour le dialogue MatDialog lui-même pour qu'il prenne tout l'écran
+.full-screen-media-dialog {
+  @include mat.dialog-overrides(
+    (
+      container-max-width: 100vw,
+      container-small-max-width: 100vw,
+      content-padding: 0,
+    )
+  );
+  max-height: 100vh;
+  .mat-mdc-dialog-container {
+    padding: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    width: 100vw !important;
+    height: 100vh !important;
+  }
+}

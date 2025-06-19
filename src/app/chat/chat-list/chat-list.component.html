@@ -1,50 +1,55 @@
-<mat-toolbar color="primary" class="chat-list-header">
-  <span>Messagerie</span>
-  <span class="spacer"></span>
-  <button mat-icon-button (click)="openNewChatDialog()" aria-label="Nouvelle conversation">
-    <mat-icon fontIcon="add_comment" class="toolbar-icon"></mat-icon> </button>
+<mat-card class="chat-list-panel">
+  <mat-toolbar color="primary" class="chat-list-header">
+    <span>Messagerie</span>
+    <span class="spacer"></span>
+    <button mat-icon-button (click)="openNewChatDialog()" aria-label="Nouvelle conversation">
+      <mat-icon fontIcon="add_comment" class="toolbar-icon"></mat-icon>
+    </button>
     <button mat-icon-button (click)="close()" aria-label="Fermer la liste">
       <mat-icon fontIcon="close" class="toolbar-icon"></mat-icon>
     </button>
   </mat-toolbar>
 
-  <mat-list class="chat-room-list">
+  <mat-card-content class="chat-room-list">
     <ng-scrollbar class="my-weather-scrollbar">
-      @if (rooms.length === 0) {
-        <mat-list-item>Aucune conversation</mat-list-item>
-      } @else {
-        @for (room of rooms; track room._id; let last = $last) {
-          <mat-list-item lines="2" (click)="selectRoom(room)" class="chat-list-item" [class.has-unread]="room.unreadCount && room.unreadCount > 0">
-            <img matListItemAvatar [src]="getRoomAvatar(room)" alt="Avatar" class="chat-room-avatar" />
-            <span matListItemTitle>
-              @if (room.isChatBot) {
-                MoodBot
-              } @else {
-                {{ room.name }}
-              }
-            </span>
-            <span matListItemLine class="last-message">
-              @if (room.lastMessage) {
-                {{ room.lastMessage.content | slice : 0 : 30 }}{{ (room.lastMessage.content.length || 0) > 30 ? "..." : "" }}
-              } @else {
-                <i>Aucun message</i>
-              }
-            </span>
+      <mat-list>
+          @if (rooms.length === 0) {
+            <mat-list-item>Aucune conversation</mat-list-item>
+          } @else {
+            @for (room of rooms; track room._id; let last = $last) {
+              <mat-list-item lines="2" (click)="selectRoom(room)" class="chat-list-item" [class.has-unread]="room.unreadCount && room.unreadCount > 0">
+                <img matListItemAvatar [src]="getRoomAvatar(room)" alt="Avatar" class="chat-room-avatar" />
+                <span matListItemTitle>
+                  @if (room.isChatBot) {
+                    MoodBot
+                  } @else {
+                    {{ room.name }}
+                  }
+                </span>
+                <span matListItemLine class="last-message">
+                  @if (room.lastMessage) {
+                    {{ room.lastMessage.content | slice : 0 : 30 }}{{ (room.lastMessage.content.length || 0) > 30 ? "..." : "" }}
+                  } @else {
+                    <i>Aucun message</i>
+                  }
+                </span>
 
-            <div matListItemMeta class="room-meta">
-              <span class="timestamp">{{
-                room.lastMessage?.createdAt | date : "shortTime"
-              }}</span>
-              @if (room.unreadCount && room.unreadCount > 0) {
-                <mat-icon class="unread-indicator" color="warn" matBadge="{{ room.unreadCount }}" matBadgeSize="small"
-                matBadgeOverlap="false">fiber_manual_record</mat-icon>
+                <div matListItemMeta class="room-meta">
+                  <span class="timestamp">{{
+                    room.lastMessage?.createdAt | date : "shortTime"
+                  }}</span>
+                  @if (room.unreadCount && room.unreadCount > 0) {
+                    <mat-icon class="unread-indicator" color="warn" matBadge="{{ room.unreadCount }}" matBadgeSize="small"
+                    matBadgeOverlap="false">fiber_manual_record</mat-icon>
+                  }
+                </div>
+              </mat-list-item>
+              @if (!last) {
+                <mat-divider></mat-divider>
               }
-            </div>
-          </mat-list-item>
-          @if (!last) {
-            <mat-divider></mat-divider>
+            }
           }
-        }
-      }
+      </mat-list>
     </ng-scrollbar>
-  </mat-list>
+  </mat-card-content>
+</mat-card>

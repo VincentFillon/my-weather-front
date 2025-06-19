@@ -1,14 +1,29 @@
 @use '@angular/material' as mat;
 
-// src/app/features/chat/components/chat-list/chat-list.component.scss
 :host {
+  min-height: 400px;
+  max-height: 60vh;
+  width: 420px;
   display: flex;
   flex-direction: column;
-  height: 100%; // Prendre toute la hauteur du conteneur popup
+  background-color: var(--mat-sys-color-surface);
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+  box-shadow: 0 2px 10px var(--mat-sys-color-shadow);
+}
+
+.chat-list-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .chat-list-header {
-  flex-shrink: 0; // Empêcher le header de rétrécir
+  flex-shrink: 0;
+  border-radius: 8px 8px 0 0;
 
   @include mat.toolbar-overrides(
     (
@@ -21,21 +36,32 @@
     flex: 1 1 auto;
   }
 
-  .toolbar-icon {
+  button {
+    margin-left: 8px;
+  }
+
+  mat-icon {
     color: var(--mat-sys-on-primary);
   }
 }
 
 .chat-room-list {
-  flex-grow: 1; // Prendre l'espace restant
-  // overflow-y: auto; // Activer le scroll si nécessaire
-  padding-top: 0 !important; // Enlever le padding par défaut de mat-list
-  background-color: var(--mat-sys-surface-container);
+  flex-grow: 1;
+  height: calc(100% - 64px);
+  width: 100%;
+  padding: 0;
+  background-color: var(--mat-sys-surface-container-low);
+  display: flex;
+  flex-direction: column;
+  position: relative;
 
-  @include mat.list-overrides((
-    list-item-container-color: var(--mat-sys-surface-container),
-    list-item-two-line-container-height: 70px
-  ));
+  mat-list {
+    padding-top: 0 !important; // Enlever le padding par défaut de mat-list
+    @include mat.list-overrides((
+      list-item-container-color: var(--mat-sys-surface-container),
+      list-item-two-line-container-height: 70px
+    ));
+  }
 }
 
 .chat-list-item {
@@ -70,16 +96,13 @@
   }
 
   .unread-indicator {
-    font-size: 12px; // Taille du point
+    font-size: 12px;
     width: 12px;
     height: 12px;
     margin-top: 4px;
-    // Alternative avec badge: positionner correctement le badge
-    // position: relative;
-    // .mat-badge-content { position: absolute; top: 5px; right: 5px; }
   }
 }
 
 mat-divider {
-  margin: 0 16px; // Marge pour les séparateurs
+  margin: 0 16px;
 }

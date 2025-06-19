@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -21,6 +22,7 @@ import {
   selector: 'app-chat-list',
   imports: [
     CommonModule,
+    MatCardModule,
     MatListModule,
     MatIconModule,
     MatButtonModule,

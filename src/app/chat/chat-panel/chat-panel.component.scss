@@ -1,14 +1,13 @@
 @use "@angular/material" as mat;
 
 :host {
-  display: block; // Pour que la hauteur/largeur s'appliquent
   min-height: 400px;
   max-height: 60vh;
-  width: 420px; // Largeur fixe
+  width: 420px;
   display: flex;
   flex-direction: column;
   background-color: var(--mat-sys-color-surface);
-  border-radius: 8px 8px 0 0; // Coins arrondis en haut
+  border-radius: 8px 8px 0 0;
   overflow: hidden;
   box-shadow: 0 2px 10px var(--mat-sys-color-shadow);
 }
@@ -45,16 +44,16 @@
     color: var(--mat-sys-on-primary);
   }
 }
+
 .message-area {
   flex-grow: 1;
-  // overflow-y: auto;
   height: calc(100% - 135px);
   width: 100%;
-  padding: 15px 10px; // Un peu plus de padding
+  padding: 15px 10px;
   background-color: var(--mat-sys-surface-container-low);
-  display: flex; // Permet aux enfants de gérer leur hauteur
-  flex-direction: column; // Empile les messages verticalement
-  position: relative; // Pour le positionnement de .drop-indicator
+  display: flex;
+  flex-direction: column;
+  position: relative;
 
   &.drag-over {
     border: 2px dashed var(--mat-sys-color-primary); // Ou une autre couleur indicative
@@ -176,6 +175,7 @@
         max-height: 200px; // Limiter la hauteur pour ne pas prendre trop de place
         border-radius: 4px;
         display: block; // Pour éviter l'espace en dessous
+        cursor: pointer;
       }
     }
   }
@@ -431,12 +431,11 @@
 
 // Styles pour la zone de prévisualisation/upload
 .upload-preview-area {
-  padding: 8px 16px;
-  border-top: 1px solid var(--mat-sys-outline);
-  background-color: var(--mat-sys-color-surface-container-lowest);
+  flex-grow: 1;
   display: flex;
   align-items: center;
-  gap: 10px;
+  column-gap: 10px;
+  background-color: var(--mat-sys-color-surface-container-lowest);
 
   .upload-indicator {
     display: flex;
@@ -453,29 +452,21 @@
     color: var(--mat-sys-color-error); // Rouge pour l'erreur
     font-size: 0.9em;
     flex-grow: 1;
-
-    mat-icon {
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
-    }
-    button {
-      margin-left: auto; // Pousse le bouton à droite
-    }
   }
 
   .preview-container {
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
+    column-gap: 10px;
     position: relative;
     flex-grow: 1;
 
     .file-preview {
-      max-height: 50px;
-      max-width: 50px;
+      flex: 1;
+      max-height: 70px;
       border-radius: 4px;
-      object-fit: cover;
+      object-fit: contain;
       border: 1px solid var(--mat-sys-outline);
     }
 
@@ -485,10 +476,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-    }
-
-    .cancel-preview-btn {
-      margin-left: auto; // Pousse le bouton à droite
     }
   }
 }

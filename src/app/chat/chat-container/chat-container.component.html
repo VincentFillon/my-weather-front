@@ -9,6 +9,9 @@
         class="chat-panel-instance"
         > </app-chat-panel>
     }
+    @if (showChatList) {
+      <app-chat-list [rooms]="rooms" (roomSelected)="openChatPanel($event)" (closeList)="toggleChatList()"></app-chat-list>
+    }
   </div>
 
   <div class="chat-controls">
@@ -23,12 +26,5 @@
         <mat-icon fontIcon="chat"></mat-icon>
       </button>
   </div>
-
-
-  @if (showChatList) {
-    <div class="chat-list-popup">
-        <app-chat-list [rooms]="rooms" (roomSelected)="openChatPanel($event)" (closeList)="toggleChatList()"></app-chat-list>
-    </div>
-  }
 
 </div>

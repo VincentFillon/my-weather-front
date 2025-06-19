@@ -43,9 +43,10 @@ import { ChatService } from '../../core/services/chat.service';
 import { UploadService } from '../../core/services/upload.service'; // Ajout
 import {
   EditChatDialogComponent,
-  EditChatDialogResult,
+  EditChatDialogResult
 } from '../edit-chat-dialog/edit-chat-dialog.component';
 import { EmojiPickerComponent } from '../emoji-picker/emoji-picker.component';
+import { FullScreenMediaDialogComponent } from '../full-screen-media-dialog/full-screen-media-dialog.component'; // Ajout
 
 @Component({
   selector: 'app-chat-panel',
@@ -64,6 +65,7 @@ import { EmojiPickerComponent } from '../emoji-picker/emoji-picker.component';
     MatDialogModule,
     NgScrollbarModule,
     NgScrollReached,
+    // FullScreenMediaDialogComponent, // Ajout
   ],
   templateUrl: './chat-panel.component.html',
   styleUrls: ['./chat-panel.component.scss'],
@@ -104,12 +106,14 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
   showEmojiPickerFor: string | null = null;
 
   // Pour l'upload de fichiers
-  selectedFile: File | null = null;
+  selectedFile: File | null = null; // Le fichier sélectionné pour la prévisualisation
+  fileToUpload: File | null = null; // Le fichier à uploader après confirmation
   previewUrl: string | ArrayBuffer | null = null;
   isUploading = signal(false);
   uploadError = signal<string | null>(null);
   uploadedMediaUrl: string | null = null; // Changé de private à public
   isDragging = signal(false);
+  showPreview = signal(false); // Pour contrôler l'affichage de la prévisualisation
 
   constructor() {
     this.processedMessages = computed(() => {
@@ -346,10 +350,17 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
   }
 
   sendMessage(): void {
-    if (
-      (!this.newMessageContent.trim() && !this.uploadedMediaUrl) ||
-      !this.currentUser
-    ) {
+    if (!this.currentUser) {
+      return;
+    }
+
+    // Si un fichier est en attente de confirmation, ne pas envoyer le message texte seul
+    if (this.fileToUpload && !this.uploadedMediaUrl) {
+      // L'envoi se fera via confirmAndSendFile
+      return;
+    }
+
+    if (!this.newMessageContent.trim() && !this.uploadedMediaUrl) {
       return;
     }
 
@@ -363,9 +374,11 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
     this.chatService.sendMessage(messageData);
     this.newMessageContent = '';
     this.selectedFile = null;
+    this.fileToUpload = null;
     this.previewUrl = null;
     this.uploadedMediaUrl = null;
     this.uploadError.set(null);
+    this.showPreview.set(false); // Cacher la prévisualisation après envoi
     this.scrollToBottom();
     // Focus sur l'input après envoi
     this.messageInput.nativeElement.focus();
@@ -450,53 +463,49 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
     const reader = new FileReader();
     reader.onload = (e) => (this.previewUrl = reader.result);
     reader.readAsDataURL(file);
-
-    this.uploadFile(); // Lancer l'upload directement après la sélection
+    this.fileToUpload = file; // Stocker le fichier pour l'upload après confirmation
+    this.showPreview.set(true); // Afficher la prévisualisation
   }
 
-  private uploadFile(): void {
-    if (!this.selectedFile || !this.currentUser) return;
+  confirmAndSendFile(): void {
+    if (!this.fileToUpload || !this.currentUser) {
+      return;
+    }
 
     this.isUploading.set(true);
     this.uploadError.set(null);
 
     this.uploadService
-      .uploadChatMedia(this.selectedFile)
+      .uploadChatMedia(this.fileToUpload)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         tap((response) => {
           this.uploadedMediaUrl = '/api/data/' + response.url;
-          // Si l'utilisateur n'a pas tapé de texte, on peut envoyer directement le média
-          if (!this.newMessageContent.trim()) {
-            this.sendMessage();
-          }
+          this.sendMessage(); // Envoyer le message après l'upload
         }),
         catchError((error) => {
           console.error("Erreur d'upload:", error);
           this.uploadError.set(
             "Erreur lors de l'upload du fichier. Veuillez réessayer."
           );
-          this.selectedFile = null;
-          this.previewUrl = null;
-          this.uploadedMediaUrl = null;
+          this.cancelFileSelection(); // Annuler la sélection en cas d'erreur
           return of(null); // Gérer l'erreur et continuer
         }),
         finalize(() => {
           this.isUploading.set(false);
-          // Ne pas réinitialiser selectedFile et previewUrl ici,
-          // car l'utilisateur pourrait vouloir ajouter du texte avant d'envoyer.
-          // Ils seront réinitialisés dans sendMessage.
         })
       )
       .subscribe();
   }
 
-  cancelUpload(): void {
+  cancelFileSelection(): void {
     this.selectedFile = null;
+    this.fileToUpload = null;
     this.previewUrl = null;
     this.uploadedMediaUrl = null;
     this.uploadError.set(null);
     this.isUploading.set(false);
+    this.showPreview.set(false); // Cacher la prévisualisation
   }
 
   // --- Fin de la gestion de l'upload ---
@@ -541,7 +550,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       try {
         if (this.messageContainer) {
-          this.messageContainer.scrollTo({ bottom: 0, duration: 500 });
+          this.messageContainer.scrollToElement(`#message-${this.processedMessages().length - 1}`, { duration: 500 });
         }
       } catch (err) {
         console.error('Could not scroll to bottom:', err);
@@ -559,6 +568,8 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
       // Optionnel: Afficher une notification à l'utilisateur
       return;
     }
+
+
 
     const dialogRef = this.dialog.open(EditChatDialogComponent, {
       width: '500px', // ou la largeur souhaitée
@@ -593,5 +604,12 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
           }
         }
       });
+  }
+
+  openFullScreenMedia(mediaUrl: string): void {
+    this.dialog.open(FullScreenMediaDialogComponent, {
+      data: { mediaUrl },
+      panelClass: 'full-screen-media-dialog', // Classe CSS pour le style plein écran
+    });
   }
 }

@@ -52,17 +52,17 @@
   }
 }
 
-.chat-list-popup {
-  position: absolute; // Positionné par rapport au :host ou .chat-container
-  bottom: 70px; // Au-dessus du bouton FAB (ajuster selon taille FAB)
-  right: 20px; // Alignè avec le bouton FAB
-  width: 400px;
-  max-height: 70vh;
-  border: 1px solid var(--mat-sys-outline);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
-  overflow: hidden; // Pour le contenu
-  display: flex;
-  flex-direction: column;
-  pointer-events: auto; // Rétablir les clics pour la liste
-}
+// .chat-list-popup {
+//   position: absolute; // Positionné par rapport au :host ou .chat-container
+//   bottom: 70px; // Au-dessus du bouton FAB (ajuster selon taille FAB)
+//   right: 20px; // Alignè avec le bouton FAB
+//   width: 400px;
+//   max-height: 70vh;
+//   border: 1px solid var(--mat-sys-outline);
+//   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+//   border-radius: 8px;
+//   overflow: hidden; // Pour le contenu
+//   display: flex;
+//   flex-direction: column;
+//   pointer-events: auto; // Rétablir les clics pour la liste
+// }
