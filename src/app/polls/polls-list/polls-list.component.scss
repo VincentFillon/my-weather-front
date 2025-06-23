@@ -47,7 +47,7 @@
       border-radius: 5px;
       padding: 15px;
       margin-bottom: 15px;
-      background-color: var(--mat-sys-surface-container-lowest);
+      background-color: var(--mat-sys-surface-container-low);
       cursor: pointer;
       transition: box-shadow 0.2s ease-in-out;
 
@@ -81,7 +81,7 @@
             margin-bottom: 5px;
 
             .option-bar {
-              background-color: var(--mat-sys-surface-container-low);
+              background-color: var(--mat-sys-surface-container-lowest);
               border-radius: 3px;
               overflow: hidden;
               position: relative;
@@ -89,7 +89,7 @@
               line-height: 20px; /* Centre le texte verticalement */
 
               .option-progress {
-                background-color: var(--mat-sys-primary); /* Couleur de la barre de progression */
+                background-color: var(--mat-sys-primary-container); /* Couleur de la barre de progression */
                 height: 100%;
                 position: absolute;
                 left: 0;
