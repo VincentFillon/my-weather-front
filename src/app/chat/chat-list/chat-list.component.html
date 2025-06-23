@@ -1,11 +1,11 @@
 <mat-card class="chat-list-panel">
-  <mat-toolbar color="primary" class="chat-list-header">
+  <mat-toolbar class="chat-list-header">
     <span>Messagerie</span>
     <span class="spacer"></span>
-    <button mat-icon-button (click)="openNewChatDialog()" aria-label="Nouvelle conversation">
+    <button matIconButton (click)="openNewChatDialog()" aria-label="Nouvelle conversation">
       <mat-icon fontIcon="add_comment" class="toolbar-icon"></mat-icon>
     </button>
-    <button mat-icon-button (click)="close()" aria-label="Fermer la liste">
+    <button matIconButton (click)="close()" aria-label="Fermer la liste">
       <mat-icon fontIcon="close" class="toolbar-icon"></mat-icon>
     </button>
   </mat-toolbar>
@@ -39,7 +39,7 @@
                     room.lastMessage?.createdAt | date : "shortTime"
                   }}</span>
                   @if (room.unreadCount && room.unreadCount > 0) {
-                    <mat-icon class="unread-indicator" color="warn" matBadge="{{ room.unreadCount }}" matBadgeSize="small"
+                    <mat-icon class="unread-indicator" class="text-error" matBadge="{{ room.unreadCount }}" matBadgeSize="small"
                     matBadgeOverlap="false">fiber_manual_record</mat-icon>
                   }
                 </div>

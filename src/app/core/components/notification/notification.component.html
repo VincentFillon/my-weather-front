@@ -18,11 +18,11 @@
   <div class="notification-actions">
     @for (action of data.actions; track $index) {
     @if (action.iconOnly && action.icon) {
-    <button type="button" mat-icon-button (click)="action.action()" class="notification-action" [attr.aria-label]="action.label">
+    <button type="button" matIconButton (click)="action.action()" class="btn-secondary notification-action" [attr.aria-label]="action.label">
       <mat-icon [fontIcon]="action.icon"></mat-icon>
     </button>
     } @else {
-    <button type="button" mat-button (click)="action.action()" class="notification-action" [attr.aria-label]="action.label">
+    <button type="button" matButton="filled" (click)="action.action()" class="btn-secondary notification-action" [attr.aria-label]="action.label">
       @if (action.icon) {
       <mat-icon [fontIcon]="action.icon"></mat-icon>
       }

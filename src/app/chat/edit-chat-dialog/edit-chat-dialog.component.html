@@ -49,12 +49,12 @@
 
   <mat-divider></mat-divider>
 
-  <button mat-button color="warn" (click)="removeRoom()">Supprimer le groupe</button>
+  <button matButton class="btn-error" (click)="removeRoom()">Supprimer le groupe</button>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-raised-button (click)="confirmSelection()" [disabled]="!chatRoomName">
+  <button matButton="filled" (click)="confirmSelection()" [disabled]="!chatRoomName">
     Sauvegarder
   </button>
-  <button mat-button (click)="closeDialog()">Annuler</button>
+  <button matButton (click)="closeDialog()">Annuler</button>
 </mat-dialog-actions>

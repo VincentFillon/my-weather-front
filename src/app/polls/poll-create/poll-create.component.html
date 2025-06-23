@@ -50,7 +50,7 @@
         @for (option of options.controls; track option; let i = $index) {
         <mat-form-field appearance="outline" class="option-item">
           <input matInput type="text" [formControlName]="i" placeholder="Option {{ i + 1 }}">
-          <button matSuffix mat-icon-button type="button" color="warn" (click)="removeOption(i)" [disabled]="options.length <= 2"
+          <button matSuffix matIconButton type="button" class="btn-error" (click)="removeOption(i)" [disabled]="options.length <= 2"
                   title="Supprimer cette option">
             <mat-icon fontIcon="delete"></mat-icon>
           </button>
@@ -60,7 +60,7 @@
         </mat-form-field>
         }
       </div>
-      <button mat-raised-button type="button" color="primary" (click)="addOption()">
+      <button matButton="filled" type="button" (click)="addOption()">
         + Ajouter une option
       </button>
     </div>
@@ -104,8 +104,8 @@
     }
 
     <div class="form-actions">
-      <button mat-button type="button" color="primary" (click)="goBack()" [disabled]="isSubmitting">Annuler</button>
-      <button mat-raised-button type="submit" color="accent" [disabled]="pollForm.invalid || isSubmitting">
+      <button matButton type="button" (click)="goBack()" [disabled]="isSubmitting">Annuler</button>
+      <button matButton="filled" type="submit" class="btn-primary" [disabled]="pollForm.invalid || isSubmitting">
         {{ isSubmitting ? 'Création en cours...' : 'Créer le sondage' }}
       </button>
     </div>

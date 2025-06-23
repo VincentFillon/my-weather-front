@@ -60,8 +60,8 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button mat-button type="button" (click)="onCancel()">Annuler</button>
-    <button mat-raised-button color="primary" type="submit" [disabled]="!form.valid">
+    <button matButton type="button" (click)="onCancel()">Annuler</button>
+    <button matButton="filled" type="submit" [disabled]="!form.valid">
       {{ isNewUser ? 'Créer' : 'Modifier' }}
     </button>
   </mat-dialog-actions>

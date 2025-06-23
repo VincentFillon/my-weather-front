@@ -3,7 +3,7 @@
   <div class="neutral-zone">
     <div class="neutral-header">
       <!-- Menu utilisateur -->
-      <button mat-icon-button [matMenuTriggerFor]="userMenu">
+      <button matIconButton [matMenuTriggerFor]="userMenu">
         <mat-icon fontIcon="menu"></mat-icon>
       </button>
       <mat-menu #userMenu="matMenu">
@@ -44,7 +44,7 @@
         </div>
         <mat-divider class="user-menu-divider"></mat-divider>
         <button mat-menu-item (click)="logout()">
-          <mat-icon fontIcon="exit_to_app" color="warn"></mat-icon>
+          <mat-icon fontIcon="exit_to_app" class="text-error"></mat-icon>
           <span>Déconnexion</span>
         </button>
       </mat-menu>
@@ -131,7 +131,7 @@
             <h3>
               {{ mood.name }}
               @if (mood.sound) {
-              <button mat-icon-button class="sound-button" [color]="isPlaying(mood._id) ? 'warn' : 'primary'" (click)="toggleSound(mood, $event)">
+              <button matIconButton class="sound-button" [ngClass]="isPlaying(mood._id) ? 'btn-error' : 'btn-primary'" (click)="toggleSound(mood, $event)">
                 <mat-icon [fontIcon]="isPlaying(mood._id) ? 'stop' : 'play_arrow'"></mat-icon>
               </button>
               }

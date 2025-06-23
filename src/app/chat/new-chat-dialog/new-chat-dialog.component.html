@@ -52,8 +52,8 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-raised-button (click)="confirmSelection()" [disabled]="!chatRoomName || !selectedUsers.length">
+  <button matButton="filled" (click)="confirmSelection()" [disabled]="!chatRoomName || !selectedUsers.length">
     Confirmer
   </button>
-  <button mat-button (click)="closeDialog()">Annuler</button>
+  <button matButton (click)="closeDialog()">Annuler</button>
 </mat-dialog-actions>

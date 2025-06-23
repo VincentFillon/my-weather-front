@@ -1,6 +1,6 @@
 <div class="settings-container">
   <div class="main-actions">
-    <button mat-raised-button type="button" routerLink="/board">Retour</button>
+    <button matButton="elevated" type="button" routerLink="/board">Retour</button>
   </div>
 
   <mat-card class="settings-card">
@@ -31,8 +31,8 @@
 
               <div class="form-actions">
                 <button
-                  mat-raised-button
-                  color="primary"
+                  matButton="filled"
+
                   type="submit"
                   [disabled]="!displayNameForm.valid"
                 >
@@ -61,8 +61,8 @@
 
               <div class="form-actions">
                 <button
-                  mat-raised-button
-                  color="primary"
+                  matButton="filled"
+
                   type="submit"
                   [disabled]="!usernameForm.valid"
                 >
@@ -100,8 +100,8 @@
 
               <div class="form-actions">
                 <button
-                  mat-raised-button
-                  color="primary"
+                  matButton="filled"
+
                   type="submit"
                   [disabled]="!imageForm.valid"
                 >
@@ -124,7 +124,7 @@
                   formControlName="currentPassword"
                 />
                 <button
-                  mat-icon-button
+                  matIconButton
                   matSuffix
                   (click)="hideCurrentPassword = !hideCurrentPassword"
                   type="button"
@@ -149,7 +149,7 @@
                   formControlName="newPassword"
                 />
                 <button
-                  mat-icon-button
+                  matIconButton
                   matSuffix
                   (click)="hideNewPassword = !hideNewPassword"
                   type="button"
@@ -177,7 +177,7 @@
                   formControlName="confirmPassword"
                 />
                 <button
-                  mat-icon-button
+                  matIconButton
                   matSuffix
                   (click)="hideConfirmPassword = !hideConfirmPassword"
                   type="button"
@@ -200,8 +200,8 @@
 
               <div class="form-actions">
                 <button
-                  mat-raised-button
-                  color="primary"
+                  matButton="filled"
+
                   type="submit"
                   [disabled]="!passwordForm.valid"
                 >
@@ -220,7 +220,7 @@
               La suppression de votre compte est irréversible. Toutes vos
               données seront définitivement supprimées.
             </p>
-            <button mat-raised-button color="warn" (click)="onDeleteAccount()">
+            <button matButton="filled" class="btn-error" (click)="onDeleteAccount()">
               Supprimer mon compte
             </button>
           </div>

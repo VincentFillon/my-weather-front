@@ -19,8 +19,8 @@
 
 .user-table {
   width: 100%;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: var(--mat-sys-surface-container);
+  box-shadow: var(--mat-sys-level2);
   border-radius: 4px;
 
   .user-avatar {
@@ -29,7 +29,6 @@
     border-radius: 50%;
     background-size: cover;
     background-position: center;
-    background-color: #e0e0e0;
   }
 
   .mood-info {
@@ -46,7 +45,6 @@
 
   th.mat-header-cell {
     font-weight: 500;
-    color: rgba(0, 0, 0, 0.87);
   }
 
   td.mat-cell {

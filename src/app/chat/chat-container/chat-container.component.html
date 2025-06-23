@@ -16,13 +16,13 @@
 
   <div class="chat-controls">
       @for (chat of getMinimizedChats(); track chat.room._id) {
-         <button mat-raised-button (click)="openChatPanel(chat.room)" class="minimized-chat-tab" [matBadge]="chat.unreadCount" matBadgeColor="warn" [matBadgeHidden]="!chat.unreadCount">
+         <button matButton="elevated" (click)="openChatPanel(chat.room)" class="minimized-chat-tab" [matBadge]="chat.unreadCount" matBadgeColor="warn" [matBadgeHidden]="!chat.unreadCount">
              {{ chat.room.name }}
               <mat-icon fontIcon="close" class="close-minimized" (click)="$event.stopPropagation(); closeChatPanel(chat.room)"></mat-icon>
          </button>
        }
 
-      <button mat-fab color="primary" (click)="toggleChatList()" class="chat-toggle-button" [matBadge]="getTotalUnreadCount()" matBadgeColor="warn" [matBadgeHidden]="!getTotalUnreadCount()">
+      <button matFab (click)="toggleChatList()" class="chat-toggle-button" [matBadge]="getTotalUnreadCount()" matBadgeColor="warn" [matBadgeHidden]="!getTotalUnreadCount()">
         <mat-icon fontIcon="chat"></mat-icon>
       </button>
   </div>

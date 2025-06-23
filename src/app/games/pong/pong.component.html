@@ -1,7 +1,7 @@
 <div class="games-container">
   <!-- Liste des parties en cours -->
   <div class="active-games">
-    <button mat-raised-button routerLink="/games">Retour</button>
+    <button matButton="elevated" routerLink="/games">Retour</button>
     <h2>Parties en cours</h2>
     @if (games.length > 0) {
     <div class="games-list">
@@ -13,7 +13,7 @@
       >
         {{ getGameDisplayName(game) }}
         @if (selectedGame && selectedGame._id === game._id) {
-        <button mat-icon-button color="warn" (click)="closeSelectedGame()">
+        <button matIconButton class="btn-error" (click)="closeSelectedGame()">
           <mat-icon fontIcon="close"></mat-icon>
         </button>
         }

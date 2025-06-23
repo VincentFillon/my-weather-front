@@ -8,11 +8,11 @@
         <mat-card class="media-card">
           <img [src]="'/api/data/' + image.filename" alt="Image" mat-card-image />
           <mat-card-actions align="end">
-            <button mat-button (click)="copyUrl('/api/data/' + image.filename)">
+            <button matButton="tonal" (click)="copyUrl('/api/data/' + image.filename)">
               <mat-icon fontIcon="content_copy"></mat-icon>
               Copier l'URL
             </button>
-            <button mat-icon-button (click)="removeMedia(image)" color="warn">
+            <button matIconButton (click)="removeMedia(image)" class="btn-error">
               <mat-icon fontIcon="delete"></mat-icon>
             </button>
           </mat-card-actions>
@@ -28,7 +28,7 @@
           (change)="uploadImage($event)"
           accept="image/png,image/jpeg,image/gif"
         />
-        <button mat-raised-button color="primary" (click)="imageInput.click()">
+        <button matButton="filled" (click)="imageInput.click()">
           <mat-icon fontIcon="add_photo_alternate"></mat-icon>
           Ajouter une Image
         </button>
@@ -43,11 +43,11 @@
             <audio controls [src]="'/api/data/' + sound.filename"></audio>
           </mat-card-content>
           <mat-card-actions align="end">
-            <button mat-button (click)="copyUrl('/api/data/' + sound.filename)">
+            <button matButton="tonal" (click)="copyUrl('/api/data/' + sound.filename)">
               <mat-icon fontIcon="content_copy"></mat-icon>
               Copier l'URL
             </button>
-            <button mat-icon-button (click)="removeMedia(sound)" color="warn">
+            <button matIconButton (click)="removeMedia(sound)" class="btn-error">
               <mat-icon fontIcon="delete"></mat-icon>
             </button>
           </mat-card-actions>
@@ -63,7 +63,7 @@
           (change)="uploadSound($event)"
           accept="audio/mpeg,audio/wav"
         />
-        <button mat-raised-button color="primary" (click)="soundInput.click()">
+        <button matButton="filled" (click)="soundInput.click()">
           <mat-icon fontIcon="audio_file"></mat-icon>
           Ajouter un audio
         </button>

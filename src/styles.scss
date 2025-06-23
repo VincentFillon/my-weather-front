@@ -68,3 +68,77 @@ body {
     height: 100vh !important;
   }
 }
+
+.text-primary {
+  color: var(--mat-sys-primary);
+}
+.text-secondary {
+  color: var(--mat-sys-secondary);
+}
+.text-tertiary {
+  color: var(--mat-sys-tertiary);
+}
+.text-error {
+  color: var(--mat-sys-error);
+}
+
+.notification-snackbar {
+  @include mat.snack-bar-overrides((
+    button-color: var(--mat-sys-on-secondary),
+    container-color: var(--mat-sys-secondary),
+    supporting-text-color: var(--mat-sys-on-secondary)
+  ));
+}
+
+// Material Buttons Colors
+:root {
+  .btn-primary {
+    @include mat.button-overrides((
+      protected-container-color: var(--mat-sys-primary),
+      protected-label-text-color: var(--mat-sys-on-primary),
+      filled-container-color: var(--mat-sys-primary),
+      filled-label-text-color: var(--mat-sys-on-primary),
+      outlined-outline-color: var(--mat-sys-primary),
+      outlined-label-text-color: var(--mat-sys-on-primary),
+      text-label-text-color: var(--mat-sys-primary),
+    ));
+    --mat-icon-button-icon-color: var(--mat-sys-primary);
+  }
+  .btn-secondary {
+    @include mat.button-overrides((
+      protected-container-color: var(--mat-sys-secondary),
+      protected-label-text-color: var(--mat-sys-on-secondary),
+      filled-container-color: var(--mat-sys-secondary),
+      filled-label-text-color: var(--mat-sys-on-secondary),
+      outlined-outline-color: var(--mat-sys-secondary),
+      outlined-label-text-color: var(--mat-sys-on-secondary),
+      text-label-text-color: var(--mat-sys-secondary),
+    ));
+    --mat-icon-button-icon-color: var(--mat-sys-secondary);
+  }
+  .btn-tertiary {
+    @include mat.button-overrides((
+      protected-container-color: var(--mat-sys-tertiary),
+      protected-label-text-color: var(--mat-sys-on-tertiary),
+      filled-container-color: var(--mat-sys-tertiary),
+      filled-label-text-color: var(--mat-sys-on-tertiary),
+      outlined-outline-color: var(--mat-sys-tertiary),
+      outlined-label-text-color: var(--mat-sys-on-tertiary),
+      text-label-text-color: var(--mat-sys-tertiary),
+    ));
+    --mat-icon-button-icon-color: var(--mat-sys-tertiary);
+  }
+  .btn-error {
+    @include mat.button-overrides((
+      protected-container-color: var(--mat-sys-error),
+      protected-label-text-color: var(--mat-sys-on-error),
+      filled-container-color: var(--mat-sys-error),
+      filled-label-text-color: var(--mat-sys-on-error),
+      outlined-outline-color: var(--mat-sys-error),
+      outlined-label-text-color: var(--mat-sys-on-error),
+      text-label-text-color: var(--mat-sys-error),
+    ));
+    --mat-icon-button-icon-color: var(--mat-sys-error);
+  }
+}
+

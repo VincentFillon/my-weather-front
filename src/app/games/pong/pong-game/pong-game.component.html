@@ -19,15 +19,15 @@
     @if (game && !game.isFinished) {
       @if (gameStarted) {
         @if (game.isPaused) {
-          <button mat-raised-button (click)="pauseGame()">Reprendre la partie</button>
+          <button matButton="filled" (click)="pauseGame()">Reprendre la partie</button>
         } @else {
-          <button mat-raised-button color="warn" (click)="pauseGame()">Pause</button>
+          <button matButton="filled" class="btn-error" (click)="pauseGame()">Pause</button>
         }
       } @else if (game && !game.isFinished) {
-        <button mat-raised-button (click)="startGame()">Démarrer la partie</button>
+        <button matButton="filled" (click)="startGame()">Démarrer la partie</button>
       }
     } @else if (game && game.isFinished) {
-      <button mat-raised-button routerLink="/games/pong">Nouvelle partie</button>
+      <button matButton="filled" routerLink="/games/pong">Nouvelle partie</button>
     }
   </div>
 </div>

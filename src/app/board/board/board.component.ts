@@ -9,7 +9,7 @@ import {
   trigger,
 } from '@angular/animations';
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
@@ -43,6 +43,7 @@ import { WeatherWidgetComponent } from '../weather-widget/weather-widget.compone
     MatCardModule,
     MatIconModule,
     MatButtonModule,
+    NgClass,
     RouterModule,
     DatePipe,
     TimerComponent,

@@ -20,7 +20,7 @@
           <mat-form-field appearance="outline">
             <mat-label for="password">Mot de passe</mat-label>
             <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" name="password" placeholder="Entrez votre mot de passe">
-            <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+            <button matIconButton matSuffix (click)="hidePassword = !hidePassword" type="button">
               <mat-icon [fontIcon]="hidePassword ? 'visibility_off' : 'visibility'"></mat-icon>
             </button>
             @if (loginForm.get('password')?.hasError('required')) {
@@ -36,7 +36,7 @@
           </mat-form-field>
 
           <div class="form-actions">
-            <button mat-raised-button color="primary" type="submit" [disabled]="!loginForm.valid || isLoading">
+            <button matButton="filled" type="submit" [disabled]="!loginForm.valid || isLoading">
               @if (isLoading) {
                 <mat-icon class="spinner" fontIcon="refresh"></mat-icon>
               }
@@ -47,7 +47,7 @@
       </mat-card-content>
 
       <mat-card-actions>
-        <a mat-button routerLink="/auth/register">Créer un compte</a>
+        <a matButton routerLink="/auth/register">Créer un compte</a>
       </mat-card-actions>
     </mat-card>
   </div>

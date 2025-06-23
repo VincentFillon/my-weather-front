@@ -151,6 +151,25 @@ export class NotificationService {
         });
       }
     });
+
+    // Notification de test
+    // this.showNotification(
+    //   {
+    //     title: 'Bienvenue',
+    //     content: 'Bienvenue sur Ma Météo !',
+    //     icon: 'waving_hand',
+    //     actions: [
+    //       {
+    //         label: 'Découvrir',
+    //         icon: 'explore',
+    //         action: () => {
+    //           this.router.navigate(['/']);
+    //         },
+    //       },
+    //     ],
+    //   },
+    //   10000000
+    // );
   }
 
   private requestNotificationPermission() {

@@ -4,6 +4,6 @@
   <p>Toutes vos données seront définitivement supprimées.</p>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button (click)="onCancel()">Annuler</button>
-  <button mat-raised-button color="warn" (click)="onConfirm()">Supprimer mon compte</button>
+  <button matButton (click)="onCancel()">Annuler</button>
+  <button matButton="filled" class="btn-error" (click)="onConfirm()">Supprimer mon compte</button>
 </mat-dialog-actions>

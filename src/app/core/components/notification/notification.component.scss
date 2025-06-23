@@ -2,8 +2,7 @@
   display: flex;
   gap: 10px;
   justify-content: flex-start;
-  align-items: stretch;
-  background-color: var(--mat-sys-surface);
+  align-items: center;
 
   .notification-image-container {
     display: flex;
@@ -19,7 +18,6 @@
     }
 
     .notification-icon {
-      color: var(--mat-sys-on-surface);
       transform: scale(2);
     }
   }
@@ -42,10 +40,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-
-    .notification-action {
-      color: var(--mat-sys-on-surface);
-    }
   }
 
   &.notification-right {

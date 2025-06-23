@@ -1,5 +1,5 @@
 <div class="poll-detail-container">
-  <button mat-raised-button (click)="goBack()" class="back-button">&larr; Retour à la liste</button>
+  <button matButton="elevated" (click)="goBack()" class="back-button">&larr; Retour à la liste</button>
 
   @if (isLoading) {
   <div class="loading">Chargement du sondage...</div>
@@ -69,10 +69,10 @@
 
   @if (deletable) {
   <div class="poll-actions">
-    <button mat-raised-button color="primary" (click)="updatePoll()">
+    <button matButton="filled" (click)="updatePoll()">
       <mat-icon fontIcon="edit"></mat-icon> Modifier le sondage
     </button>
-    <button mat-raised-button color="warn" (click)="deletePoll()">
+    <button matButton="filled" class="btn-error" (click)="deletePoll()">
       <mat-icon fontIcon="delete"></mat-icon> Supprimer le sondage
     </button>
   </div>

@@ -44,5 +44,7 @@ export class NotificationComponent {
     ) {
       this.alignRight = true;
     }
+
+    this.snackBarRef.containerInstance.snackBarConfig.panelClass = 'notification-snackbar';
   }
 }

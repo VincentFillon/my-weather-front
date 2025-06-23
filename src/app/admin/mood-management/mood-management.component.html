@@ -1,7 +1,7 @@
 <div class="mood-management-container">
   <div class="header">
     <h1>Gestion des humeurs</h1>
-    <button mat-raised-button color="primary" (click)="onAddMood()">
+    <button matButton="filled" (click)="onAddMood()">
       <mat-icon fontIcon="add"></mat-icon>
       Nouvelle humeur
     </button>
@@ -36,10 +36,10 @@
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef>Actions</th>
       <td mat-cell *matCellDef="let mood">
-        <button mat-icon-button color="primary" (click)="onEditMood(mood)">
+        <button matIconButton (click)="onEditMood(mood)">
           <mat-icon fontIcon="edit"></mat-icon>
         </button>
-        <button mat-icon-button color="warn" (click)="onDeleteMood(mood._id)">
+        <button matIconButton class="btn-error" (click)="onDeleteMood(mood._id)">
           <mat-icon fontIcon="delete"></mat-icon>
         </button>
       </td>
