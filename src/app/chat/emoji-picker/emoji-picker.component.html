@@ -1,1 +1,42 @@
-<emoji-mart (emojiSelect)="selectEmoji($event)" [darkMode]="false" [i18n]="emoji18n"></emoji-mart>
+@if (allowGifSelection) {
+  <div class="emoji-gif-picker-container">
+    <mat-tab-group animationDuration="0ms" (selectedTabChange)="onTabChange($event)" [selectedIndex]="selectedTab()">
+      <mat-tab label="Emojis">
+        <div class="emoji-tab-content">
+          <emoji-mart (emojiSelect)="selectEmoji($event)" [darkMode]="false" [i18n]="emoji18n" [darkMode]="themeService.getCurrentTheme() === 'dark'"></emoji-mart>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="GIFs">
+        <div class="gif-tab-content">
+          <mat-form-field appearance="outline" class="gif-search-field">
+            <input matInput placeholder="Rechercher des GIFs..." [(ngModel)]="gifSearchQuery" (keyup)="onGifSearch()">
+            <button matSuffix mat-icon-button (click)="onGifSearch()">
+              <mat-icon>search</mat-icon>
+            </button>
+          </mat-form-field>
+
+          <ng-scrollbar class="my-weather-scrollbar" [reachedBottomOffset]="scrollThreshold" (reachedBottom)="onScroll()">
+            @if (isLoadingGifs()) {
+              <div class="loading-spinner">
+                <mat-spinner diameter="30"></mat-spinner>
+              </div>
+            } @else if (gifError()) {
+              <div class="error-message">{{ gifError() }}</div>
+            } @else {
+              <div class="gif-results-grid">
+                @for (gif of (gifSearchQuery ? searchResults() : trendingGifs()); track gif.id) {
+                  <img [src]="gif.media_formats.gif.url" [alt]="gif.title" (click)="selectGif(gif)" class="gif-item">
+                } @empty {
+                  <p class="no-results">Aucun GIF trouvé.</p>
+                }
+              </div>
+            }
+          </ng-scrollbar>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+} @else {
+  <emoji-mart (emojiSelect)="selectEmoji($event)" [darkMode]="false" [i18n]="emoji18n" [darkMode]="themeService.getCurrentTheme() === 'dark'"></emoji-mart>
+}

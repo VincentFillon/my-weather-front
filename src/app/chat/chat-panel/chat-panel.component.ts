@@ -28,25 +28,27 @@ import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { EmojiComponent } from '@ctrl/ngx-emoji-mart/ngx-emoji';
 import { NgScrollbar, NgScrollbarModule } from 'ngx-scrollbar';
 import { NgScrollReached } from 'ngx-scrollbar/reached-event';
 import { of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import {
   Message,
+  MessageSegment,
   ProcessedMessage,
   SendMessageDto,
 } from '../../core/models/message';
 import { Room, UpdateRoomDto } from '../../core/models/room';
 import { User } from '../../core/models/user';
 import { ChatService } from '../../core/services/chat.service';
-import { UploadService } from '../../core/services/upload.service'; // Ajout
+import { UploadService } from '../../core/services/upload.service';
 import {
   EditChatDialogComponent,
-  EditChatDialogResult
+  EditChatDialogResult,
 } from '../edit-chat-dialog/edit-chat-dialog.component';
 import { EmojiPickerComponent } from '../emoji-picker/emoji-picker.component';
-import { FullScreenMediaDialogComponent } from '../full-screen-media-dialog/full-screen-media-dialog.component'; // Ajout
+import { FullScreenMediaDialogComponent } from '../full-screen-media-dialog/full-screen-media-dialog.component';
 
 @Component({
   selector: 'app-chat-panel',
@@ -62,10 +64,10 @@ import { FullScreenMediaDialogComponent } from '../full-screen-media-dialog/full
     MatToolbarModule,
     MatProgressSpinnerModule,
     EmojiPickerComponent,
+    EmojiComponent,
     MatDialogModule,
     NgScrollbarModule,
     NgScrollReached,
-    // FullScreenMediaDialogComponent, // Ajout
   ],
   templateUrl: './chat-panel.component.html',
   styleUrls: ['./chat-panel.component.scss'],
@@ -75,12 +77,13 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
   @HostListener('document:keydown.escape', ['$event'])
   onEscapeKey(event: KeyboardEvent) {
     this.closeEmojiPicker();
+    this.closeMainEmojiGifPicker();
   }
 
   @Input({ required: true }) room!: Room;
   @Input({ required: true }) currentUser!: User | null;
   @Output() closePanel = new EventEmitter<Room>();
-  @Output() minimizePanel = new EventEmitter<Room>(); // Ou juste close
+  @Output() minimizePanel = new EventEmitter<Room>();
 
   @ViewChild('messageContainer')
   private messageContainer!: NgScrollbar;
@@ -88,7 +91,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
   private messageInput!: ElementRef<HTMLInputElement>;
 
   private chatService = inject(ChatService);
-  private uploadService = inject(UploadService); // Ajout
+  private uploadService = inject(UploadService);
   private dialog = inject(MatDialog);
   private destroyRef = inject(DestroyRef);
 
@@ -98,22 +101,24 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
   newMessageContent: string = '';
   isLoading = signal(false);
   isLoadingOlder = signal(false);
-  hasMoreMessages = signal(true); // Assumer qu'il y en a plus au début
+  hasMoreMessages = signal(true);
   private readonly initialLoadLimit = 30;
   private readonly paginationLimit = 20;
   readonly scrollThreshold = 100;
 
   showEmojiPickerFor: string | null = null;
+  showMainEmojiGifPicker = signal(false); // Pour le sélecteur principal
 
-  // Pour l'upload de fichiers
-  selectedFile: File | null = null; // Le fichier sélectionné pour la prévisualisation
-  fileToUpload: File | null = null; // Le fichier à uploader après confirmation
+  // Pour l'upload de fichiers et GIFs
+  selectedFile: File | null = null;
+  fileToUpload: File | null = null;
   previewUrl: string | ArrayBuffer | null = null;
   isUploading = signal(false);
   uploadError = signal<string | null>(null);
-  uploadedMediaUrl: string | null = null; // Changé de private à public
+  uploadedMediaUrl: string | null = null;
   isDragging = signal(false);
-  showPreview = signal(false); // Pour contrôler l'affichage de la prévisualisation
+  showPreview = signal(false);
+  selectedGifUrl: string | null = null; // Pour stocker l'URL du GIF sélectionné
 
   constructor() {
     this.processedMessages = computed(() => {
@@ -182,34 +187,46 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
         })();
 
         return {
-          ...msg, // Copie les propriétés du message original
+          ...msg,
+          content: msg.content,
           showAvatarAndName,
           showTimestamp,
           isGroupStart,
           isGroupEnd,
           showDateSeparator,
           isBotMessage,
+          parsedContent: this.parseMessage(msg.content),
         };
       });
     });
   }
 
+  private parseMessage(message: string): MessageSegment[] {
+    const regex = /(:[a-zA-Z0-9_+:-]+:)/g;
+    const parts = message.split(regex);
+    return parts
+      .filter((part) => part.trim().length > 0)
+      .map((part) => {
+        if (regex.test(part)) {
+          return { type: 'emoji', content: part };
+        }
+        return { type: 'text', content: part };
+      });
+  }
+
   ngOnInit(): void {
-    this.loadInitialMessages(); // Charge les premiers messages
-    this.subscribeToRoomEvents(); // S'abonne aux nouveaux messages pour CETTE room
-    // S'abonner aux updates spécifiques à CETTE room (via socket)
+    this.loadInitialMessages();
+    this.subscribeToRoomEvents();
     this.chatService.subscribeToRoomUpdates(this.room._id);
   }
 
   ngOnDestroy(): void {
-    // Se désabonner des updates spécifiques à CETTE room (via socket)
     this.chatService.unsubscribeFromRoomUpdates(this.room._id);
   }
 
-  // Mettre à jour rawMessages lors du chargement initial
   private loadInitialMessages(): void {
     this.isLoading.set(true);
-    this.hasMoreMessages.set(true); // Réinitialiser
+    this.hasMoreMessages.set(true);
     this.chatService
       .getPaginatedMessages(this.room._id, this.initialLoadLimit)
       .pipe(
@@ -218,12 +235,10 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (messages) => {
-          // Les messages arrivent du plus récent au plus ancien via l'API
-          // Inverser pour affichage chronologique standard (optionnel, dépend de l'API)
-          const sortedMessages = messages.slice().reverse(); // Créer une copie et inverser
+          const sortedMessages = messages.slice().reverse();
           this.rawMessages.set(sortedMessages);
-          this.hasMoreMessages.set(messages.length === this.initialLoadLimit); // S'il y a moins de messages que la limite, on a tout chargé
-          queueMicrotask(() => this.scrollToBottom()); // Scroll vers le bas après chargement initial
+          this.hasMoreMessages.set(messages.length === this.initialLoadLimit);
+          queueMicrotask(() => this.scrollToBottom());
           this.markAsRead();
         },
         error: (err) => {
@@ -235,7 +250,6 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
       });
   }
 
-  // Mettre à jour rawMessages à la réception d'un nouveau message
   private subscribeToRoomEvents(): void {
     this.chatService
       .onMessageSent()
@@ -243,12 +257,10 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
       .subscribe((message) => {
         if (message.room === this.room._id) {
           const isOwnMessage = message.sender?._id === this.currentUser?._id;
-          // Ajoute le nouveau message au signal existant
           this.rawMessages.update((currentMessages) => [
             ...currentMessages,
             { ...message, isRead: isOwnMessage },
           ]);
-          // Scroll après la mise à jour du DOM
           queueMicrotask(() => this.scrollToBottom());
           this.markAsRead();
         }
@@ -259,7 +271,6 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
       .subscribe((message) => {
         if (message.room === this.room._id) {
           const isOwnMessage = message.sender?._id === this.currentUser?._id;
-          // Ajoute le nouveau message au signal existant
           this.rawMessages.update((currentMessages) =>
             currentMessages.map((msg) =>
               msg._id === message._id ? message : msg
@@ -292,10 +303,6 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
       ? new Date(oldestMessage.createdAt)
       : undefined;
 
-    // Sauvegarder l'état du scroll avant de charger
-    // const oldScrollHeight = (this.messageContainer.contentDimension().height || 50) - this.scrollThreshold;
-    // const oldScrollTop = element.scrollTop; // scrollTop est proche de 0
-
     this.chatService
       .getPaginatedMessages(this.room._id, this.paginationLimit, beforeDate)
       .pipe(
@@ -305,14 +312,12 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (olderMessages) => {
           if (olderMessages.length === 0) {
-            this.hasMoreMessages.set(false); // Plus rien à charger
+            this.hasMoreMessages.set(false);
             return;
           }
 
-          // Messages reçus du plus récent au plus ancien (dans la page)
-          const sortedOlderMessages = olderMessages.slice().reverse(); // Inverser pour préfixer correctement
+          const sortedOlderMessages = olderMessages.slice().reverse();
 
-          // Préfixer les anciens messages au signal
           this.rawMessages.update((current) => [
             ...sortedOlderMessages,
             ...current,
@@ -320,18 +325,6 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
           this.hasMoreMessages.set(
             olderMessages.length === this.paginationLimit
           );
-
-          // Restaurer la position de scroll après mise à jour du DOM
-          // queueMicrotask(() => {
-          //   try {
-          //     this.messageContainer.scrollTo({
-          //       bottom: oldScrollHeight,
-          //       duration: 500,
-          //     });
-          //   } catch (e) {
-          //     console.error('Scroll restoration failed', e);
-          //   }
-          // });
         },
         error: (err) =>
           console.error(
@@ -343,7 +336,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
 
   onScroll(): void {
     if (this.isLoadingOlder() || !this.hasMoreMessages()) {
-      return; // Ne rien faire si déjà en chargement ou si tout est chargé
+      return;
     }
 
     this.loadOlderMessages();
@@ -354,13 +347,15 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Si un fichier est en attente de confirmation, ne pas envoyer le message texte seul
     if (this.fileToUpload && !this.uploadedMediaUrl) {
-      // L'envoi se fera via confirmAndSendFile
       return;
     }
 
-    if (!this.newMessageContent.trim() && !this.uploadedMediaUrl) {
+    if (
+      !this.newMessageContent.trim() &&
+      !this.uploadedMediaUrl &&
+      !this.selectedGifUrl
+    ) {
       return;
     }
 
@@ -368,7 +363,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
       room: this.room._id,
       content: this.newMessageContent,
       sender: this.currentUser,
-      mediaUrl: this.uploadedMediaUrl ?? undefined,
+      mediaUrl: this.uploadedMediaUrl ?? this.selectedGifUrl ?? undefined, // Utilise le GIF si présent
     };
 
     this.chatService.sendMessage(messageData);
@@ -378,9 +373,9 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
     this.previewUrl = null;
     this.uploadedMediaUrl = null;
     this.uploadError.set(null);
-    this.showPreview.set(false); // Cacher la prévisualisation après envoi
+    this.showPreview.set(false);
+    this.selectedGifUrl = null; // Réinitialiser l'URL du GIF
     this.scrollToBottom();
-    // Focus sur l'input après envoi
     this.messageInput.nativeElement.focus();
   }
 
@@ -399,7 +394,6 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
   onDragLeave(event: DragEvent) {
     event.preventDefault();
     event.stopPropagation();
-    // Vérifier si le curseur quitte vraiment la zone (et non un enfant)
     const target = event.target as HTMLElement;
     if (
       target === this.messageContainer.nativeElement ||
@@ -417,7 +411,6 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
     const files = event.dataTransfer?.files;
     if (files && files.length > 0) {
       this.handleFile(files[0]);
-      // Réinitialiser le dataTransfer pour éviter les problèmes
       if (event.dataTransfer) {
         event.dataTransfer.clearData();
       }
@@ -430,13 +423,13 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
     if (file) {
       this.handleFile(file);
     }
-    // Réinitialiser l'input pour permettre de sélectionner le même fichier à nouveau
     element.value = '';
   }
 
   private handleFile(file: File): void {
     this.uploadError.set(null);
     this.uploadedMediaUrl = null;
+    this.selectedGifUrl = null; // Annuler la sélection de GIF si un fichier est uploadé
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     const maxSize = 5 * 1024 * 1024; // 5MB
 
@@ -457,45 +450,49 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
     }
 
     this.selectedFile = file;
-    this.previewUrl = null; // Réinitialiser au cas où
+    this.previewUrl = null;
 
-    // Afficher l'aperçu
     const reader = new FileReader();
     reader.onload = (e) => (this.previewUrl = reader.result);
     reader.readAsDataURL(file);
-    this.fileToUpload = file; // Stocker le fichier pour l'upload après confirmation
-    this.showPreview.set(true); // Afficher la prévisualisation
+    this.fileToUpload = file;
+    this.showPreview.set(true);
   }
 
   confirmAndSendFile(): void {
-    if (!this.fileToUpload || !this.currentUser) {
+    if ((!this.fileToUpload && !this.selectedGifUrl) || !this.currentUser) {
       return;
     }
 
-    this.isUploading.set(true);
-    this.uploadError.set(null);
+    if (this.selectedGifUrl) {
+      this.uploadedMediaUrl = this.selectedGifUrl;
+      this.sendMessage();
+    } else if (this.fileToUpload) {
+      this.isUploading.set(true);
+      this.uploadError.set(null);
 
-    this.uploadService
-      .uploadChatMedia(this.fileToUpload)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        tap((response) => {
-          this.uploadedMediaUrl = '/api/data/' + response.url;
-          this.sendMessage(); // Envoyer le message après l'upload
-        }),
-        catchError((error) => {
-          console.error("Erreur d'upload:", error);
-          this.uploadError.set(
-            "Erreur lors de l'upload du fichier. Veuillez réessayer."
-          );
-          this.cancelFileSelection(); // Annuler la sélection en cas d'erreur
-          return of(null); // Gérer l'erreur et continuer
-        }),
-        finalize(() => {
-          this.isUploading.set(false);
-        })
-      )
-      .subscribe();
+      this.uploadService
+        .uploadChatMedia(this.fileToUpload)
+        .pipe(
+          takeUntilDestroyed(this.destroyRef),
+          tap((response) => {
+            this.uploadedMediaUrl = '/api/data/' + response.url;
+            this.sendMessage();
+          }),
+          catchError((error) => {
+            console.error("Erreur d'upload:", error);
+            this.uploadError.set(
+              "Erreur lors de l'upload du fichier. Veuillez réessayer."
+            );
+            this.cancelFileSelection();
+            return of(null);
+          }),
+          finalize(() => {
+            this.isUploading.set(false);
+          })
+        )
+        .subscribe();
+    }
   }
 
   cancelFileSelection(): void {
@@ -505,27 +502,64 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
     this.uploadedMediaUrl = null;
     this.uploadError.set(null);
     this.isUploading.set(false);
-    this.showPreview.set(false); // Cacher la prévisualisation
+    this.showPreview.set(false);
+    this.selectedGifUrl = null; // Annuler la sélection de GIF
   }
 
   // --- Fin de la gestion de l'upload ---
 
+  toggleEmojiGifPicker(): void {
+    this.showMainEmojiGifPicker.update((val) => !val);
+    if (this.showMainEmojiGifPicker()) {
+      this.closeEmojiPicker(); // Fermer le picker de réaction si le principal s'ouvre
+    }
+  }
+
+  closeMainEmojiGifPicker(): void {
+    this.showMainEmojiGifPicker.set(false);
+  }
+
   openEmojiPicker(messageId: string) {
     this.showEmojiPickerFor = messageId;
+    this.closeMainEmojiGifPicker(); // Fermer le picker principal si celui de réaction s'ouvre
   }
 
   closeEmojiPicker() {
     this.showEmojiPickerFor = null;
   }
 
+  insertEmojiAtCursor(emojiId: string): void {
+    const inputElement = this.messageInput.nativeElement;
+    const start = inputElement.selectionStart || 0;
+    const end = inputElement.selectionEnd || 0;
+
+    this.newMessageContent =
+      this.newMessageContent.substring(0, start) +
+      emojiId +
+      this.newMessageContent.substring(end, this.newMessageContent.length);
+
+    // Mettre à jour la position du curseur
+    const newCursorPosition = start + emojiId.length;
+    // Utiliser queueMicrotask pour s'assurer que le DOM est mis à jour avant de définir la sélection
+    queueMicrotask(() => {
+      inputElement.setSelectionRange(newCursorPosition, newCursorPosition);
+      inputElement.focus();
+    });
+  }
+
+  handleGifSelection(gifUrl: string): void {
+    this.cancelFileSelection(); // Annuler toute sélection de fichier existante
+    this.selectedGifUrl = gifUrl;
+    this.previewUrl = gifUrl; // Utiliser l'URL du GIF pour la prévisualisation
+    this.showPreview.set(true);
+  }
+
   addReaction(messageId: string, emoji: string) {
-    // Appelle le service pour ajouter la réaction (optimiste possible)
     this.chatService.addReaction({ messageId, emoji });
   }
 
   toggleReaction(messageId: string, emoji: string) {
     if (!this.currentUser?._id) return;
-    // Si l'utilisateur a déjà réagi, retire la réaction, sinon ajoute
     const message = this.rawMessages().find((msg) => msg._id === messageId);
     const reaction = message?.reactions?.find((r) => r.emoji === emoji);
     const alreadyReacted = reaction?.userIds.includes(this.currentUser._id);
@@ -546,11 +580,13 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
   }
 
   scrollToBottom(): void {
-    // Utiliser setTimeout pour s'assurer que le DOM est mis à jour avant de scroller
     setTimeout(() => {
       try {
         if (this.messageContainer) {
-          this.messageContainer.scrollToElement(`#message-${this.processedMessages().length - 1}`, { duration: 500 });
+          this.messageContainer.scrollToElement(
+            `#message-${this.processedMessages().length - 1}`,
+            { duration: 500 }
+          );
         }
       } catch (err) {
         console.error('Could not scroll to bottom:', err);
@@ -565,16 +601,13 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
       this.room.creator?._id !== this.currentUser._id
     ) {
       console.warn('Only the room creator can edit the room.');
-      // Optionnel: Afficher une notification à l'utilisateur
       return;
     }
 
-
-
     const dialogRef = this.dialog.open(EditChatDialogComponent, {
-      width: '500px', // ou la largeur souhaitée
+      width: '500px',
       data: { room: this.room },
-      disableClose: true, // Empêcher la fermeture en cliquant à l'extérieur ou avec Echap
+      disableClose: true,
     });
 
     dialogRef
@@ -592,15 +625,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
               image: result.image,
               userIds: result.userIds,
             };
-            // Le service backend attend l'ID de l'utilisateur qui fait la requête pour la vérification des droits.
-            // Dans un vrai scénario, cela viendrait du token. Ici, nous le passons explicitement.
-            // Note: La méthode updateRoom du service socket n'est pas conçue pour passer le requestingUserId.
-            // Il faudrait soit modifier le backend pour le prendre du socket.handshake.auth,
-            // soit créer une nouvelle méthode HTTP pour cela, ou adapter l'event socket.
-            // Pour l'instant, on va supposer que le backend le gère via le token de l'utilisateur connecté au socket.
             this.chatService.updateRoom(updateDto);
-            // Idéalement, attendre la confirmation de la mise à jour via un événement socket 'roomUpdated'
-            // et mettre à jour this.room localement.
           }
         }
       });
@@ -609,7 +634,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
   openFullScreenMedia(mediaUrl: string): void {
     this.dialog.open(FullScreenMediaDialogComponent, {
       data: { mediaUrl },
-      panelClass: 'full-screen-media-dialog', // Classe CSS pour le style plein écran
+      panelClass: 'full-screen-media-dialog',
     });
   }
 }
