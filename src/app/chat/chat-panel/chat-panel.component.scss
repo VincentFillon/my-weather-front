@@ -47,7 +47,7 @@
 
 .message-area {
   flex-grow: 1;
-  height: calc(100% - 135px);
+  height: calc(100% - 180px);
   width: 100%;
   padding: 15px 10px;
   background-color: var(--mat-sys-surface-container-low);
@@ -168,6 +168,10 @@
     min-width: 65px; // Largeur minimale pour pouvoir afficher au moins deux réactions en dessous sur une seule ligne
     max-width: 100%;
 
+    ::ng-deep ngx-emoji {
+      vertical-align: middle;
+    }
+
     .media-container {
       margin-bottom: 5px;
       img.chat-media {
@@ -177,6 +181,15 @@
         display: block; // Pour éviter l'espace en dessous
         cursor: pointer;
       }
+    }
+  }
+
+  .message-bubble {
+    span {
+      // Styles pour les emojis dans le contenu du message
+      font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Segoe UI Symbol", "Android Emoji", sans-serif;
+      font-size: 1em; // Assurez-vous que la taille est cohérente
+      line-height: 1.4;
     }
   }
 
@@ -274,6 +287,9 @@
     .message-details {
       .add-reaction-wrapper {
         left: -32px;
+      }
+      .reactions-bar {
+        justify-content: flex-end;
       }
     }
   }
@@ -375,9 +391,6 @@
       .add-reaction-wrapper {
         display: block; // Affiche le bouton d'ajout de réaction au survol
       }
-      .reactions-bar {
-        right: 10px;
-      }
     }
   }
 }
@@ -386,6 +399,83 @@
   z-index: 1;
   margin-top: -10px;
   margin-bottom: 10px;
+}
+
+.main-emoji-gif-picker-popover {
+  position: absolute;
+  bottom: 70px; // Au-dessus de la zone de saisie
+  right: 10px;
+  z-index: 100; // Assurez-vous qu'il est au-dessus des autres éléments
+  background-color: var(--mat-sys-color-surface);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: 353px;
+  height: 481px; // Hauteur fixe
+  overflow: hidden; // Pour gérer le contenu des onglets
+  display: flex;
+  flex-direction: column;
+
+  // Styles pour les onglets du picker
+  .mat-mdc-tab-group {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mat-mdc-tab-body-wrapper {
+    flex-grow: 1;
+    overflow: hidden; // Important pour que le contenu scrollable fonctionne
+  }
+
+  .mat-mdc-tab-body-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .emoji-tab-content, .gif-tab-content {
+    flex-grow: 1;
+    overflow-y: auto; // Permet le défilement interne
+    padding: 10px;
+  }
+
+  .gif-search-field {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px; // Hauteur pour le spinner
+  }
+
+  .error-message, .no-results {
+    text-align: center;
+    color: var(--mat-sys-color-error);
+    padding: 10px;
+  }
+
+  .gif-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); // Grille responsive
+    gap: 8px;
+    padding: 5px;
+
+    .gif-item {
+      width: 100%;
+      height: 100px; // Hauteur fixe pour les GIFs
+      object-fit: cover; // Couvre la zone sans déformer
+      border-radius: 4px;
+      cursor: pointer;
+      transition: transform 0.1s ease-in-out;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+  }
 }
 
 .message-input-area {
@@ -464,7 +554,7 @@
 
     .file-preview {
       flex: 1;
-      max-height: 70px;
+      max-height: 100px;
       border-radius: 4px;
       object-fit: contain;
       border: 1px solid var(--mat-sys-outline);

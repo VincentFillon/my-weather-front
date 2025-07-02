@@ -17,6 +17,11 @@ export interface Message {
   createdAt: Date;
 }
 
+export interface MessageSegment {
+  type: 'text' | 'emoji';
+  content: string;
+}
+
 export interface ProcessedMessage extends Message {
   showAvatarAndName: boolean;
   showTimestamp: boolean;
@@ -24,6 +29,7 @@ export interface ProcessedMessage extends Message {
   isGroupEnd: boolean;
   showDateSeparator: boolean;
   isBotMessage?: boolean; // Ajout du flag pour les messages du bot
+  parsedContent?: MessageSegment[]; // Contenu du message avec les emojis et le texte séparés
 }
 
 export interface SendMessageDto {
