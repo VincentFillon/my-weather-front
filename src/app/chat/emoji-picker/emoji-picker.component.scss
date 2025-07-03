@@ -12,6 +12,11 @@
   display: flex;
   flex-direction: column;
   background-color: var(--mat-sys-surface-container);
+
+  ::ng-deep .emoji-mart {
+    border: none;
+    border-radius: 0px;
+  }
 }
 
 .mat-mdc-tab-group {

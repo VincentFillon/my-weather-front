@@ -17,11 +17,7 @@
           </mat-form-field>
 
           <ng-scrollbar class="my-weather-scrollbar" [reachedBottomOffset]="scrollThreshold" (reachedBottom)="onScroll()">
-            @if (isLoadingGifs()) {
-              <div class="loading-spinner">
-                <mat-spinner diameter="30"></mat-spinner>
-              </div>
-            } @else if (gifError()) {
+            @if (gifError()) {
               <div class="error-message">{{ gifError() }}</div>
             } @else {
               <div class="gif-results-grid">
@@ -31,6 +27,11 @@
                   <p class="no-results">Aucun GIF trouvé.</p>
                 }
               </div>
+              @if (isLoadingGifs()) {
+                <div class="loading-spinner">
+                  <mat-spinner diameter="30"></mat-spinner>
+                </div>
+              }
             }
           </ng-scrollbar>
         </div>
