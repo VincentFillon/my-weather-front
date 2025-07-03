@@ -15,7 +15,7 @@ import {
   Output,
   Signal,
   signal,
-  ViewChild,
+  ViewChild
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -35,14 +35,18 @@ import { of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import {
   Message,
+  MessageReaction,
   MessageSegment,
   ProcessedMessage,
+  ProcessedReaction,
   SendMessageDto,
 } from '../../core/models/message';
 import { Room, UpdateRoomDto } from '../../core/models/room';
 import { User } from '../../core/models/user';
+import { AuthService } from '../../core/services/auth.service';
 import { ChatService } from '../../core/services/chat.service';
 import { UploadService } from '../../core/services/upload.service';
+import { UserService } from '../../core/services/user.service';
 import {
   EditChatDialogComponent,
   EditChatDialogResult,
@@ -90,12 +94,16 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
   @ViewChild('messageInput')
   private messageInput!: ElementRef<HTMLInputElement>;
 
+  private authService = inject(AuthService);
   private chatService = inject(ChatService);
+  private userService = inject(UserService);
   private uploadService = inject(UploadService);
   private dialog = inject(MatDialog);
   private destroyRef = inject(DestroyRef);
 
+  private users = signal<User[]>([]);
   private rawMessages = signal<Message[]>([]);
+  private userNames: Map<string, string> = new Map();
   processedMessages: Signal<ProcessedMessage[]>;
 
   newMessageContent: string = '';
@@ -126,6 +134,12 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
       if (!messages || messages.length === 0) {
         return [];
       }
+
+      const users = this.users();
+      this.userNames.clear();
+      users.forEach((user) => {
+        this.userNames.set(user._id, user.displayName || user.username);
+      });
 
       return messages.map((msg, index, arr): ProcessedMessage => {
         const prevMsg = index > 0 ? arr[index - 1] : null;
@@ -188,7 +202,6 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
 
         return {
           ...msg,
-          content: msg.content,
           showAvatarAndName,
           showTimestamp,
           isGroupStart,
@@ -196,25 +209,14 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
           showDateSeparator,
           isBotMessage,
           parsedContent: this.parseMessage(msg.content),
+          parsedReactions: this.parseReactions(msg.reactions),
         };
       });
     });
   }
 
-  private parseMessage(message: string): MessageSegment[] {
-    const regex = /(:[a-zA-Z0-9_+:-]+:)/g;
-    const parts = message.split(regex);
-    return parts
-      .filter((part) => part.trim().length > 0)
-      .map((part) => {
-        if (regex.test(part)) {
-          return { type: 'emoji', content: part };
-        }
-        return { type: 'text', content: part };
-      });
-  }
-
   ngOnInit(): void {
+    this.loadUsers();
     this.loadInitialMessages();
     this.subscribeToRoomEvents();
     this.chatService.subscribeToRoomUpdates(this.room._id);
@@ -222,6 +224,22 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.chatService.unsubscribeFromRoomUpdates(this.room._id);
+  }
+
+  private loadUsers(): void {
+    this.userService
+      .findAllUsers()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (users) => {
+          this.users.set(users);
+        },
+        error: (err) => {
+          console.error('Error loading users:', err);
+        },
+      });
   }
 
   private loadInitialMessages(): void {
@@ -290,6 +308,60 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
       });
   }
 
+  private parseMessage(message: string): MessageSegment[] {
+    const regex = /(:[a-zA-Z0-9_+:-]+:)/g;
+    const parts = message.split(regex);
+    return parts
+      .filter((part) => part.trim().length > 0)
+      .map((part) => {
+        if (regex.test(part)) {
+          return { type: 'emoji', content: part };
+        }
+        return { type: 'text', content: part };
+      });
+  }
+
+  private parseReactions(reactions: MessageReaction[]): ProcessedReaction[] {
+    const parsedReactions: ProcessedReaction[] = [];
+
+    for (const reaction of reactions) {
+      let tooltip = '';
+      // Limiter l'affichage à 10 utilisateurs maximum
+      if (reaction.userIds.length > 10) {
+        if (this.currentUser?._id && reaction.userIds.includes(this.currentUser._id)) {
+          tooltip = `Vous et ${reaction.userIds.length - 1} autres personnes`;
+        } else {
+          tooltip = `${reaction.userIds.length} personnes`;
+        }
+      } else {
+        for (let i = 0; i < reaction.userIds.length; i++) {
+          const userId = reaction.userIds[i];
+          let userName = '';
+          if (userId === this.currentUser?._id) {
+            userName = 'Vous';
+          } else {
+            if (this.userNames.has(userId)) {
+              userName = this.userNames.get(userId)!;
+            } else {
+              userName = 'Utilisateur inconnu';
+              console.warn(`Nom d'utilisateur inconnu pour ID ${userId}`);
+            }
+          }
+          if (i === 0) {
+            tooltip = userName;
+          } else if (i === reaction.userIds.length - 1) {
+            tooltip += ` et ${userName}`;
+          } else {
+            tooltip += `, ${userName}`;
+          }
+        }
+      }
+      parsedReactions.push({ ...reaction, tooltip });
+    }
+
+    return parsedReactions;
+  }
+
   private markAsRead() {
     this.chatService.markRoomAsRead(this.room._id);
   }
@@ -332,6 +404,23 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
             err
           ),
       });
+  }
+
+  getRoomAvatar(room: Room): string {
+    if (room.isChatBot) {
+      return 'assets/bot-avatar.png'; // Un avatar spécifique pour le bot
+    }
+    let avatar: string = 'assets/default-avatar.png';
+    if (room.image) {
+      avatar = room.image;
+    } else if (room.users.length > 2) {
+      avatar = 'assets/default-group-avatar.png';
+    } else {
+      avatar =
+        room.users.find((u) => u._id !== this.authService.currentUser()?._id)
+          ?.image || 'assets/default-avatar.png';
+    }
+    return avatar;
   }
 
   onScroll(): void {

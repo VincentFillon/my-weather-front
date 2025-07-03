@@ -22,6 +22,10 @@ export interface MessageSegment {
   content: string;
 }
 
+export interface ProcessedReaction extends MessageReaction {
+  tooltip: string;
+}
+
 export interface ProcessedMessage extends Message {
   showAvatarAndName: boolean;
   showTimestamp: boolean;
@@ -30,6 +34,7 @@ export interface ProcessedMessage extends Message {
   showDateSeparator: boolean;
   isBotMessage?: boolean; // Ajout du flag pour les messages du bot
   parsedContent?: MessageSegment[]; // Contenu du message avec les emojis et le texte séparés
+  parsedReactions?: ProcessedReaction[]; // Réactions avec des tooltips
 }
 
 export interface SendMessageDto {

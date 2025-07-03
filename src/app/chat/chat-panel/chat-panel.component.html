@@ -1,5 +1,8 @@
 <mat-card class="chat-panel">
   <mat-toolbar class="chat-panel-header">
+    <div class="chat-room-avatar-wrapper">
+      <img [src]="getRoomAvatar(room)" alt="Avatar" class="chat-room-avatar" (click)="openFullScreenMedia(getRoomAvatar(room))" />
+    </div>
     <span>{{ room.name }}</span>
     <span class="spacer"></span>
     <!-- Bouton Paramètres -->
@@ -103,9 +106,9 @@
                   @if (message.reactions.length) {
                     <!-- Affichage des réactions sous chaque message -->
                     <div class="reactions-bar">
-                      @for (reaction of message.reactions; track reaction.emoji) {
+                      @for (reaction of message.parsedReactions; track reaction.emoji) {
                         <button class="reaction-btn" [class.own-reaction]="currentUser && reaction.userIds.includes(currentUser._id)"
-                          (click)="toggleReaction(message._id, reaction.emoji)" [title]="reaction.userIds.length + ' personne(s) ont réagi'">
+                          (click)="toggleReaction(message._id, reaction.emoji)" [title]="reaction.tooltip">
                           @if (reaction.emoji.startsWith(':') && reaction.emoji.endsWith(':')) {
                             <ngx-emoji [emoji]="reaction.emoji" [size]="16"></ngx-emoji>
                           } @else {
