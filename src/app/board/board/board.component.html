@@ -1,4 +1,4 @@
-<div class="board-container">
+<div class="board-container" [style.backgroundImage]="'url(' + backgroundImgUrl + ')'">
   <!-- Zone neutre -->
   <div class="neutral-zone">
     <div class="neutral-header">
@@ -158,4 +158,5 @@
       </div>
     </ng-scrollbar>
   </div>
+  <canvas id="moodChartCanvas"></canvas>
 </div>

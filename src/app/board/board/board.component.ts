@@ -17,14 +17,17 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'; // Ajout de l'import
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Chart, registerables } from 'chart.js';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { Subscription } from 'rxjs';
 import { Mood } from '../../core/models/mood';
+import { MoodChartData } from '../../core/models/mood-chart-data';
 import { PublicHoliday } from '../../core/models/public-holiday';
 import { Role } from '../../core/models/role.enum';
 import { User } from '../../core/models/user';
 import { WorldDay } from '../../core/models/world-day';
 import { AuthService } from '../../core/services/auth.service';
+import { MoodChartService } from '../../core/services/mood-chart.service';
 import { MoodService } from '../../core/services/mood.service';
 import { PublicHolidaysService } from '../../core/services/public-holidays.service';
 import { ThemeService } from '../../core/services/theme.service'; // Ajout de l'import
@@ -74,6 +77,7 @@ export class BoardComponent implements OnInit, OnDestroy {
   private userService = inject(UserService);
   private worldDaysService = inject(WorldDaysService);
   private publicHolidaysService = inject(PublicHolidaysService);
+  private moodChartService = inject(MoodChartService); // Injection du service MoodChart
   public themeService = inject(ThemeService); // Injection et public pour le template
 
   currentUser: User | null = null;
@@ -154,6 +158,10 @@ export class BoardComponent implements OnInit, OnDestroy {
   moods: Mood[] = [];
   moodsIds: string[] = [];
   medianMood: Mood | null = null;
+  backgroundImgUrl: string = ''; // Nouvelle propriété pour l'URL de l'image de fond
+
+  private moodChart: Chart | undefined;
+  private moodChartData: MoodChartData | undefined;
 
   users: User[] = [];
 
@@ -236,9 +244,16 @@ export class BoardComponent implements OnInit, OnDestroy {
 
     // Trouver l'humeur correspondante
     this.medianMood = moods.find((mood) => mood._id === medianUserId) || null;
+    if (this.medianMood?.backgroundImg) {
+      this.backgroundImgUrl = this.medianMood.backgroundImg;
+    } else {
+      this.backgroundImgUrl = ''; // Ou une image par défaut
+    }
   }
 
   ngOnInit() {
+    Chart.register(...registerables); // Enregistrer tous les composants de Chart.js
+
     const currentUserSubscription = this.authService.currentUser$.subscribe(
       (user) => {
         this.currentUser = user;
@@ -323,6 +338,15 @@ export class BoardComponent implements OnInit, OnDestroy {
         this.setUsers(this.users.filter((u) => u._id !== userId));
       });
     this.subscriptions.push(userRemovedSubscription);
+
+    // Récupérer les données du graphique d'humeur
+    const moodChartSubscription = this.moodChartService
+      .getMoodChartData()
+      .subscribe((data) => {
+        this.moodChartData = data;
+        this.renderMoodChart();
+      });
+    this.subscriptions.push(moodChartSubscription);
   }
 
   ngOnDestroy() {
@@ -442,5 +466,62 @@ export class BoardComponent implements OnInit, OnDestroy {
   logout() {
     // console.debug('[BoardComponent] logout');
     this.authService.logout();
+  }
+  private renderMoodChart() {
+    if (this.moodChart) {
+      this.moodChart.destroy(); // Détruire l'ancien graphique si il existe
+    }
+
+    const canvas = document.getElementById('moodChartCanvas') as HTMLCanvasElement;
+    if (canvas && this.moodChartData) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        this.moodChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: this.moodChartData.labels,
+            datasets: [
+              {
+                label: 'Évolution de l\'humeur',
+                data: this.moodChartData.data,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(255, 255, 255, 0.1)', // Lignes de grille plus transparentes
+                },
+                ticks: {
+                  color: 'rgba(255, 255, 255, 0.7)', // Couleur des labels de l'axe Y
+                },
+              },
+              x: {
+                grid: {
+                  color: 'rgba(255, 255, 255, 0.1)', // Lignes de grille plus transparentes
+                },
+                ticks: {
+                  color: 'rgba(255, 255, 255, 0.7)', // Couleur des labels de l'axe X
+                },
+              },
+            },
+            plugins: {
+              legend: {
+                labels: {
+                  color: 'rgba(255, 255, 255, 0.9)', // Couleur du texte de la légende
+                },
+              },
+            },
+          },
+        });
+      }
+    }
   }
 }
