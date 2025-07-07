@@ -1,4 +1,5 @@
 export interface MoodChartData {
-  labels: string[];
-  data: number[];
+  date: string;
+  medianMoodOrder: number;
+  userMoodOrder: number;
 }

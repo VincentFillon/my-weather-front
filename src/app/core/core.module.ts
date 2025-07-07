@@ -3,6 +3,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { authInterceptor } from './interceptors/auth.interceptor';
 import { AuthService } from './services/auth.service';
+import { MoodChartService } from './services/mood-chart.service';
 import { MoodService } from './services/mood.service';
 import { NotificationService } from './services/notification.service';
 import { SocketService } from './services/socket.service';
@@ -24,6 +25,7 @@ import { WorldDaysService } from './services/world-days.service';
     NotificationService,
     TicTacToeService,
     WorldDaysService,
+    MoodChartService,
   ],
 })
 export class CoreModule { }

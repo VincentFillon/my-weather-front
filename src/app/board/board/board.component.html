@@ -1,4 +1,4 @@
-<div class="board-container" [style.backgroundImage]="'url(' + backgroundImgUrl + ')'">
+<div class="board-container">
   <!-- Zone neutre -->
   <div class="neutral-zone">
     <div class="neutral-header">
@@ -99,6 +99,7 @@
 
 
   <div class="board-grid-container">
+    <div class="board-background" [style.backgroundImage]="'url(' + backgroundImgUrl + ')'"></div>
     <!-- Date du jour -->
     <div class="date-container">
       <h2 class="today-date">
@@ -157,6 +158,8 @@
         }
       </div>
     </ng-scrollbar>
+    <div class="mood-chart-container">
+      <canvas id="moodChartCanvas"></canvas>
+    </div>
   </div>
-  <canvas id="moodChartCanvas"></canvas>
 </div>
