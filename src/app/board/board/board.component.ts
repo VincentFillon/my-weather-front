@@ -17,14 +17,17 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'; // Ajout de l'import
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Chart, registerables } from 'chart.js';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { Subscription } from 'rxjs';
 import { Mood } from '../../core/models/mood';
+import { MoodChartData } from '../../core/models/mood-chart-data';
 import { PublicHoliday } from '../../core/models/public-holiday';
 import { Role } from '../../core/models/role.enum';
 import { User } from '../../core/models/user';
 import { WorldDay } from '../../core/models/world-day';
 import { AuthService } from '../../core/services/auth.service';
+import { MoodChartService } from '../../core/services/mood-chart.service';
 import { MoodService } from '../../core/services/mood.service';
 import { PublicHolidaysService } from '../../core/services/public-holidays.service';
 import { ThemeService } from '../../core/services/theme.service'; // Ajout de l'import
@@ -74,6 +77,7 @@ export class BoardComponent implements OnInit, OnDestroy {
   private userService = inject(UserService);
   private worldDaysService = inject(WorldDaysService);
   private publicHolidaysService = inject(PublicHolidaysService);
+  private moodChartService = inject(MoodChartService); // Injection du service MoodChart
   public themeService = inject(ThemeService); // Injection et public pour le template
 
   currentUser: User | null = null;
@@ -154,6 +158,10 @@ export class BoardComponent implements OnInit, OnDestroy {
   moods: Mood[] = [];
   moodsIds: string[] = [];
   medianMood: Mood | null = null;
+  backgroundImgUrl: string = ''; // Nouvelle propriété pour l'URL de l'image de fond
+
+  private moodChart: Chart | undefined;
+  private moodChartData: MoodChartData[] | undefined;
 
   users: User[] = [];
 
@@ -161,6 +169,8 @@ export class BoardComponent implements OnInit, OnDestroy {
   focusedUserTimeout?: NodeJS.Timeout;
 
   private subscriptions: Subscription[] = [];
+  private moodChartSubscription: Subscription | undefined;
+  private moodChartTimeout: NodeJS.Timeout | undefined;
 
   private currentAudio: HTMLAudioElement | null = null;
   private currentPlayingMoodId: string | null = null;
@@ -179,66 +189,9 @@ export class BoardComponent implements OnInit, OnDestroy {
     }
   }
 
-  private setMoods(moods: Mood[]) {
-    if (this.moodsTimeout) {
-      clearTimeout(this.moodsTimeout);
-    }
-    this.moodsTimeout = setTimeout(() => {
-      this.calculateMedianMood(moods, this.users);
-      this.moods = moods.sort((a, b) => a.order - b.order);
-      this.moodsIds = moods.map((mood) => mood._id);
-    }, 150);
-  }
-
-  private setUsers(users: User[]) {
-    if (this.usersTimeout) {
-      clearTimeout(this.usersTimeout);
-    }
-    this.usersTimeout = setTimeout(() => {
-      this.calculateMedianMood(this.moods, users);
-      this.users = users;
-    }, 150);
-  }
-
-  private calculateMedianMood(moods: Mood[], users: User[]) {
-    // Si pas d'utilisateurs ou pas d'humeurs, pas de médiane
-    if (users.length === 0 || moods.length === 0) {
-      this.medianMood = null;
-      return;
-    }
-
-    // Créer un tableau avec tous les utilisateurs qui ont une humeur
-    const usersWithMood = users.filter((user) => user.mood?._id);
-
-    // Si aucun utilisateur n'a d'humeur, pas de médiane
-    if (usersWithMood.length === 0) {
-      this.medianMood = null;
-      return;
-    }
-
-    // Créer une carte des humeurs pour un accès rapide à l'ordre
-    const moodsMap = new Map<string, Mood>(
-      moods.map((mood) => [mood._id, mood])
-    );
-
-    // Trier les utilisateurs par l'ordre de leur humeur
-    usersWithMood.sort((a, b) => {
-      const orderA = moodsMap.get(a.mood?._id || '')?.order || 0;
-      const orderB = moodsMap.get(b.mood?._id || '')?.order || 0;
-      return orderA - orderB;
-    });
-
-    // Trouver l'index médian
-    // la médiane est volontairement pessimiste et va récupérer l'élément supérieur en cas de nombre impair
-    // pour une médiane "optimiste", il faudrait utiliser Math.floor
-    const medianIndex = Math.ceil((usersWithMood.length - 1) / 2);
-    const medianUserId = usersWithMood[medianIndex].mood?._id;
-
-    // Trouver l'humeur correspondante
-    this.medianMood = moods.find((mood) => mood._id === medianUserId) || null;
-  }
-
   ngOnInit() {
+    Chart.register(...registerables); // Enregistrer tous les composants de Chart.js et le plugin
+
     const currentUserSubscription = this.authService.currentUser$.subscribe(
       (user) => {
         this.currentUser = user;
@@ -329,6 +282,89 @@ export class BoardComponent implements OnInit, OnDestroy {
     this.stopSound();
     // Se désabonner de tous les observables
     this.subscriptions.forEach((sub) => sub.unsubscribe());
+    this.moodChartSubscription?.unsubscribe();
+  }
+
+  private setMoods(moods: Mood[]) {
+    if (this.moodsTimeout) {
+      clearTimeout(this.moodsTimeout);
+    }
+    this.moodsTimeout = setTimeout(() => {
+      this.calculateMedianMood(moods, this.users);
+      this.moods = moods.sort((a, b) => a.order - b.order);
+      this.moodsIds = moods.map((mood) => mood._id);
+      this.getMoodChartData();
+    }, 150);
+  }
+
+  private setUsers(users: User[]) {
+    if (this.usersTimeout) {
+      clearTimeout(this.usersTimeout);
+    }
+    this.usersTimeout = setTimeout(() => {
+      this.calculateMedianMood(this.moods, users);
+      this.users = users;
+      this.getMoodChartData();
+    }, 150);
+  }
+
+  private getMoodChartData(): void {
+    if (this.moodChartTimeout) {
+      clearTimeout(this.moodChartTimeout);
+    }
+    this.moodChartTimeout = setTimeout(() => {
+      this.moodChartSubscription?.unsubscribe();
+      // Récupérer les données du graphique d'humeur
+      this.moodChartSubscription = this.moodChartService
+        .getMoodChartData()
+        .subscribe((data) => {
+          this.moodChartData = data;
+          this.renderMoodChart();
+        });
+    });
+  }
+
+  private calculateMedianMood(moods: Mood[], users: User[]) {
+    // Si pas d'utilisateurs ou pas d'humeurs, pas de médiane
+    if (users.length === 0 || moods.length === 0) {
+      this.medianMood = null;
+      return;
+    }
+
+    // Créer un tableau avec tous les utilisateurs qui ont une humeur
+    const usersWithMood = users.filter((user) => user.mood?._id);
+
+    // Si aucun utilisateur n'a d'humeur, pas de médiane
+    if (usersWithMood.length === 0) {
+      this.medianMood = null;
+      return;
+    }
+
+    // Créer une carte des humeurs pour un accès rapide à l'ordre
+    const moodsMap = new Map<string, Mood>(
+      moods.map((mood) => [mood._id, mood])
+    );
+
+    // Trier les utilisateurs par l'ordre de leur humeur
+    usersWithMood.sort((a, b) => {
+      const orderA = moodsMap.get(a.mood?._id || '')?.order || 0;
+      const orderB = moodsMap.get(b.mood?._id || '')?.order || 0;
+      return orderA - orderB;
+    });
+
+    // Trouver l'index médian
+    // la médiane est volontairement pessimiste et va récupérer l'élément supérieur en cas de nombre impair
+    // pour une médiane "optimiste", il faudrait utiliser Math.floor
+    const medianIndex = Math.ceil((usersWithMood.length - 1) / 2);
+    const medianUserId = usersWithMood[medianIndex].mood?._id;
+
+    // Trouver l'humeur correspondante
+    this.medianMood = moods.find((mood) => mood._id === medianUserId) || null;
+    if (this.medianMood?.backgroundImg) {
+      this.backgroundImgUrl = this.medianMood.backgroundImg;
+    } else {
+      this.backgroundImgUrl = ''; // Ou une image par défaut
+    }
   }
 
   getOtherMoodsIds(moodId: string): string[] {
@@ -442,5 +478,89 @@ export class BoardComponent implements OnInit, OnDestroy {
   logout() {
     // console.debug('[BoardComponent] logout');
     this.authService.logout();
+  }
+  private renderMoodChart() {
+    if (this.moodChart) {
+      this.moodChart.destroy(); // Détruire l'ancien graphique si il existe
+    }
+
+    const canvas = document.getElementById(
+      'moodChartCanvas'
+    ) as HTMLCanvasElement;
+    if (canvas && this.moodChartData) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        this.moodChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: this.moodChartData.map((data) => data.date),
+            datasets: [
+              {
+                label: 'Mon humeur',
+                data: this.moodChartData.map((data) => data.userMoodOrder),
+                borderColor: 'rgba(128, 213, 211, 0.6)',
+                backgroundColor: 'rgba(128, 213, 211, 0.1)',
+                fill: 'start', // Remplir vers le bas
+                spanGaps: true, // Combler les vides
+              },
+              {
+                label: 'Humeur médiane',
+                data: this.moodChartData.map((data) => data.medianMoodOrder),
+                borderColor: 'rgba(188, 198, 233, 0.6)',
+                backgroundColor: 'rgba(188, 198, 233, 0.1)',
+                fill: 'start', // Remplir vers le bas
+                spanGaps: true, // Combler les vides
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                reverse: true, // Inverser l'axe Y
+                min: Math.min(...this.moods.map((m) => m.order)), // Ordre minimum de toutes les humeurs
+                max: Math.max(...this.moods.map((m) => m.order)), // Ordre maximum de toutes les humeurs
+                grid: {
+                  color: 'rgba(84, 94, 124, 0.15)',
+                },
+                ticks: {
+                  color: 'rgba(84, 94, 124, 0.8)',
+                  callback: (value: number | string) => {
+                    const mood = this.moods.find((m) => m.order === value);
+                    return mood ? mood.name : ''; // Retourne le nom de l'humeur ou une chaîne vide
+                  },
+                  stepSize: 1, // Assure que chaque ordre est affiché
+                },
+              },
+              x: {
+                grid: {
+                  color: 'rgba(84, 94, 124, 0.15)',
+                },
+                ticks: {
+                  color: 'rgba(84, 94, 124, 0.8)',
+                },
+              },
+            },
+            plugins: {
+              legend: {
+                labels: {
+                  color: 'rgba(84, 94, 124, 0.8)',
+                },
+              },
+              tooltip: {
+                callbacks: {
+                  label: (context) => {
+                    const value = context.raw as number;
+                    const mood = this.moods.find((m) => m.order === value);
+                    return mood ? mood.name : `Ordre: ${value}`;
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+    }
   }
 }

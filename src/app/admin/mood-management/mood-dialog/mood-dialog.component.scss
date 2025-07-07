@@ -5,6 +5,18 @@ mat-dialog-content {
   min-width: 300px;
 }
 
+.background-preview {
+  width: 100%;
+  height: 100px;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 mat-form-field {
   width: 100%;
 }
