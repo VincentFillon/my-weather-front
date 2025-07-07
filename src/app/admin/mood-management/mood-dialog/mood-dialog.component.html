@@ -34,8 +34,19 @@
     </mat-form-field>
 
     <mat-form-field appearance="fill">
-      <mat-label>Couleur</mat-label>
+      <mat-label>Couleur (optionnel)</mat-label>
       <input matInput formControlName="color" [(colorPicker)]="moodColor" required>
+    </mat-form-field>
+
+    <div class="background-preview" [ngStyle]="{'background-image': 'url(' + form.get('backgroundImg')?.value + ')'}">
+      @if (!form.get('backgroundImg')?.value) {
+        <i>Aucune image de fond sélectionnée</i>
+      }
+    </div>
+
+    <mat-form-field appearance="fill">
+      <mat-label>URL du fond d'écran (optionnel)</mat-label>
+      <input matInput formControlName="backgroundImg" required>
     </mat-form-field>
 
     <mat-form-field appearance="fill">

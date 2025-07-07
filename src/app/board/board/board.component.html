@@ -99,6 +99,7 @@
 
 
   <div class="board-grid-container">
+    <div class="board-background" [style.backgroundImage]="'url(' + backgroundImgUrl + ')'"></div>
     <!-- Date du jour -->
     <div class="date-container">
       <h2 class="today-date">
@@ -157,5 +158,8 @@
         }
       </div>
     </ng-scrollbar>
+    <div class="mood-chart-container">
+      <canvas id="moodChartCanvas"></canvas>
+    </div>
   </div>
 </div>

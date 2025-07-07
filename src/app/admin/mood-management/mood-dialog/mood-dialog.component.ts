@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 
+import { NgStyle } from '@angular/common';
 import {
   FormBuilder,
   FormGroup,
@@ -32,6 +33,7 @@ interface DialogData {
     MatInputModule,
     MatButtonModule,
     ColorPickerDirective,
+    NgStyle,
   ],
   templateUrl: './mood-dialog.component.html',
   styleUrls: ['./mood-dialog.component.scss'],
@@ -53,6 +55,7 @@ export class MoodDialogComponent {
       image: [data.mood?.image || '', [Validators.required]],
       color: [data.mood?.color || ''],
       sound: [data.mood?.sound || ''],
+      backgroundImg: [data.mood?.backgroundImg || ''],
     });
   }
 
