@@ -22,8 +22,7 @@
   canvas {
     width: 100%;
     height: 100%;
-    opacity: 0.5; /* Transparence du graphique */
-    background-color: transparent; /* Assurez-vous que le fond est transparent */
+    background-color: transparent;
   }
 }
 
@@ -231,7 +230,7 @@
     background-position: center center;
     background-repeat: no-repeat;
     transition: background-image 1s ease-in-out;
-    opacity: 0.02;
+    opacity: 0.1;
     width: 100%;
     height: 100%;
     z-index: -1;

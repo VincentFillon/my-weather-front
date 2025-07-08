@@ -1,5 +1,5 @@
 
-import { Inject, Injectable, Renderer2, RendererFactory2, DOCUMENT } from '@angular/core';
+import { DOCUMENT, Inject, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +8,6 @@ export class ThemeService {
   private renderer: Renderer2;
   private readonly THEME_KEY = 'user-theme-preference';
   private readonly DARK_THEME_CLASS = 'dark-mode';
-  private readonly LIGHT_THEME_CLASS = 'light-mode'; // Optionnel, si vous voulez une classe explicite pour le clair
 
   public isDarkMode: boolean = false;
 
