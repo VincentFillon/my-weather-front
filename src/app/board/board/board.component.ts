@@ -83,6 +83,8 @@ export class BoardComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
   isAdmin = false;
 
+  isDarkMode = this.themeService.isDarkMode;
+
   today = new Date();
   todayWorldDay: WorldDay | undefined;
   startOfDay: Date;
@@ -276,6 +278,15 @@ export class BoardComponent implements OnInit, OnDestroy {
         this.setUsers(this.users.filter((u) => u._id !== userId));
       });
     this.subscriptions.push(userRemovedSubscription);
+
+    const themeSubscription = this.themeService.darkModeSubject
+      .asObservable()
+      .subscribe((isDarkMode) => {
+        this.isDarkMode = isDarkMode;
+        // Re-render le graphique d'humeur avec le nouveau thème
+        this.renderMoodChart();
+      });
+    this.subscriptions.push(themeSubscription);
   }
 
   ngOnDestroy() {
@@ -499,9 +510,11 @@ export class BoardComponent implements OnInit, OnDestroy {
                 label: 'Mon humeur',
                 data: this.moodChartData.map((data) => data.userMoodOrder),
                 // borderColor: 'rgba(128, 213, 211, 0.6)',
-                borderColor: this.themeService.isDarkMode ? '#80d5d3' : '#356666',
+                borderColor: this.isDarkMode ? '#80d5d3' : '#356666',
                 // backgroundColor: 'rgba(128, 213, 211, 0.1)',
-                backgroundColor: this.themeService.isDarkMode ? 'rgba(128, 213, 211, 0.2)' : 'rgba(53, 102, 102, 0.2)',
+                backgroundColor: this.isDarkMode
+                  ? 'rgba(128, 213, 211, 0.2)'
+                  : 'rgba(53, 102, 102, 0.2)',
                 fill: 'start', // Remplir vers le bas
                 spanGaps: true, // Combler les vides
               },
@@ -509,9 +522,11 @@ export class BoardComponent implements OnInit, OnDestroy {
                 label: 'Humeur médiane',
                 data: this.moodChartData.map((data) => data.medianMoodOrder),
                 // borderColor: 'rgba(188, 198, 233, 0.6)',
-                borderColor: this.themeService.isDarkMode ? '#c0c6dc' : '#585e71',
+                borderColor: this.isDarkMode ? '#c0c6dc' : '#585e71',
                 // backgroundColor: 'rgba(188, 198, 233, 0.1)',
-                backgroundColor: this.themeService.isDarkMode ? 'rgba(64, 70, 89, 0.2)' : 'rgba(192, 198, 220, 0.2)',
+                backgroundColor: this.isDarkMode
+                  ? 'rgba(64, 70, 89, 0.2)'
+                  : 'rgba(192, 198, 220, 0.2)',
                 fill: 'start', // Remplir vers le bas
                 spanGaps: true, // Combler les vides
               },
@@ -527,11 +542,11 @@ export class BoardComponent implements OnInit, OnDestroy {
                 max: Math.max(...this.moods.map((m) => m.order)), // Ordre maximum de toutes les humeurs
                 grid: {
                   // color: 'rgba(84, 94, 124, 0.15)',
-                  color: this.themeService.isDarkMode ? '#45464d' : '#c5c6d0',
+                  color: this.isDarkMode ? '#45464d' : '#c5c6d0',
                 },
                 ticks: {
                   // color: 'rgba(84, 94, 124, 0.8)',
-                  color: this.themeService.isDarkMode ? '#909098' : '#757780',
+                  color: this.isDarkMode ? '#909098' : '#757780',
                   callback: (value: number | string) => {
                     const mood = this.moods.find((m) => m.order === value);
                     return mood ? mood.name : ''; // Retourne le nom de l'humeur ou une chaîne vide
@@ -542,11 +557,11 @@ export class BoardComponent implements OnInit, OnDestroy {
               x: {
                 grid: {
                   // color: 'rgba(84, 94, 124, 0.15)',
-                  color: this.themeService.isDarkMode ? '#45464d' : '#c5c6d0',
+                  color: this.isDarkMode ? '#45464d' : '#c5c6d0',
                 },
                 ticks: {
                   // color: 'rgba(84, 94, 124, 0.8)',
-                  color: this.themeService.isDarkMode ? '#909098' : '#757780',
+                  color: this.isDarkMode ? '#909098' : '#757780',
                 },
               },
             },
@@ -554,7 +569,7 @@ export class BoardComponent implements OnInit, OnDestroy {
               legend: {
                 labels: {
                   // color: 'rgba(84, 94, 124, 0.8)',
-                  color: this.themeService.isDarkMode ? '#909098' : '#757780',
+                  color: this.isDarkMode ? '#909098' : '#757780',
                 },
               },
               tooltip: {

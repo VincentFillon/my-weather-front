@@ -1,5 +1,6 @@
 
 import { DOCUMENT, Inject, Injectable, Renderer2, RendererFactory2 } from '@angular/core';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -8,6 +9,8 @@ export class ThemeService {
   private renderer: Renderer2;
   private readonly THEME_KEY = 'user-theme-preference';
   private readonly DARK_THEME_CLASS = 'dark-mode';
+
+  public darkModeSubject = new Subject<boolean>();
 
   public isDarkMode: boolean = false;
 
@@ -39,8 +42,10 @@ export class ThemeService {
   private applyTheme(): void {
     if (this.isDarkMode) {
       this.renderer.addClass(this.document.body, this.DARK_THEME_CLASS);
+      this.darkModeSubject.next(true);
     } else {
       this.renderer.removeClass(this.document.body, this.DARK_THEME_CLASS);
+      this.darkModeSubject.next(false);
     }
   }
 
