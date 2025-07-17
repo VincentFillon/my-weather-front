@@ -1,0 +1,12 @@
+<div class="mood-chart-container">
+  <div class="mood-chart-canvas-container">
+    <canvas id="moodChartCanvas"></canvas>
+  </div>
+  <div class="chart-controls">
+    <mat-button-toggle-group name="fontStyle" aria-label="Font Style" [(ngModel)]="selectedDays" (change)="onDaysChange()">
+      @for (option of daysOptions; track option.value) {
+      <mat-button-toggle [value]="option.value">{{option.label}}</mat-button-toggle>
+      }
+    </mat-button-toggle-group>
+  </div>
+</div>

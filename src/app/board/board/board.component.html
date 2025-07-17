@@ -158,8 +158,15 @@
         }
       </div>
     </ng-scrollbar>
-    <div class="mood-chart-container">
-      <canvas id="moodChartCanvas"></canvas>
-    </div>
+
+    <button mat-fab color="primary" class="open-chart-button" (click)="toggleMoodChart()">
+      <mat-icon fontIcon="bar_chart"></mat-icon>
+    </button>
+
+    @if (moodChartOpened) {
+      <div class="chart-container">
+        <app-mood-chart></app-mood-chart>
+      </div>
+    }
   </div>
 </div>

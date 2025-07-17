@@ -1,4 +1,10 @@
-import { Component, LOCALE_ID, OnDestroy, OnInit, inject } from '@angular/core';
+import {
+  Component,
+  inject,
+  LOCALE_ID,
+  OnDestroy,
+  OnInit
+} from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import {
@@ -15,24 +21,22 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle'; // Ajout de l'import
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Chart, registerables } from 'chart.js';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { Subscription } from 'rxjs';
 import { Mood } from '../../core/models/mood';
-import { MoodChartData } from '../../core/models/mood-chart-data';
 import { PublicHoliday } from '../../core/models/public-holiday';
 import { Role } from '../../core/models/role.enum';
 import { User } from '../../core/models/user';
 import { WorldDay } from '../../core/models/world-day';
 import { AuthService } from '../../core/services/auth.service';
-import { MoodChartService } from '../../core/services/mood-chart.service';
 import { MoodService } from '../../core/services/mood.service';
 import { PublicHolidaysService } from '../../core/services/public-holidays.service';
-import { ThemeService } from '../../core/services/theme.service'; // Ajout de l'import
+import { ThemeService } from '../../core/services/theme.service';
 import { UserService } from '../../core/services/user.service';
 import { WorldDaysService } from '../../core/services/world-days.service';
+import { MoodChartComponent } from '../mood-chart/mood-chart.component';
 import { Interruption, TimerComponent } from '../timer/timer.component';
 import { WeatherWidgetComponent } from '../weather-widget/weather-widget.component';
 
@@ -51,9 +55,10 @@ import { WeatherWidgetComponent } from '../weather-widget/weather-widget.compone
     DatePipe,
     TimerComponent,
     MatTooltipModule,
-    MatSlideToggleModule, // Ajout du module
+    MatSlideToggleModule,
     WeatherWidgetComponent,
     NgScrollbarModule,
+    MoodChartComponent,
   ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss'],
@@ -77,7 +82,6 @@ export class BoardComponent implements OnInit, OnDestroy {
   private userService = inject(UserService);
   private worldDaysService = inject(WorldDaysService);
   private publicHolidaysService = inject(PublicHolidaysService);
-  private moodChartService = inject(MoodChartService);
   public themeService = inject(ThemeService);
 
   currentUser: User | null = null;
@@ -162,23 +166,20 @@ export class BoardComponent implements OnInit, OnDestroy {
   medianMood: Mood | null = null;
   backgroundImgUrl: string = ''; // Nouvelle propriété pour l'URL de l'image de fond
 
-  private moodChart: Chart | undefined;
-  private moodChartData: MoodChartData[] | undefined;
-
   users: User[] = [];
 
   focusedUser: User | null = null;
   focusedUserTimeout?: NodeJS.Timeout;
 
   private subscriptions: Subscription[] = [];
-  private moodChartSubscription: Subscription | undefined;
-  private moodChartTimeout: NodeJS.Timeout | undefined;
 
   private currentAudio: HTMLAudioElement | null = null;
   private currentPlayingMoodId: string | null = null;
 
   private moodsTimeout: any;
   private usersTimeout: any;
+
+  moodChartOpened = true;
 
   constructor() {
     this.startOfDay = new Date(this.today);
@@ -192,8 +193,6 @@ export class BoardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    Chart.register(...registerables); // Enregistrer tous les composants de Chart.js et le plugin
-
     const currentUserSubscription = this.authService.currentUser$.subscribe(
       (user) => {
         this.currentUser = user;
@@ -283,8 +282,6 @@ export class BoardComponent implements OnInit, OnDestroy {
       .asObservable()
       .subscribe((isDarkMode) => {
         this.isDarkMode = isDarkMode;
-        // Re-render le graphique d'humeur avec le nouveau thème
-        this.renderMoodChart();
       });
     this.subscriptions.push(themeSubscription);
   }
@@ -293,7 +290,6 @@ export class BoardComponent implements OnInit, OnDestroy {
     this.stopSound();
     // Se désabonner de tous les observables
     this.subscriptions.forEach((sub) => sub.unsubscribe());
-    this.moodChartSubscription?.unsubscribe();
   }
 
   private setMoods(moods: Mood[]) {
@@ -304,7 +300,6 @@ export class BoardComponent implements OnInit, OnDestroy {
       this.calculateMedianMood(moods, this.users);
       this.moods = moods.sort((a, b) => a.order - b.order);
       this.moodsIds = moods.map((mood) => mood._id);
-      this.getMoodChartData();
     }, 150);
   }
 
@@ -315,24 +310,7 @@ export class BoardComponent implements OnInit, OnDestroy {
     this.usersTimeout = setTimeout(() => {
       this.calculateMedianMood(this.moods, users);
       this.users = users;
-      this.getMoodChartData();
     }, 150);
-  }
-
-  private getMoodChartData(): void {
-    if (this.moodChartTimeout) {
-      clearTimeout(this.moodChartTimeout);
-    }
-    this.moodChartTimeout = setTimeout(() => {
-      this.moodChartSubscription?.unsubscribe();
-      // Récupérer les données du graphique d'humeur
-      this.moodChartSubscription = this.moodChartService
-        .getMoodChartData()
-        .subscribe((data) => {
-          this.moodChartData = data;
-          this.renderMoodChart();
-        });
-    });
   }
 
   private calculateMedianMood(moods: Mood[], users: User[]) {
@@ -490,101 +468,8 @@ export class BoardComponent implements OnInit, OnDestroy {
     // console.debug('[BoardComponent] logout');
     this.authService.logout();
   }
-  private renderMoodChart() {
-    if (this.moodChart) {
-      this.moodChart.destroy(); // Détruire l'ancien graphique si il existe
-    }
 
-    const canvas = document.getElementById(
-      'moodChartCanvas'
-    ) as HTMLCanvasElement;
-    if (canvas && this.moodChartData) {
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        this.moodChart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: this.moodChartData.map((data) => data.date),
-            datasets: [
-              {
-                label: 'Mon humeur',
-                data: this.moodChartData.map((data) => data.userMoodOrder),
-                // borderColor: 'rgba(128, 213, 211, 0.6)',
-                borderColor: this.isDarkMode ? '#80d5d3' : '#356666',
-                // backgroundColor: 'rgba(128, 213, 211, 0.1)',
-                backgroundColor: this.isDarkMode
-                  ? 'rgba(128, 213, 211, 0.2)'
-                  : 'rgba(53, 102, 102, 0.2)',
-                fill: 'start', // Remplir vers le bas
-                spanGaps: true, // Combler les vides
-              },
-              {
-                label: 'Humeur médiane',
-                data: this.moodChartData.map((data) => data.medianMoodOrder),
-                // borderColor: 'rgba(188, 198, 233, 0.6)',
-                borderColor: this.isDarkMode ? '#c0c6dc' : '#585e71',
-                // backgroundColor: 'rgba(188, 198, 233, 0.1)',
-                backgroundColor: this.isDarkMode
-                  ? 'rgba(64, 70, 89, 0.2)'
-                  : 'rgba(192, 198, 220, 0.2)',
-                fill: 'start', // Remplir vers le bas
-                spanGaps: true, // Combler les vides
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                reverse: true, // Inverser l'axe Y
-                min: Math.min(...this.moods.map((m) => m.order)), // Ordre minimum de toutes les humeurs
-                max: Math.max(...this.moods.map((m) => m.order)), // Ordre maximum de toutes les humeurs
-                grid: {
-                  // color: 'rgba(84, 94, 124, 0.15)',
-                  color: this.isDarkMode ? '#45464d' : '#c5c6d0',
-                },
-                ticks: {
-                  // color: 'rgba(84, 94, 124, 0.8)',
-                  color: this.isDarkMode ? '#909098' : '#757780',
-                  callback: (value: number | string) => {
-                    const mood = this.moods.find((m) => m.order === value);
-                    return mood ? mood.name : ''; // Retourne le nom de l'humeur ou une chaîne vide
-                  },
-                  stepSize: 1, // Assure que chaque ordre est affiché
-                },
-              },
-              x: {
-                grid: {
-                  // color: 'rgba(84, 94, 124, 0.15)',
-                  color: this.isDarkMode ? '#45464d' : '#c5c6d0',
-                },
-                ticks: {
-                  // color: 'rgba(84, 94, 124, 0.8)',
-                  color: this.isDarkMode ? '#909098' : '#757780',
-                },
-              },
-            },
-            plugins: {
-              legend: {
-                labels: {
-                  // color: 'rgba(84, 94, 124, 0.8)',
-                  color: this.isDarkMode ? '#909098' : '#757780',
-                },
-              },
-              tooltip: {
-                callbacks: {
-                  label: (context) => {
-                    const value = context.raw as number;
-                    const mood = this.moods.find((m) => m.order === value);
-                    return mood ? mood.name : `Ordre: ${value}`;
-                  },
-                },
-              },
-            },
-          },
-        });
-      }
-    }
+  toggleMoodChart(): void {
+    this.moodChartOpened = !this.moodChartOpened;
   }
 }
