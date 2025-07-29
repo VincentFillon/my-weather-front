@@ -9,6 +9,7 @@ import { MoodChartData } from '../../core/models/mood-chart-data';
 import { MoodChartService } from '../../core/services/mood-chart.service';
 import { MoodService } from '../../core/services/mood.service';
 import { ThemeService } from '../../core/services/theme.service';
+import { UserService } from '../../core/services/user.service';
 
 @Component({
   selector: 'app-mood-chart',
@@ -19,6 +20,7 @@ import { ThemeService } from '../../core/services/theme.service';
 })
 export class MoodChartComponent implements OnInit, OnDestroy {
   private moodChartService = inject(MoodChartService);
+  private userService = inject(UserService);
   public themeService = inject(ThemeService);
   private moodService = inject(MoodService);
 
@@ -67,6 +69,43 @@ export class MoodChartComponent implements OnInit, OnDestroy {
         this.renderMoodChart();
       });
     this.subscriptions.push(moodsSubscription);
+
+    const moodUpdatedSubscription = this.moodService
+      .onMoodUpdated()
+      .subscribe((mood) => {
+        this.moods = this.moods
+          .map((m) => (m._id === mood._id ? mood : m))
+          .sort((a, b) => a.order - b.order);
+        this.renderMoodChart();
+      });
+    this.subscriptions.push(moodUpdatedSubscription);
+
+    const moodCreatedSubscription = this.moodService
+      .onMoodCreated()
+      .subscribe((mood) => {
+        this.moods = this.moods
+          .map((m) => (m._id === mood._id ? mood : m))
+          .sort((a, b) => a.order - b.order);
+        this.renderMoodChart();
+      });
+    this.subscriptions.push(moodCreatedSubscription);
+
+    const moodRemovedSubscription = this.moodService
+      .onMoodRemoved()
+      .subscribe((moodId) => {
+        this.moods = this.moods
+          .filter((m) => m._id !== moodId)
+          .sort((a, b) => a.order - b.order);
+        this.renderMoodChart();
+      });
+    this.subscriptions.push(moodRemovedSubscription);
+
+    const usersMoodUpdatedSubscription = this.userService
+      .onUserMoodUpdated()
+      .subscribe((/* user */) => {
+        this.getMoodChartData();
+      });
+    this.subscriptions.push(usersMoodUpdatedSubscription);
   }
 
   ngOnDestroy() {
