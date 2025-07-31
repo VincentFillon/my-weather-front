@@ -4,6 +4,7 @@ import { Observable, Subject, catchError, of, share } from 'rxjs';
 import { ManagerOptions, Socket, SocketOptions, io } from 'socket.io-client';
 
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
 
 export interface SocketIoConfig {
@@ -79,7 +80,7 @@ export class SocketService {
           const config: SocketIoConfig = {
             url: wsUrl,
             options: {
-              path: '/api/socket',
+              path: `${environment.apiUrl}/socket`,
               // transports: ['websocket'],
               reconnection: true,
               reconnectionAttempts: Infinity,

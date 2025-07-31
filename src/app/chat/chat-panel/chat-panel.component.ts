@@ -33,6 +33,7 @@ import { NgScrollbar, NgScrollbarModule } from 'ngx-scrollbar';
 import { NgScrollReached } from 'ngx-scrollbar/reached-event';
 import { of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 import {
   Message,
   MessageReaction,
@@ -565,7 +566,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
         .pipe(
           takeUntilDestroyed(this.destroyRef),
           tap((response) => {
-            this.uploadedMediaUrl = '/api/data/' + response.url;
+            this.uploadedMediaUrl = environment.apiUrl + '/data/' + response.url;
             this.sendMessage();
           }),
           catchError((error) => {

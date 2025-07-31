@@ -6,6 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
+import { environment } from '../../../environments/environment';
 import { Media } from '../../core/models/media';
 import { MediaType } from '../../core/models/media-type.enum';
 import { UploadService } from '../../core/services/upload.service';
@@ -29,6 +30,8 @@ export class MediaComponent implements OnInit {
 
   images: Media[] = [];
   sounds: Media[] = [];
+
+  apiUrl = environment.apiUrl;
 
   constructor() {}
 

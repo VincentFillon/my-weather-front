@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { Role } from '../models/role.enum';
 import { User } from '../models/user';
 
@@ -17,7 +18,7 @@ export class AuthService {
   private readonly TOKEN_REFRESH_INTERVAL = 1000 * 60 * 30; // 30 minutes
   private readonly TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 12; // 12 heures
 
-  private readonly API_URL = `/api/auth`;
+  private readonly API_URL = `${environment.apiUrl}/auth`;
 
   private http = inject(HttpClient);
 

@@ -2,6 +2,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { Message, MessageReactionDto, SendMessageDto } from '../models/message';
 import {
   CreateRoomDto,
@@ -18,7 +19,7 @@ export class ChatService {
   private socketService = inject(SocketService);
   private http = inject(HttpClient);
 
-  private apiUrl = '/api/chat';
+  private apiUrl = `${environment.apiUrl}/chat`;
 
   private roomCreatedObserver$?: Observable<Room>;
   private messageSentObserver$?: Observable<Message>;

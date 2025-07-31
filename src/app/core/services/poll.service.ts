@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
@@ -16,9 +15,6 @@ import { SocketService } from './socket.service';
 })
 export class PollService {
   private socketService = inject(SocketService);
-  private http = inject(HttpClient);
-
-  private apiUrl = '/api/poll';
 
   private pollsObserver$?: Observable<Poll[]>;
   private pollsSearchObserver$?: Observable<Poll[]>;

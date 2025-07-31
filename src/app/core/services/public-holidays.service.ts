@@ -1,12 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 import { PublicHoliday } from '../models/public-holiday';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PublicHolidaysService {
-  private readonly API_URL = `/api/public-holidays`;
+  private readonly API_URL = `${environment.apiUrl}/public-holidays`;
 
   constructor(private http: HttpClient) {}
 
