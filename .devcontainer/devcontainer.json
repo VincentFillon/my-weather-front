@@ -1,0 +1,13 @@
+{
+  "name": "Ma météo",
+  "image": "ghcr.io/devcontainers/templates/typescript-node:4.0.2",
+  "postCreateCommand": "npm install",
+  "forwardPorts": [4200],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "angular.ng-template"
+      ]
+    }
+  }
+}
