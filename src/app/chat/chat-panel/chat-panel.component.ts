@@ -256,8 +256,8 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
           const sortedMessages = messages.slice().reverse();
           this.rawMessages.set(sortedMessages);
           this.hasMoreMessages.set(messages.length === this.initialLoadLimit);
-          queueMicrotask(() => this.scrollToBottom());
           this.markAsRead();
+          // this.scrollToBottom();
         },
         error: (err) => {
           console.error(
@@ -279,8 +279,8 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
             ...currentMessages,
             { ...message, isRead: isOwnMessage },
           ]);
-          queueMicrotask(() => this.scrollToBottom());
           this.markAsRead();
+          // this.scrollToBottom();
         }
       });
     this.chatService
@@ -464,7 +464,7 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
     this.uploadError.set(null);
     this.showPreview.set(false);
     this.selectedGifUrl = null; // Réinitialiser l'URL du GIF
-    this.scrollToBottom();
+    // this.scrollToBottom();
     this.messageInput.nativeElement.focus();
   }
 
@@ -668,19 +668,18 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
     this.minimizePanel.emit(this.room);
   }
 
+  // Fait défiler jusqu'en bas immédiatement puis maintient le bas pendant quelques secondes
   scrollToBottom(): void {
-    setTimeout(() => {
-      try {
-        if (this.messageContainer) {
-          this.messageContainer.scrollToElement(
-            `#message-${this.processedMessages().length - 1}`,
-            { duration: 500 }
-          );
-        }
-      } catch (err) {
-        console.error('Could not scroll to bottom:', err);
-      }
-    }, 0);
+    if (!this.messageContainer) return;
+
+    // Scroll immédiat pour retour visuel instantané
+    try {
+      requestAnimationFrame(() => {
+        this.messageContainer.scrollTo({ bottom: 0, duration: 150 });
+      });
+    } catch (err) {
+      console.error('Could not scroll to bottom:', err);
+    }
   }
 
   openEditRoomDialog(): void {

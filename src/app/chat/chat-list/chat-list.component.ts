@@ -73,6 +73,30 @@ export class ChatListComponent {
   close(): void {
     this.closeList.emit();
   }
+
+  // Retourne un aperçu du dernier message de la room.
+  // Si c'est une image/gif (média), renvoie { text: 'image', italic: true } pour affichage en italique.
+  getLastMessagePreview(room: Room): { text: string; italic: boolean } {
+    if (!room.lastMessage) {
+      return { text: '', italic: false };
+    }
+
+    // Détection heuristique d'un média image/gif
+    if (room.lastMessage.mediaUrl) {
+      if (room.lastMessage.mediaUrl.endsWith('.gif')) {
+        return { text: '[gif]', italic: true };
+      }
+      if (/\.(png|jpe?g|webp|bmp|svg)$/i.test(room.lastMessage.mediaUrl)) {
+        return { text: '[image]', italic: true };
+      }
+    }
+
+    return {
+      text: room.lastMessage.content || '',
+      italic: false,
+    };
+  }
+
   openNewChatDialog(): void {
     const dialogRef = this.dialog.open(NewChatDialogComponent, {
       width: '60vw',
