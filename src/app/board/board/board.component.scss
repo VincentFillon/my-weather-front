@@ -373,6 +373,23 @@
       background-position: center;
     }
 
+    .user-name {
+      flex: 1 0 auto;
+    }
+
+    .user-medal {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      line-height: 36px;
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border-radius: 50%;
+      border: 1px solid var(--mat-sys-secondary-container);
+      margin-right: 2px;
+    }
+
     h3 {
       margin: 0;
       white-space: pre-line;

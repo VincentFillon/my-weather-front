@@ -1,4 +1,6 @@
 <div class="board-container">
+  <app-daily-hunt [huntFoundFromParent]="alreadyFoundToday"></app-daily-hunt>
+
   <!-- Zone neutre -->
   <div class="neutral-zone">
     <div class="neutral-header">
@@ -60,7 +62,10 @@
             <div class="user-avatar" [style.backgroundImage]="
                   'url(' + (user.image || 'assets/default-avatar.png') + ')'
                 "></div>
-            <h3>{{ user.displayName }}</h3>
+            <h3 class="user-name">{{ user.displayName }}</h3>
+            @if (hasUserFoundHunt(user._id)) {
+              <div class="user-medal" [matTooltip]="getWinnerTooltip(user._id)">{{ getWinnerMedal(user._id) }}</div>
+            }
           </div>
         </div>
         }
@@ -148,7 +153,10 @@
                   <div class="user-avatar" [style.backgroundImage]="
                     'url(' + (user.image || 'assets/default-avatar.png') + ')'
                   "></div>
-                  <h3>{{ user.displayName }}</h3>
+                  <h3 class="user-name">{{ user.displayName }}</h3>
+                  @if (hasUserFoundHunt(user._id)) {
+                    <div class="user-medal" [matTooltip]="getWinnerTooltip(user._id)">{{ getWinnerMedal(user._id) }}</div>
+                  }
                 </div>
               </div>
               }
@@ -164,9 +172,9 @@
     </button>
 
     @if (moodChartOpened) {
-      <div class="chart-container">
-        <app-mood-chart></app-mood-chart>
-      </div>
+    <div class="chart-container">
+      <app-mood-chart></app-mood-chart>
+    </div>
     }
   </div>
 </div>
