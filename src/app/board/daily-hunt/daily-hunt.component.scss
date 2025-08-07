@@ -1,0 +1,13 @@
+.hunt-image {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  opacity: 0.1;
+  cursor: pointer;
+  z-index: 1000;
+  transition: opacity 0.3s ease-in-out;
+
+  &:hover {
+    opacity: 1;
+  }
+}
