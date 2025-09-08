@@ -140,7 +140,48 @@ export class ChatContainerComponent implements OnInit, OnDestroy {
   loadInitialRooms(): void {
     this.roomsSubscription = this.chatService.getMyRooms().subscribe({
       next: (rooms) => {
-        this.rooms = rooms.map((r) => ({ ...r, unreadCount: 0 })); // Initialiser unreadCount
+        // Initialiser unreadCount et hydrater le dernier message au 1er chargement
+        this.rooms = rooms.map((r) => ({ ...r, unreadCount: r.unreadCount ?? 0 }));
+
+        // // Hydratation du dernier message si manquant, en tâche de fond
+        // const roomsNeedingLastMessage = this.rooms.filter((r) => !r.lastMessage);
+        // const concurrency = 4;
+
+        // const runWorker = async (queue: Room[]) => {
+        //   while (queue.length) {
+        //     const room = queue.shift()!;
+        //     try {
+        //       // On récupère 1 message le plus récent via HTTP
+        //       const msgs = await firstValueFrom(this.chatService.getPaginatedMessages(room._id, 1));
+        //       const last = msgs && msgs.length > 0 ? msgs[0] : undefined;
+        //       if (last) {
+        //         // Protection contre les courses: ne pas écraser un message plus récent éventuellement venu par socket
+        //         this.rooms = this.rooms.map((r) => {
+        //           if (r._id !== room._id) return r;
+        //           const current = r.lastMessage;
+        //           if (!current) return { ...r, lastMessage: last };
+        //           const currentTs = new Date(current.createdAt).getTime();
+        //           const incomingTs = new Date(last.createdAt).getTime();
+        //           return incomingTs >= currentTs ? { ...r, lastMessage: last } : r;
+        //         });
+        //         // Demander une détection de changements si nécessaire
+        //         this.cdr.markForCheck();
+        //       }
+        //     } catch (e) {
+        //       // silencieux: l'UI affichera "Aucun message" pour cette room
+        //       // console.error('Hydration lastMessage failed for room', room._id, e);
+        //     }
+        //   }
+        // };
+
+        // // Démarre quelques workers en parallèle
+        // const queue = [...roomsNeedingLastMessage];
+        // const workers = Array.from({ length: Math.min(concurrency, queue.length) }, () =>
+        //   runWorker(queue)
+        // );
+        // Promise.all(workers).then(() => {
+        //   // Rien à faire; l'affichage se mettra à jour au fil des attributions
+        // });
       },
       error: (err) => console.error('Error loading rooms:', err),
     });

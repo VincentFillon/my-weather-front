@@ -26,6 +26,21 @@ export class DailyHuntComponent implements OnInit, OnDestroy, OnChanges {
     const todaysHuntSubscription = this.dailyHuntService
       .getTodaysHunt()
       .subscribe((hunt) => {
+        // Eviter que le dessin soit caché dans un bord d'écran
+        if (hunt) {
+          // Si la position X est trop proche du bord droit
+          const positionX = hunt.positionX / 100 * window.innerWidth;
+          if (window.innerWidth - positionX < 50) {
+            // On place le dessin à au moins 50px du bord droit
+            hunt.positionX = (window.innerWidth - 50) / window.innerWidth * 100;
+          }
+          // Si la position Y est trop proche du bord inférieur
+          const positionY = hunt.positionY / 100 * window.innerHeight;
+          if (window.innerHeight - positionY < 50) {
+            // On place le dessin à au moins 50px du bord inférieur
+            hunt.positionY = (window.innerHeight - 50) / window.innerHeight * 100;
+          }
+        }
         this.dailyHunt = hunt;
       });
     this.subscriptions.push(todaysHuntSubscription);

@@ -1,7 +1,7 @@
 <mat-card class="chat-panel">
   <mat-toolbar class="chat-panel-header">
-    <div class="chat-room-avatar-wrapper">
-      <img [src]="getRoomAvatar(room)" alt="Avatar" class="chat-room-avatar" (click)="openFullScreenMedia(getRoomAvatar(room))" />
+    <div class="chat-room-avatar-wrapper" (click)="openFullScreenMedia(getRoomAvatar(room))">
+      <img [src]="getRoomAvatar(room)" alt="Avatar" class="chat-room-avatar" />
     </div>
     <span>{{ room.name }}</span>
     <span class="spacer"></span>
@@ -20,7 +20,7 @@
   </mat-toolbar>
 
   <mat-card-content class="message-area" [class.drag-over]="isDragging()">
-    <ng-scrollbar class="my-weather-scrollbar" #messageContainer="ngScrollbar" orientation="vertical" [reachedTopOffset]="scrollThreshold" (reachedTop)="onScroll()">
+    <ng-scrollbar class="my-weather-scrollbar" #messageContainer="ngScrollbar" orientation="vertical" [reachedTopOffset]="scrollThreshold" (reachedTop)="onScroll()" (afterUpdate)="scrollToBottom()">
       @if (isDragging()) {
         <div class="drop-indicator">Déposez votre fichier ici</div>
       }
@@ -32,106 +32,104 @@
 
       @if (isLoading()) {
         <p>Chargement des messages...</p>
+      } @else if (processedMessages().length === 0) {
+        <p class="no-messages"><i>Aucun message</i></p>
       } @else {
-        @if (processedMessages().length === 0) {
-          <p class="no-messages"><i>Aucun message</i></p>
-        } @else {
-          @for (message of processedMessages(); track message._id; let i = $index) {
-            @if (message.showDateSeparator) {
-              <div class="date-separator">
-                <span>{{ message.createdAt | date:'fullDate' }}</span>
+        @for (message of processedMessages(); track message._id; let i = $index) {
+          @if (message.showDateSeparator) {
+            <div class="date-separator">
+              <span>{{ message.createdAt | date:'fullDate' }}</span>
+            </div>
+          }
+          <div [attr.id]="'message-' + i"
+            class="message-item-container"
+            [class.my-message]="message.sender?._id === currentUser?._id && !message.isBotMessage"
+            [class.other-message]="message.sender?._id !== currentUser?._id && !message.isBotMessage"
+            [class.bot-message]="message.isBotMessage"
+            [class.group-start]="message.isGroupStart"
+            [class.group-end]="message.isGroupEnd">
+
+            <div class="message-content-wrapper">
+              <div class="avatar-wrapper">
+                @if (message.showAvatarAndName) {
+                  @if (message.isBotMessage) {
+                    <img class="message-avatar" src="assets/bot-avatar.png" alt="MoodBot">
+                  } @else {
+                    <img class="message-avatar" [src]="message.sender!.image || 'assets/default-avatar.png'" [alt]="message.sender!.displayName">
+                  }
+                }
               </div>
-            }
-            <div [attr.id]="'message-' + i"
-              class="message-item-container"
-              [class.my-message]="message.sender?._id === currentUser?._id && !message.isBotMessage"
-              [class.other-message]="message.sender?._id !== currentUser?._id && !message.isBotMessage"
-              [class.bot-message]="message.isBotMessage"
-              [class.group-start]="message.isGroupStart"
-              [class.group-end]="message.isGroupEnd">
 
-              <div class="message-content-wrapper">
-                <div class="avatar-wrapper">
-                  @if (message.showAvatarAndName) {
+              <div class="message-details">
+                @if (message.showAvatarAndName) {
+                  <div class="sender-name">
                     @if (message.isBotMessage) {
-                      <img class="message-avatar" src="assets/bot-avatar.png" alt="MoodBot">
+                      {{ room.name }}
                     } @else {
-                      <img class="message-avatar" [src]="message.sender!.image || 'assets/default-avatar.png'" [alt]="message.sender!.displayName">
-                    }
-                  }
-                </div>
-
-                <div class="message-details">
-                  @if (message.showAvatarAndName) {
-                    <div class="sender-name">
-                      @if (message.isBotMessage) {
-                        {{ room.name }}
-                      } @else {
-                        {{ message.sender!.displayName }}
-                      }
-                    </div>
-                  }
-
-                  <div class="message-bubble">
-                    <!-- Affichage du média -->
-                    @if (message.mediaUrl) {
-                      <div class="media-container">
-                        <img [src]="message.mediaUrl" alt="Média partagé" class="chat-media" (click)="openFullScreenMedia(message.mediaUrl)">
-                      </div>
-                    }
-                    <!-- Affichage du contenu texte -->
-                    @if (message.parsedContent && message.parsedContent.length) {
-                      <span>
-                        @for (segment of message.parsedContent; let index = $index; track $index) {
-                          @if (segment.type === 'emoji') {
-                            <ngx-emoji [emoji]="segment.content" [size]="index === 0 && message.parsedContent.length === 1 ? 32 : 16"></ngx-emoji>
-                          } @else if (segment.type === 'text') {
-                            {{ segment.content }}
-                          }
-                        }
-                      </span>
-                    } @else if (message.content) {
-                      <span>{{ message.content }}</span>
-                    }
-
-                    <div class="add-reaction-wrapper">
-                      <button class="add-reaction-btn" (click)="openEmojiPicker(message._id)">+</button>
-                    </div>
-
-                    @if (message.showTimestamp) {
-                      <div class="message-timestamp">{{ message.createdAt | date:'shortTime' }}</div>
+                      {{ message.sender!.displayName }}
                     }
                   </div>
+                }
 
-                  @if (message.reactions.length) {
-                    <!-- Affichage des réactions sous chaque message -->
-                    <div class="reactions-bar">
-                      @for (reaction of message.parsedReactions; track reaction.emoji) {
-                        <button class="reaction-btn" [class.own-reaction]="currentUser && reaction.userIds.includes(currentUser._id)"
-                          (click)="toggleReaction(message._id, reaction.emoji)" [title]="reaction.tooltip">
-                          @if (reaction.emoji.startsWith(':') && reaction.emoji.endsWith(':')) {
-                            <ngx-emoji [emoji]="reaction.emoji" [size]="16"></ngx-emoji>
-                          } @else {
-                            {{ reaction.emoji }}
-                          }
-                          <span>{{reaction.userIds.length > 1 ? reaction.userIds.length : ''}}</span>
-                        </button>
-                      }
+                <div class="message-bubble">
+                  <!-- Affichage du média -->
+                  @if (message.mediaUrl) {
+                    <div class="media-container" (click)="openFullScreenMedia(message.mediaUrl)">
+                      <img [src]="message.mediaUrl" alt="Média partagé" class="chat-media">
                     </div>
                   }
+                  <!-- Affichage du contenu texte -->
+                  @if (message.parsedContent && message.parsedContent.length) {
+                    <span>
+                      @for (segment of message.parsedContent; let index = $index; track $index) {
+                        @if (segment.type === 'emoji') {
+                          <ngx-emoji [emoji]="segment.content" [size]="index === 0 && message.parsedContent.length === 1 ? 32 : 16"></ngx-emoji>
+                        } @else if (segment.type === 'text') {
+                          {{ segment.content }}
+                        }
+                      }
+                    </span>
+                  } @else if (message.content) {
+                    <span>{{ message.content }}</span>
+                  }
+
+                  <div class="add-reaction-wrapper">
+                    <button class="add-reaction-btn" (click)="openEmojiPicker(message._id)">+</button>
+                  </div>
+
+                  @if (message.showTimestamp) {
+                    <div class="message-timestamp">{{ message.createdAt | date:'shortTime' }}</div>
+                  }
                 </div>
+
+                @if (message.reactions.length) {
+                  <!-- Affichage des réactions sous chaque message -->
+                  <div class="reactions-bar">
+                    @for (reaction of message.parsedReactions; track reaction.emoji) {
+                      <button class="reaction-btn" [class.own-reaction]="currentUser && reaction.userIds.includes(currentUser._id)"
+                        (click)="toggleReaction(message._id, reaction.emoji)" [title]="reaction.tooltip">
+                        @if (reaction.emoji.startsWith(':') && reaction.emoji.endsWith(':')) {
+                          <ngx-emoji [emoji]="reaction.emoji" [size]="16"></ngx-emoji>
+                        } @else {
+                          {{ reaction.emoji }}
+                        }
+                        <span>{{reaction.userIds.length > 1 ? reaction.userIds.length : ''}}</span>
+                      </button>
+                    }
+                  </div>
+                }
               </div>
             </div>
+          </div>
 
-            @if (showEmojiPickerFor === message._id) {
-              <div class="emoji-picker-popover">
-                <app-emoji-picker
-                  [allowGifSelection]="false"
-                  (emojiSelected)="addReaction(message._id, $event); closeEmojiPicker()"
-                  (close)="closeEmojiPicker()">
-                </app-emoji-picker>
-              </div>
-            }
+          @if (showEmojiPickerFor === message._id) {
+            <div class="emoji-picker-popover">
+              <app-emoji-picker
+                [allowGifSelection]="false"
+                (emojiSelected)="addReaction(message._id, $event); closeEmojiPicker()"
+                (close)="closeEmojiPicker()">
+              </app-emoji-picker>
+            </div>
           }
         }
       }
@@ -184,7 +182,7 @@
         </div>
       } @else {
         <!-- Bouton Joindre -->
-        <input type="file" #fileInput hidden (change)="onFileSelected($event)" accept="image/jpeg,image/png,image/gif,image/webp">
+        <input type="file" #fileInput hidden (change)="onFileSelected($event)" accept="image/jpeg,image/png,image/gif,image/webp,image/svg">
         <button matIconButton (click)="fileInput.click()" aria-label="Joindre un fichier">
           <mat-icon fontIcon="attachment"></mat-icon>
         </button>
