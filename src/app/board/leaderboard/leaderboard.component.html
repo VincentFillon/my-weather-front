@@ -1,0 +1,82 @@
+<div class="leaderboard-overlay" [class.open]="isOpen" (click)="onClose()">
+  <div class="leaderboard-panel" (click)="$event.stopPropagation()">
+    <div class="leaderboard-header">
+      <h2>Classement &laquo;Où est la teub ?&raquo;</h2>
+      <button class="close-btn" (click)="onClose()">×</button>
+    </div>
+
+    <div class="period-selector">
+      <label for="period-select">Période :</label>
+      <select
+        id="period-select"
+        [value]="selectedPeriod"
+        (change)="onPeriodChange($any($event.target).value)">
+        <option *ngFor="let period of periods" [value]="period.value">
+          {{ period.label }}
+        </option>
+      </select>
+    </div>
+
+    <div class="leaderboard-content">
+      <div *ngIf="isLoading" class="loading">
+        Chargement du classement...
+      </div>
+
+      <div *ngIf="!isLoading && leaderboardData" class="leaderboard-table-container">
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th class="position-col">Pos</th>
+              <th class="player-col">Joueur</th>
+              <th class="points-col">Points</th>
+              <th *ngFor="let day of leaderboardData.lastFiveDays" class="day-col">
+                {{ formatDate(day) }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let entry of leaderboardData.leaderboard; let i = index" class="leaderboard-row">
+              <td class="position-cell">
+                <span class="position">{{ getPositionEmoji(i) }}</span>
+              </td>
+              <td class="player-cell">
+                <div class="player-info">
+                  <img *ngIf="entry.user.image" [src]="entry.user.image" [alt]="entry.user.displayName" class="player-avatar">
+                  <div *ngIf="!entry.user.image" class="player-avatar-placeholder">
+                    {{ entry.user.displayName.charAt(0).toUpperCase() }}
+                  </div>
+                  <span class="player-name">{{ entry.user.displayName }}</span>
+                </div>
+              </td>
+              <td class="points-cell">
+                <span class="points">{{ entry.totalPoints }}</span>
+              </td>
+              <td *ngFor="let result of entry.lastFiveResults" class="result-cell">
+                <span [class]="getResultClass(result)">
+                  {{ formatResult(result) }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="!isLoading && (!leaderboardData || leaderboardData.leaderboard.length === 0)" class="no-data">
+        Aucun résultat trouvé pour cette période.
+      </div>
+    </div>
+
+    <div class="leaderboard-footer">
+      <div class="scoring-info">
+        <p><strong>Système de points :</strong></p>
+        <ul class="scoring-list">
+          <li>🥇 1er = 5 points</li>
+          <li>🥈 2ème = 4 points</li>
+          <li>🥉 3ème = 3 points</li>
+          <li>Autres = 1 point</li>
+          <li>NA = Non participé ce jour-là</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

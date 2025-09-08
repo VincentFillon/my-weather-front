@@ -31,6 +31,10 @@
           <mat-icon fontIcon="sports_esports"></mat-icon>
           <span>Je m'ennuie</span>
         </button>
+        <button mat-menu-item (click)="toggleLeaderboard()">
+          <mat-icon fontIcon="leaderboard"></mat-icon>
+          <span>Classement &laquo;Où est la teub ?&raquo;</span>
+        </button>
         @if (isAdmin) {
         <button mat-menu-item routerLink="/admin/moods">
           <mat-icon fontIcon="admin_panel_settings"></mat-icon>
@@ -177,4 +181,9 @@
     </div>
     }
   </div>
+
+  <app-leaderboard
+    [isOpen]="leaderboardOpened"
+    (close)="toggleLeaderboard()">
+  </app-leaderboard>
 </div>

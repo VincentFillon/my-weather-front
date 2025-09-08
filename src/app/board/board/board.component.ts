@@ -38,6 +38,7 @@ import { ThemeService } from '../../core/services/theme.service';
 import { UserService } from '../../core/services/user.service';
 import { WorldDaysService } from '../../core/services/world-days.service';
 import { DailyHuntComponent } from '../daily-hunt/daily-hunt.component';
+import { LeaderboardComponent } from '../leaderboard/leaderboard.component';
 import { MoodChartComponent } from '../mood-chart/mood-chart.component';
 import { Interruption, TimerComponent } from '../timer/timer.component';
 import { WeatherWidgetComponent } from '../weather-widget/weather-widget.component';
@@ -62,6 +63,7 @@ import { WeatherWidgetComponent } from '../weather-widget/weather-widget.compone
     NgScrollbarModule,
     MoodChartComponent,
     DailyHuntComponent,
+    LeaderboardComponent,
   ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss'],
@@ -187,6 +189,7 @@ export class BoardComponent implements OnInit, OnDestroy {
   private usersTimeout: any;
 
   moodChartOpened = true;
+  leaderboardOpened = false;
 
   constructor() {
     this.startOfDay = new Date(this.today);
@@ -499,6 +502,10 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   toggleMoodChart(): void {
     this.moodChartOpened = !this.moodChartOpened;
+  }
+
+  toggleLeaderboard(): void {
+    this.leaderboardOpened = !this.leaderboardOpened;
   }
 
   hasUserFoundHunt(userId: string): boolean {
