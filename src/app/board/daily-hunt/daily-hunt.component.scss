@@ -1,13 +1,31 @@
-.hunt-image {
-  position: absolute;
-  width: 50px;
-  height: 50px;
-  opacity: 0.1;
-  cursor: pointer;
-  z-index: 1000;
-  transition: opacity 0.3s ease-in-out;
-
-  &:hover {
-    opacity: 1;
-  }
+:host {
+  user-select: none;
+  pointer-events: none;
 }
+
+#daily-hunt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  pointer-events: none; // Important : permet les interactions sur le canvas
+}
+
+// .hunt-image {
+//   position: absolute;
+//   /* Valeur par défaut pour 1920px (50px/1920*100) */
+//   width: var(--hunt-image-size-vw, 2.6041666666666666666666666666667vw);
+//   /* Valeur par défaut pour 1280px (50px/1280*100) */
+//   height: var(--hunt-image-size-vh, 3.90625vh);
+//   z-index: 1000;
+//   opacity: 0.1;
+//   cursor: pointer;
+//   pointer-events: auto;
+//   transition: opacity 0.3s ease-in-out;
+
+//   &:hover {
+//     opacity: 1;
+//   }
+// }
