@@ -57,31 +57,16 @@ export class DailyHuntComponent
     const todaysHuntSubscription = this.dailyHuntService
       .getTodaysHunt()
       .subscribe((hunt) => {
-        // Eviter que le dessin soit caché dans un bord d'écran
-        if (hunt) {
-          // Si la position X est trop proche du bord droit
-          const positionX = (hunt.positionX / 100) * window.innerWidth;
-          if (window.innerWidth - positionX < 50) {
-            // On place le dessin à au moins 50px du bord droit
-            hunt.positionX =
-              ((window.innerWidth - 50) / window.innerWidth) * 100;
-          }
-          // Si la position Y est trop proche du bord inférieur
-          const positionY = (hunt.positionY / 100) * window.innerHeight;
-          if (window.innerHeight - positionY < 50) {
-            // On place le dessin à au moins 50px du bord inférieur
-            hunt.positionY =
-              ((window.innerHeight - 50) / window.innerHeight) * 100;
-          }
-        }
         this.dailyHunt = hunt;
         this.draw(); // Redessiner quand on reçoit les données
       });
     this.subscriptions.push(todaysHuntSubscription);
 
-    const themeSubscription = this.themeService.darkModeSubject.subscribe(() => {
-      this.updateSvgColorAndRedraw();
-    });
+    const themeSubscription = this.themeService.darkModeSubject.subscribe(
+      () => {
+        this.updateSvgColorAndRedraw();
+      }
+    );
     this.subscriptions.push(themeSubscription);
 
     const huntResultSubscription = this.dailyHuntService
@@ -218,7 +203,8 @@ export class DailyHuntComponent
   }
 
   private getDisplayImageSizePx(): { w: number; h: number } {
-    let w = 50, h = 50;
+    let w = 50,
+      h = 50;
     if (this.svgViewWidth && !isNaN(this.svgViewWidth)) {
       w = (this.svgViewWidth / 100) * window.innerWidth;
     }
@@ -229,6 +215,26 @@ export class DailyHuntComponent
     return { w, h };
   }
 
+  private getDisplayImagePosition(
+    dailyHunt: DailyHunt,
+    imgW: number,
+    imgH: number
+  ): { x: number; y: number } {
+    const cssWidth = window.innerWidth;
+    const cssHeight = window.innerHeight;
+
+    let imgX = (dailyHunt.positionX / 100) * cssWidth - imgW / 2;
+    let imgY = (dailyHunt.positionY / 100) * cssHeight - imgH / 2;
+
+    // S'assurer que l'image ne soit jamais dessinée en dehors de l'écran
+    if (imgX < imgW) imgX = imgW;
+    if (imgX > cssWidth - imgW) imgX = cssWidth - imgW;
+    if (imgY < imgH) imgY = imgH;
+    if (imgY > cssHeight - imgH) imgY = cssHeight - imgH;
+
+    return { x: imgX, y: imgY };
+  }
+
   private isMouseOverHuntImage(event: MouseEvent): boolean {
     if (!this.dailyHunt || this.huntFound) return false;
 
@@ -237,11 +243,7 @@ export class DailyHuntComponent
     const mouseY = event.clientY - rect.top;
 
     const { w: imgW, h: imgH } = this.getDisplayImageSizePx();
-    const cssWidth = window.innerWidth;
-    const cssHeight = window.innerHeight;
-
-    const imgX = (this.dailyHunt.positionX / 100) * cssWidth - imgW / 2;
-    const imgY = (this.dailyHunt.positionY / 100) * cssHeight - imgH / 2;
+    const { x: imgX, y: imgY } = this.getDisplayImagePosition(this.dailyHunt, imgW, imgH);
 
     return (
       mouseX >= imgX &&
@@ -295,14 +297,13 @@ export class DailyHuntComponent
 
     // Calculer la taille et position
     const { w: imgW, h: imgH } = this.getDisplayImageSizePx();
-    const x = (this.dailyHunt.positionX / 100) * cssWidth - imgW / 2;
-    const y = (this.dailyHunt.positionY / 100) * cssHeight - imgH / 2;
+    const { x: imgX, y: imgY } = this.getDisplayImagePosition(this.dailyHunt, imgW, imgH);
 
     // Appliquer l'opacité selon l'état du survol
     this.ctx.globalAlpha = this.isHovering ? 1.0 : 0.1;
 
     // Dessiner l'image
-    this.ctx.drawImage(this.svgImage, x, y, imgW, imgH);
+    this.ctx.drawImage(this.svgImage, imgX, imgY, imgW, imgH);
 
     // Remettre l'opacité à 1
     this.ctx.globalAlpha = 1.0;
