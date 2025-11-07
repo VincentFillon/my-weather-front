@@ -165,7 +165,7 @@ export class BoardComponent implements OnInit, OnDestroy {
   nextPublicHoliday: PublicHoliday | null = null;
 
   gtaVIReleaseDateAnnouncement = new Date('2025-05-02T00:00:00Z');
-  gtaVIReleaseDate = new Date('2026-05-26T00:00:00Z');
+  gtaVIReleaseDate = new Date('2026-11-19T00:00:00Z');
 
   moods: Mood[] = [];
   moodsIds: string[] = [];
