@@ -103,7 +103,12 @@ export class DailyHuntComponent
   }
 
   private resizeHandler = () => {
-    this.draw();
+    // Recalculer les dimensions de l'image en fonction de la nouvelle taille de fenêtre
+    this.svgViewWidth = (50 / window.innerWidth) * 100;
+    this.svgViewHeight = (50 / window.innerHeight) * 100;
+
+    // Reconfigurer complètement le canvas (buffer size + transformations)
+    this.setupCanvasSizeAndRedraw();
   };
 
   private initCanvasAndSvg() {
