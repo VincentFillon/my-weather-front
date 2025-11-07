@@ -37,6 +37,13 @@ export class LeaderboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadLeaderboard();
+
+    // S'abonner à l'événement newHuntFind pour mettre à jour le leaderboard en temps réel
+    const newHuntFindSubscription = this.dailyHuntService.onNewHuntFind()
+      .subscribe(() => {
+        this.loadLeaderboard();
+      });
+    this.subscriptions.push(newHuntFindSubscription);
   }
 
   ngOnDestroy(): void {
