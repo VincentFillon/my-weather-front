@@ -44,6 +44,12 @@ export const routes: Routes = [
         canActivate: [AuthGuard]
     },
     {
+        path: 'advent-calendar',
+        title: 'Météo des humeurs - Calendrier de l\'Avent',
+        loadChildren: () => import('./advent-calendar/advent-calendar.routes').then(m => m.routes),
+        canActivate: [AuthGuard]
+    },
+    {
         path: '**',
         redirectTo: 'board'
     }

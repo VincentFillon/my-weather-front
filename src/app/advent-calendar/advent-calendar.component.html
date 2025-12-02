@@ -1,0 +1,69 @@
+<div class="calendar-container">
+  <button matButton="elevated" type="button" routerLink="/board">Retour</button>
+  <h1 class="calendar-title">Calendrier de l'Avent</h1>
+  
+  <div class="calendar-grid">
+    @for (day of calendar$ | async; track day.day) {
+      <div 
+           class="day-card"
+           [ngClass]="{
+             'locked': day.status === 'LOCKED',
+             'openable': day.status === 'OPENABLE',
+             'opened': day.status === 'OPENED'
+           }"
+           (click)="openDay(day)">
+        
+        <div class="day-number">
+          {{ day.day }}
+        </div>
+        
+        @if (day.status === 'OPENED') {
+          <div class="star-icon">
+            <span>★</span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Modal -->
+  @if (selectedDay) {
+    <div class="modal-overlay" (click)="closeModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <h2 class="modal-title">Jour {{ selectedDay.day }}</h2>
+        
+        @if (selectedDay.type === 'image') {
+          <div class="modal-body">
+            <img [src]="selectedDay.content" alt="Reward" class="reward-image">
+          </div>
+        }
+        
+        @if (selectedDay.type === 'quote') {
+          <div class="modal-body">
+            <blockquote class="reward-quote">"{{ selectedDay.content }}"</blockquote>
+          </div>
+        }
+
+        @if (selectedDay.day === 24) {
+          <div class="special-reward">
+            <p class="special-text">Félicitations ! Vous avez débloqué un cadre exclusif !</p>
+            <button (click)="equipFrame()" class="btn-primary">
+              Équiper maintenant
+            </button>
+          </div>
+        }
+
+        <button (click)="closeModal()" class="btn-secondary close-btn">
+          Fermer
+        </button>
+      </div>
+    </div>
+  }
+</div>
+
+@if (notificationMessage) {
+  <div class="notification-toast">
+      {{ notificationMessage }}
+      <button (click)="notificationMessage = null" class="close-toast">X</button>
+  </div>
+}

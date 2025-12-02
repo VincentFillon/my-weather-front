@@ -5,7 +5,7 @@ import {
   OnDestroy,
   OnInit
 } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 
 import {
   animate,
@@ -43,6 +43,8 @@ import { MoodChartComponent } from '../mood-chart/mood-chart.component';
 import { Interruption, TimerComponent } from '../timer/timer.component';
 import { WeatherWidgetComponent } from '../weather-widget/weather-widget.component';
 import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { SocketService } from '../../core/services/socket.service';
 
 @Component({
   selector: 'app-board',
@@ -91,6 +93,9 @@ export class BoardComponent implements OnInit, OnDestroy {
   private publicHolidaysService = inject(PublicHolidaysService);
   public themeService = inject(ThemeService);
   private dailyHuntService = inject(DailyHuntService);
+  private snackBar = inject(MatSnackBar);
+  private router = inject(Router);
+  private socketService = inject(SocketService);
 
   currentUser: User | null = null;
   isAdmin = false;
@@ -317,6 +322,18 @@ export class BoardComponent implements OnInit, OnDestroy {
         this.huntWinners.sort((a, b) => a.rank - b.rank);
       });
     this.subscriptions.push(newHuntFindSubscription);
+
+    // Advent Calendar Notification
+    const adventCalendarNotificationSubscription = this.socketService
+      .fromEvent('adventCalendarNotification')
+      .subscribe((data: any) => {
+        this.snackBar.open(data.message, 'Aller au calendrier', { duration: 10000 })
+          .onAction()
+          .subscribe(() => {
+            this.router.navigate(['/advent-calendar']);
+          });
+      });
+    this.subscriptions.push(adventCalendarNotificationSubscription);
   }
 
   ngOnDestroy() {
