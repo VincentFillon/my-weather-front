@@ -17,7 +17,7 @@
   <mat-selection-list class="user-list" #userSelectionList (selectionChange)="onSelectionChange($event)">
     @for (user of filteredUsers$ | async; track user._id) {
     <mat-list-option class="user-list-item" [value]="user">
-      <img matListItemAvatar [src]="user.image || 'assets/default-avatar.png'" [alt]="user.displayName" />
+      <app-avatar matListItemAvatar [user]="user" [size]="40"></app-avatar>
       <span matListItemTitle>{{ user.displayName }}</span>
       <span matListItemLine>{{ user.username }}</span>
     </mat-list-option>

@@ -21,6 +21,7 @@ import { User } from '../../core/models/user';
 import { AuthService } from '../../core/services/auth.service';
 import { ChatService } from '../../core/services/chat.service';
 import { UserService } from '../../core/services/user.service';
+import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
 
 export interface NewChatDialogResult {
   name: string;
@@ -41,7 +42,9 @@ export interface NewChatDialogResult {
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+    MatIconModule,
     MatProgressSpinnerModule,
+    AvatarComponent,
   ],
   templateUrl: './new-chat-dialog.component.html',
   styleUrls: ['./new-chat-dialog.component.scss'],

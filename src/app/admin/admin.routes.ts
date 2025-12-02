@@ -3,6 +3,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { MoodManagementComponent } from './mood-management/mood-management.component';
 import { UserManagementComponent } from './user-management/user-management.component';
 import { MediaComponent } from './media/media.component';
+import { FrameManagementComponent } from './frame-management/frame-management.component';
 
 export const routes: Routes = [
   {
@@ -25,6 +26,10 @@ export const routes: Routes = [
       {
         path: 'media',
         component: MediaComponent
+      },
+      {
+        path: 'frames',
+        component: FrameManagementComponent
       }
     ]
   }

@@ -12,6 +12,14 @@ export interface User {
     updatedAt?: Date;
     moodUpdatedAt?: Date;
     _v?: number;
+    frames?: Frame[];
+    selectedFrame?: Frame;
+}
+
+export interface Frame {
+    _id: string;
+    name: string;
+    image: string;
 }
 
 export interface CreateUserDto {

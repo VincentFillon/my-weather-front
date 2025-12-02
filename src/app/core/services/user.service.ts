@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CreateUserDto, UpdateUserDto, User } from '../models/user';
+import { CreateUserDto, UpdateUserDto, User, Frame } from '../models/user';
 import { SocketService } from './socket.service';
 
 @Injectable({
@@ -15,10 +15,18 @@ export class UserService {
   private userUpdated$?: Observable<User>;
   private userMoodUpdated$?: Observable<User>;
   private userRemoved$?: Observable<string>;
+  private userFrameSelected$?: Observable<User>;
+  private frameCreated$?: Observable<Frame>;
+  private frameUpdated$?: Observable<Frame>;
+  private frameDeleted$?: Observable<string>;
 
   // Méthodes pour les users
   public createUser(user: CreateUserDto): void {
     this.socketService.emit('createUser', user);
+  }
+
+  public selectFrame(frameId: string): void {
+    this.socketService.emit('selectFrame', frameId);
   }
 
   public findAllUsers(): Observable<User[]> {
@@ -50,6 +58,23 @@ export class UserService {
 
   public removeUser(id: string): void {
     this.socketService.emit('removeUser', id);
+  }
+
+  public createFrame(frame: Partial<Frame>): void {
+    this.socketService.emit('createFrame', frame);
+  }
+
+  public updateFrame(frame: Partial<Frame>): void {
+    this.socketService.emit('updateFrame', frame);
+  }
+
+  public deleteFrame(id: string): void {
+    this.socketService.emit('deleteFrame', id);
+  }
+
+  public findAllFrames(): Observable<Frame[]> {
+    this.socketService.emit('findAllFrames', {});
+    return this.socketService.fromEvent<Frame[]>('framesFound');
   }
 
   public onUserCreated(): Observable<User> {
@@ -86,5 +111,34 @@ export class UserService {
     }
     // console.debug('[WebSocket] subscribed to "userRemoved" event');
     return this.userRemoved$;
+  }
+
+  public onUserFrameSelected(): Observable<User> {
+    if (!this.userFrameSelected$) {
+      this.userFrameSelected$ =
+        this.socketService.fromEvent<User>('userFrameSelected');
+    }
+    return this.userFrameSelected$;
+  }
+
+  public onFrameCreated(): Observable<Frame> {
+    if (!this.frameCreated$) {
+      this.frameCreated$ = this.socketService.fromEvent<Frame>('frameCreated');
+    }
+    return this.frameCreated$;
+  }
+
+  public onFrameUpdated(): Observable<Frame> {
+    if (!this.frameUpdated$) {
+      this.frameUpdated$ = this.socketService.fromEvent<Frame>('frameUpdated');
+    }
+    return this.frameUpdated$;
+  }
+
+  public onFrameDeleted(): Observable<string> {
+    if (!this.frameDeleted$) {
+      this.frameDeleted$ = this.socketService.fromEvent<string>('frameDeleted');
+    }
+    return this.frameDeleted$;
   }
 }

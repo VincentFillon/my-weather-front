@@ -26,6 +26,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   users: any[] = [];
   images: any[] = [];
   sounds: any[] = [];
+  frames: any[] = [];
   private subscriptions: Subscription[] = [];
 
   constructor() {}
@@ -49,6 +50,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.uploadService.findAllUploads().subscribe((medias) => {
         this.images = medias.filter((media) => media.type === MediaType.IMAGE);
         this.sounds = medias.filter((media) => media.type === MediaType.SOUND);
+      })
+    );
+
+    // S'abonner aux mises à jour des cadres
+    this.subscriptions.push(
+      this.userService.findAllFrames().subscribe((frames) => {
+        this.frames = frames;
       })
     );
     // TODO: Add media files loading when the backend endpoint is available

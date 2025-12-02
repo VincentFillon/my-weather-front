@@ -53,6 +53,7 @@ import {
 } from '../edit-chat-dialog/edit-chat-dialog.component';
 import { EmojiPickerComponent } from '../emoji-picker/emoji-picker.component';
 import { FullScreenMediaDialogComponent } from '../full-screen-media-dialog/full-screen-media-dialog.component';
+import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
 
 @Component({
   selector: 'app-chat-panel',
@@ -72,6 +73,7 @@ import { FullScreenMediaDialogComponent } from '../full-screen-media-dialog/full
     MatDialogModule,
     NgScrollbarModule,
     NgScrollReached,
+    AvatarComponent,
   ],
   templateUrl: './chat-panel.component.html',
   styleUrls: ['./chat-panel.component.scss'],
@@ -404,6 +406,13 @@ export class ChatPanelComponent implements OnInit, OnDestroy {
             err
           ),
       });
+  }
+
+  getOtherUser(room: Room): User | undefined {
+    if (room.isChatBot || room.users.length > 2) {
+      return undefined;
+    }
+    return room.users.find((u) => u._id !== this.authService.currentUser()?._id);
   }
 
   getRoomAvatar(room: Room): string {

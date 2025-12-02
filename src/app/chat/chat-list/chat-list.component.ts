@@ -17,6 +17,7 @@ import {
   NewChatDialogComponent,
   NewChatDialogResult,
 } from '../new-chat-dialog/new-chat-dialog.component';
+import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
 
 @Component({
   selector: 'app-chat-list',
@@ -30,7 +31,7 @@ import {
     MatToolbarModule,
     MatDialogModule,
     NgScrollbarModule,
-
+    AvatarComponent,
   ],
   templateUrl: './chat-list.component.html',
   styleUrls: ['./chat-list.component.scss'],
@@ -48,6 +49,13 @@ export class ChatListComponent {
 
   showUserSelection = false;
   filteredUsers: User[] = [];
+
+  getOtherUser(room: Room): User | undefined {
+    if (room.isChatBot || room.users.length > 2) {
+      return undefined;
+    }
+    return room.users.find((u) => u._id !== this.authService.currentUser()?._id);
+  }
 
   getRoomAvatar(room: Room): string {
     if (room.isChatBot) {

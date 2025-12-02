@@ -6,11 +6,12 @@ import {
   LeaderboardData,
   LeaderboardPeriod
 } from '../../core/services/daily-hunt.service';
+import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
 
 @Component({
   selector: 'app-leaderboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AvatarComponent],
   templateUrl: './leaderboard.component.html',
   styleUrl: './leaderboard.component.scss'
 })

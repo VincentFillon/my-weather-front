@@ -21,7 +21,10 @@ import { RouterModule } from '@angular/router';
 import { User } from '../../core/models/user';
 import { AuthService } from '../../core/services/auth.service';
 import { UploadService } from '../../core/services/upload.service';
+import { UserService } from '../../core/services/user.service';
 import { DeleteAccountDialogComponent } from '../delete-account-dialog/delete-account-dialog.component';
+import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   standalone: true,
@@ -38,7 +41,10 @@ import { DeleteAccountDialogComponent } from '../delete-account-dialog/delete-ac
     MatTabsModule,
     MatDialogModule,
     MatSnackBarModule,
+    MatSnackBarModule,
     MatDividerModule,
+    AvatarComponent,
+    CommonModule,
   ],
   selector: 'app-profile-settings',
   templateUrl: './profile-settings.component.html',
@@ -50,6 +56,7 @@ export class ProfileSettingsComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   private dialog = inject(MatDialog);
   private uploadService = inject(UploadService);
+  private userService = inject(UserService);
 
   displayNameForm: FormGroup;
   usernameForm: FormGroup;
@@ -95,15 +102,17 @@ export class ProfileSettingsComponent implements OnInit {
   ngOnInit(): void {
     this.authService.currentUser$.subscribe((user) => {
       if (user) {
-        this.currentUser = user;
-        this.displayNameForm.patchValue({
-          displayName: user.displayName,
-        });
-        this.usernameForm.patchValue({
-          username: user.username,
-        });
-        this.imageForm.patchValue({
-          image: user.image,
+        this.userService.findOneUser(user._id).subscribe((user) => {
+          this.currentUser = user;
+          this.displayNameForm.patchValue({
+            displayName: user.displayName,
+          });
+          this.usernameForm.patchValue({
+            username: user.username,
+          });
+          this.imageForm.patchValue({
+            image: user.image,
+          });
         });
       }
     });
@@ -242,5 +251,10 @@ export class ProfileSettingsComponent implements OnInit {
         });
       }
     });
+  }
+
+  onSelectFrame(frameId: string): void {
+    this.userService.selectFrame(frameId);
+    this.snackBar.open('Cadre mis à jour', 'Fermer', { duration: 3000 });
   }
 }

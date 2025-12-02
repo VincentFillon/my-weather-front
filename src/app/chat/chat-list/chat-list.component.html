@@ -18,7 +18,13 @@
           } @else {
             @for (room of rooms; track room._id; let last = $last) {
               <mat-list-item lines="2" (click)="selectRoom(room)" class="chat-list-item" [class.has-unread]="room.unreadCount && room.unreadCount > 0">
-                <img matListItemAvatar [src]="getRoomAvatar(room)" alt="Avatar" class="chat-room-avatar" />
+                @if (getOtherUser(room); as otherUser) {
+                  <div matListItemAvatar>
+                    <app-avatar [user]="otherUser" [size]="40"></app-avatar>
+                  </div>
+                } @else {
+                  <img matListItemAvatar [src]="getRoomAvatar(room)" alt="Avatar" class="chat-room-avatar" />
+                }
                 <span matListItemTitle>
                   @if (room.isChatBot) {
                     MoodBot

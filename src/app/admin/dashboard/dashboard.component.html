@@ -45,6 +45,20 @@
         </div>
       </mat-card-content>
     </mat-card>
+
+    <!-- Cadres d'avatars -->
+    <mat-card class="dashboard-card" [routerLink]="['/admin/frames']">
+      <mat-card-header>
+        <mat-card-title>Cadres</mat-card-title>
+        <mat-card-subtitle>Gérer les cadres d'avatars</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-container">
+          <mat-icon fontIcon="people"></mat-icon>
+          <span class="stat-number">{{ frames.length }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
   </div>
 
   <router-outlet></router-outlet>

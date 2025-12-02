@@ -1,7 +1,11 @@
 <mat-card class="chat-panel">
   <mat-toolbar class="chat-panel-header">
     <div class="chat-room-avatar-wrapper" (click)="openFullScreenMedia(getRoomAvatar(room))">
-      <img [src]="getRoomAvatar(room)" alt="Avatar" class="chat-room-avatar" />
+      @if (getOtherUser(room); as otherUser) {
+        <app-avatar [user]="otherUser" [size]="40"></app-avatar>
+      } @else {
+        <img [src]="getRoomAvatar(room)" alt="Avatar" class="chat-room-avatar" />
+      }
     </div>
     <span>{{ room.name }}</span>
     <span class="spacer"></span>
@@ -55,7 +59,7 @@
                   @if (message.isBotMessage) {
                     <img class="message-avatar" src="assets/bot-avatar.png" alt="MoodBot">
                   } @else {
-                    <img class="message-avatar" [src]="message.sender!.image || 'assets/default-avatar.png'" [alt]="message.sender!.displayName">
+                    <app-avatar [user]="message.sender!" [size]="40"></app-avatar>
                   }
                 }
               </div>

@@ -1,0 +1,6 @@
+<div class="avatar-container" [style.width.px]="size" [style.height.px]="size" [class.with-frame]="showFrame && frameUrl">
+  <img [src]="avatarUrl" [alt]="user?.displayName || 'Avatar'" class="avatar-image" />
+  @if (showFrame && frameUrl) {
+    <img [src]="frameUrl" class="avatar-frame" alt="Frame" />
+  }
+</div>

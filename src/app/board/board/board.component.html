@@ -10,12 +10,7 @@
       </button>
       <mat-menu #userMenu="matMenu">
         <div class="user-menu-header">
-          <div
-            class="user-avatar"
-            [style.backgroundImage]="
-              'url(' + (currentUser?.image || 'assets/default-avatar.png') + ')'
-            "
-          ></div>
+          <app-avatar [user]="currentUser" [size]="64"></app-avatar>
           <p>Connecté en tant que</p>
           <h3>{{ currentUser?.displayName }}</h3>
           <p>{{ currentUser?.username }}</p>
@@ -91,12 +86,7 @@
           (mouseleave)="toggleUserFocus(user, false)"
         >
           <div class="user-card-title">
-            <div
-              class="user-avatar"
-              [style.backgroundImage]="
-                'url(' + (user.image || 'assets/default-avatar.png') + ')'
-              "
-            ></div>
+            <app-avatar [user]="user" [size]="40"></app-avatar>
             <h3 class="user-name">{{ user.displayName }}</h3>
             @if (hasUserFoundHunt(user._id)) {
             <div class="user-medal" [matTooltip]="getWinnerTooltip(user._id)">
@@ -242,12 +232,7 @@
                 (mouseleave)="toggleUserFocus(user, false)"
               >
                 <div class="user-card-title">
-                  <div
-                    class="user-avatar"
-                    [style.backgroundImage]="
-                      'url(' + (user.image || 'assets/default-avatar.png') + ')'
-                    "
-                  ></div>
+                  <app-avatar [user]="user" [size]="40"></app-avatar>
                   <h3 class="user-name">{{ user.displayName }}</h3>
                   @if (hasUserFoundHunt(user._id)) {
                   <div

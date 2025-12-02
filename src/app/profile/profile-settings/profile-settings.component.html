@@ -73,6 +73,49 @@
           </div>
         </mat-tab>
 
+        <!-- Sélection du cadre -->
+        <mat-tab label="Cadres">
+          <div class="tab-content">
+            <div class="current-frame-preview">
+              <h3 class="frames-title">Cadre actuel</h3>
+              <app-avatar [user]="currentUser" [size]="100"></app-avatar>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <h3 class="frames-title">Vos cadres</h3>
+            <div class="frames-grid">
+              <div
+                class="frame-item"
+                [class.selected]="!currentUser?.selectedFrame"
+                (click)="onSelectFrame('')"
+              >
+                <div class="frame-preview">
+                  <img [src]="currentUser?.image || 'assets/default-avatar.png'" alt="Avatar" class="avatar-base" />
+                </div>
+                <span>Aucun</span>
+              </div>
+
+              @for (frame of currentUser?.frames; track frame._id) {
+                <div
+                  class="frame-item"
+                  [class.selected]="currentUser?.selectedFrame?._id === frame._id"
+                  (click)="onSelectFrame(frame._id)"
+                >
+                  <div class="frame-preview">
+                    <img [src]="currentUser?.image || 'assets/default-avatar.png'" alt="Avatar" class="avatar-base" />
+                    <img [src]="frame.image" alt="Frame" class="frame-overlay" />
+                  </div>
+                  <span>{{ frame.name }}</span>
+                </div>
+              }
+            </div>
+            @if (!currentUser?.frames?.length) {
+              <p class="no-frames">Vous ne possédez aucun cadre pour le moment.</p>
+            }
+          </div>
+        </mat-tab>
+
         <!-- Modification de l'image de profil -->
         <mat-tab label="Image de profil">
           <div class="tab-content">

@@ -41,10 +41,7 @@
               </td>
               <td class="player-cell">
                 <div class="player-info">
-                  <img *ngIf="entry.user.image" [src]="entry.user.image" [alt]="entry.user.displayName" class="player-avatar">
-                  <div *ngIf="!entry.user.image" class="player-avatar-placeholder">
-                    {{ entry.user.displayName.charAt(0).toUpperCase() }}
-                  </div>
+                  <app-avatar [user]="entry.user" [size]="32"></app-avatar>
                   <span class="player-name">{{ entry.user.displayName }}</span>
                 </div>
               </td>

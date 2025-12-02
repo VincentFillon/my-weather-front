@@ -8,11 +8,12 @@ import { Subscription } from 'rxjs';
 import { User } from '../../core/models/user';
 import { UserService } from '../../core/services/user.service';
 import { UserDialogComponent } from './user-dialog/user-dialog.component';
+import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
 
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [MatTableModule, MatButtonModule, MatIconModule, MatDialogModule],
+  imports: [MatTableModule, MatButtonModule, MatIconModule, MatDialogModule, AvatarComponent],
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.scss'],
 })

@@ -1,0 +1,21 @@
+<h1 mat-dialog-title>{{ data._id ? 'Modifier' : 'Ajouter' }} un cadre</h1>
+<div mat-dialog-content>
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Nom</mat-label>
+    <input matInput [(ngModel)]="data.name" required>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>URL de l'image</mat-label>
+    <input matInput [(ngModel)]="data.image" required>
+  </mat-form-field>
+
+  <div *ngIf="data.image" class="preview-container">
+    <label>Aperçu :</label>
+    <img [src]="data.image" alt="Aperçu" class="preview-image">
+  </div>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button (click)="onNoClick()">Annuler</button>
+  <button mat-raised-button color="primary" [mat-dialog-close]="data" [disabled]="!data.name || !data.image">Enregistrer</button>
+</div>

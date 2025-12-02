@@ -42,6 +42,7 @@ import { LeaderboardComponent } from '../leaderboard/leaderboard.component';
 import { MoodChartComponent } from '../mood-chart/mood-chart.component';
 import { Interruption, TimerComponent } from '../timer/timer.component';
 import { WeatherWidgetComponent } from '../weather-widget/weather-widget.component';
+import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
 
 @Component({
   selector: 'app-board',
@@ -64,6 +65,7 @@ import { WeatherWidgetComponent } from '../weather-widget/weather-widget.compone
     MoodChartComponent,
     DailyHuntComponent,
     LeaderboardComponent,
+    AvatarComponent,
   ],
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss'],

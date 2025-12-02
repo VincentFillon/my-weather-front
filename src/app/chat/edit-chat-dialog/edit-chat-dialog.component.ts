@@ -21,6 +21,7 @@ import { Room } from '../../core/models/room';
 import { User } from '../../core/models/user';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
+import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
 // ChatService n'est pas directement utilisé ici pour modifier, seulement pour charger les utilisateurs potentiels si besoin.
 // La modification effective sera faite par le composant appelant.
 
@@ -47,7 +48,9 @@ export interface EditChatDialogResult {
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+    MatIconModule,
     MatProgressSpinnerModule,
+    AvatarComponent,
   ],
   templateUrl: './edit-chat-dialog.component.html',
   styleUrls: ['./edit-chat-dialog.component.scss'],
