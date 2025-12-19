@@ -10,6 +10,19 @@
   border-radius: 8px 8px 0 0;
   overflow: hidden;
   box-shadow: 0 2px 10px var(--mat-sys-color-shadow);
+
+  @media (max-width: 768px) {
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 950; // Above Chat Container/Toggles (900), below Dialogs (1000)
+    border-radius: 0;
+  }
 }
 
 .chat-list-panel {

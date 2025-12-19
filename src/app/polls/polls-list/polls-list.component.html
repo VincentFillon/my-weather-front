@@ -5,7 +5,12 @@
     <button matButton="filled" (click)="navigateToCreate()">Créer un nouveau sondage</button>
   </div>
 
-  <div class="polls-filters">
+  <button mat-stroked-button class="mobile-filter-toggle" (click)="toggleFilters()">
+    {{ isFiltersVisible ? 'Masquer les filtres' : 'Afficher les filtres' }}
+    <mat-icon>{{ isFiltersVisible ? 'expand_less' : 'expand_more' }}</mat-icon>
+  </button>
+
+  <div class="polls-filters" [class.filters-visible]="isFiltersVisible">
     <mat-form-field appearance="outline">
       <mat-label>Rechercher</mat-label>
       <input matInput type="text" [(ngModel)]="filters.term" (ngModelChange)="applyFilters()" />

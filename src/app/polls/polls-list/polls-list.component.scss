@@ -8,6 +8,29 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    flex-wrap: wrap; // Allow wrapping
+    gap: 10px; // Spacing when wrapped
+
+    @media (max-width: 768px) {
+        justify-content: center; // Center on mobile
+        h2 {
+            width: 100%;
+            text-align: center;
+            order: -1; // Title first
+        }
+    }
+  }
+
+  .mobile-filter-toggle {
+    display: none;
+    margin: 0 auto 15px; // Center button
+    
+    @media (max-width: 768px) {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        justify-content: center;
+    }
   }
 
   .polls-filters {
@@ -16,6 +39,17 @@
     align-items: center;
     gap: 10px;
     margin-bottom: 20px;
+    flex-wrap: wrap; // Allow wrapping
+
+    @media (max-width: 768px) {
+        display: none; // Hidden by default on mobile
+        flex-direction: column; // Stack filters on mobile
+        align-items: stretch; // Full width inputs
+        
+        &.filters-visible {
+            display: flex;
+        }
+    }
 
     @include mat.form-field-overrides(
       (

@@ -193,6 +193,9 @@ export class BoardComponent implements OnInit, OnDestroy {
   moodChartOpened = true;
   leaderboardOpened = false;
 
+  // State for responsive sidebar
+  public isSidebarOpen: boolean = false;
+
   constructor() {
     this.startOfDay = new Date(this.today);
     this.startOfDay.setHours(8, 30, 0, 0);
@@ -202,6 +205,10 @@ export class BoardComponent implements OnInit, OnDestroy {
     } else {
       this.endOfDay.setHours(18, 0, 0, 0);
     }
+  }
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
   }
 
   ngOnInit() {
@@ -413,6 +420,20 @@ export class BoardComponent implements OnInit, OnDestroy {
 
     // Vérifier si l'utilisateur a le droit de déplacer cet utilisateur
     if (this.canMoveUser(userId)) {
+      this.updateUserMood(userId, targetMoodId);
+    }
+  }
+
+  joinMood(mood: Mood): void {
+    if (!this.currentUser) return;
+    
+    // Si l'utilisateur est déjà dans ce mood, on ne fait rien
+    if (this.currentUser.mood?._id === mood._id) return;
+
+    this.updateUserMood(this.currentUser._id, mood._id);
+  }
+
+  private updateUserMood(userId: string, targetMoodId: string | null): void {
       // Mettre à jour immédiatement la liste des utilisateurs
       this.setUsers(
         this.users.map((user) => {
@@ -425,7 +446,6 @@ export class BoardComponent implements OnInit, OnDestroy {
 
       // Appeler le service pour mettre à jour le mood de l'utilisateur
       this.userService.updateUserMood(userId, targetMoodId);
-    }
   }
 
   // Vérifier si l'utilisateur peut déplacer un utilisateur donné

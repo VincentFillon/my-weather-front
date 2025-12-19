@@ -14,6 +14,18 @@
       [width]="canvasWidth"
       [height]="canvasHeight"
     ></canvas>
+    @if (game && !game.isFinished && gameStarted && !game.isPaused) {
+      <div
+        class="drag-zone"
+        [class.dragging]="isDragging"
+        [style.top.px]="dragZoneTop"
+        [style.left.px]="dragZoneLeft"
+        [style.width.px]="dragZoneWidth"
+        [style.height.px]="dragZoneHeight"
+        (mousedown)="onDragStart($event)"
+        (touchstart)="onDragStart($event)"
+      ></div>
+    }
   </div>
   <div class="game-actions">
     @if (game && !game.isFinished) {
