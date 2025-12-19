@@ -14,6 +14,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import {
   BehaviorSubject,
@@ -46,6 +47,7 @@ interface PollWithResults extends Poll {
   selector: 'app-polls-list',
   imports: [
     MatButtonModule,
+    MatIconModule,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -88,6 +90,13 @@ export class PollsListComponent implements OnInit, OnDestroy {
   private pollSearchSubscription = new Subscription();
   private subscriptions = new Subscription();
   private filterSubject = new Subject<void>();
+
+  // Mobile filters state
+  public isFiltersVisible = false;
+
+  toggleFilters(): void {
+    this.isFiltersVisible = !this.isFiltersVisible;
+  }
 
   ngOnInit(): void {
     this.filterSubject.pipe(debounceTime(300)).subscribe(() => {

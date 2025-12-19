@@ -8,11 +8,21 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  
+  // Mobile adjustments
+  @media (max-width: 768px) {
+    margin-left: 10px;
+    width: calc(100% - 20px);
+    margin-bottom: 80px; // Increased bottom margin to be above FABs
+  }
 
   .mood-chart-canvas-container {
     height: 300px;
     width: 100%;
     flex: 1 0 auto;
+    
+    // Allow canvas to be responsive
+    min-width: 0;
 
     canvas {
       width: 100%;
@@ -20,8 +30,40 @@
       background-color: transparent;
     }
   }
+  
+  .chart-controls {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 5px; 
+    
+    // Ensure button toggle group can wrap
+    ::ng-deep .mat-button-toggle-group {
+       width: 100%; 
+       flex-wrap: wrap; // Wrap buttons
+       display: flex; // Ensure it is flex
+       justify-content: center; // Center buttons
+       height: auto; // Allow height to grow
+       border: none; // Default border can look weird when wrapped
+       
+       .mat-button-toggle {
+         flex: 0 1 auto; // Shrink if needed, but don't grow indefinitely
+         // min-width: 60px;
+         border-left: 1px solid var(--mat-sys-outline); // Re-add separator if needed or rely on default
+         margin: 2px; // Add spacing between buttons when wrapped
+         border: 1px solid var(--mat-sys-outline);
+         border-radius: 4px;
+       }
+    }
+    
+    @media (max-width: 768px) {
+        padding-left: 60px; // Clear left FAB
+        padding-right: 60px; // Clear right FAB
+        box-sizing: border-box;
+    }
+  }
 
   @include mat.button-toggle-overrides((
-    height: 30px
+    // height: 30px 
   ));
 }

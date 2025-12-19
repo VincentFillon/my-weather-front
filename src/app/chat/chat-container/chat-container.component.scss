@@ -3,7 +3,7 @@
   position: fixed;
   bottom: 0;
   right: 0;
-  z-index: 1000; // Au-dessus des autres éléments
+  z-index: 900; // Above board toggle (800) but below overlays (1000)
   display: flex; // Pour aligner les contrôles et les panneaux
   align-items: flex-end; // Aligner en bas
   pointer-events: none; // Permettre de cliquer à travers le conteneur global
@@ -29,6 +29,17 @@
   align-items: flex-end;
   gap: 10px;
   pointer-events: auto; // Rétablir les clics pour les contrôles
+  
+  // Mobile adjustments
+  @media (max-width: 768px) {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 900; // Match context or higher?
+    // Actually if controls are inside host, they inherit context unless fixed.
+    // If fixed, they break out. 900 puts them same level as container.
+    // Since container is 900, it's fine.
+  }
 }
 
 .minimized-chat-tab {

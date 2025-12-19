@@ -1,19 +1,33 @@
 <div class="games-container">
+  <!-- Game Header (Visible to all) -->
+  <div class="game-header">
+     <button mat-icon-button (click)="toggleGamesList()">
+       <mat-icon>list</mat-icon>
+     </button>
+     <button mat-button class="back-link" routerLink="/games">Retour</button>
+     <button mat-icon-button (click)="toggleLeaderboard()">
+       <mat-icon>leaderboard</mat-icon>
+     </button>
+  </div>
+
   <!-- Liste des parties en cours -->
-  <div class="active-games">
-    <button matButton="elevated" routerLink="/games">Retour</button>
-    <h2>Parties en cours</h2>
+  <div class="active-games side-panel" [class.open]="showGamesList">
+    <div class="panel-header">
+        <h3>Parties en cours</h3>
+        <button mat-icon-button (click)="toggleGamesList()"><mat-icon>close</mat-icon></button>
+    </div>
+    
     @if (games.length > 0) {
     <div class="games-list">
       @for (game of games; track game._id) {
       <div
         class="game-item"
         [class.selected]="game === selectedGame"
-        (click)="selectGame(game)"
+        (click)="selectGame(game); showGamesList = false;"
       >
         {{ getGameDisplayName(game) }}
         @if (selectedGame && selectedGame._id === game._id) {
-        <button matIconButton class="btn-error" (click)="closeSelectedGame()">
+        <button matIconButton class="btn-error" (click)="closeSelectedGame(); $event.stopPropagation()">
           <mat-icon fontIcon="close"></mat-icon>
         </button>
         }
@@ -31,8 +45,12 @@
   </div>
 
   <!-- Classement -->
-  <div class="leaderboard-container">
-    <h2>Classement</h2>
+  <div class="leaderboard-container side-panel" [class.open]="showLeaderboard">
+     <div class="panel-header">
+        <h3>Classement</h3>
+        <button mat-icon-button (click)="toggleLeaderboard()"><mat-icon>close</mat-icon></button>
+    </div>
+    
     <div class="leaderboard">
       <table>
         <thead>

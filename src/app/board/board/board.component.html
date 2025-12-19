@@ -1,8 +1,22 @@
 <div class="board-container">
   <app-daily-hunt [huntFoundFromParent]="alreadyFoundToday"></app-daily-hunt>
 
+  <!-- Mobile Toggle Button -->
+  <!-- Mobile Toggle Button -->
+  <button
+    mat-icon-button
+    class="sidebar-toggle-btn mobile-only"
+    (click)="toggleSidebar()"
+  >
+    <mat-icon>{{ isSidebarOpen ? "close" : "menu" }}</mat-icon>
+  </button>
+
   <!-- Zone neutre -->
-  <div class="neutral-zone">
+  <div
+    class="neutral-zone"
+    [class.open]="isSidebarOpen"
+    [class.closed]="!isSidebarOpen"
+  >
     <div class="neutral-header">
       <!-- Menu utilisateur -->
       <button matIconButton [matMenuTriggerFor]="userMenu">
@@ -145,8 +159,8 @@
           [attr.href]="todayWorldDay?.link"
           target="_blank"
           [matTooltip]="todayWorldDay?.title"
-          >{{ today | date : "longDate" }}</a
-        >,
+          >{{ today | date : "longDate" }},</a
+        >
         <span class="end-of-day-timer">
           <app-timer
             [interruptions]="workdayInterruptions"
@@ -244,6 +258,15 @@
                   }
                 </div>
               </div>
+              } @if (currentUser?.mood?._id !== mood._id) {
+              <button
+                matIconButton
+                class="join-button"
+                (click)="joinMood(mood)"
+                matTooltip="Me placer ici"
+              >
+                <mat-icon fontIcon="filter_center_focus"></mat-icon>
+              </button>
               }
             </div>
           </div>
