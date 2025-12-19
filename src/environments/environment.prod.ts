@@ -6,4 +6,5 @@ export const environment = {
     lat: 43.607479,
     lon: 6.9532,
   },
+  vapidPublicKey: 'BJo99gm8ksjs7RG1ofVjlfN7WR6jzJ6D34ttLtO2OR_nevbyAxqndNcZvsURV4q_Ns-P53KZOKUSpmQ4grbA074',
 };

@@ -13,6 +13,9 @@ import { Pong } from '../models/pong';
 import { TicTacToe } from '../models/tic-tac-toe';
 import { User } from '../models/user';
 import { AuthService } from './auth.service';
+import { HttpClient } from '@angular/common/http';
+import { SwPush } from '@angular/service-worker';
+import { environment } from '../../../environments/environment';
 import { SocketService } from './socket.service';
 
 @Injectable({
@@ -24,11 +27,18 @@ export class NotificationService {
   private socketService = inject(SocketService);
   private router = inject(Router);
 
+  private http = inject(HttpClient);
+  private swPush = inject(SwPush);
+  private readonly VAPID_PUBLIC_KEY = environment.vapidPublicKey;
+
   constructor() {}
 
   public init() {
     // Demander l'autorisation d'envoyer des notifications système
     this.requestNotificationPermission();
+
+    // S'abonner aux notifications Push (PWA)
+    this.subscribeToPush();
 
     this.authService.currentUser$.subscribe((connectedUser) => {
       // console.debug('[NotificationService] currentUser:', currentUser);
@@ -170,6 +180,29 @@ export class NotificationService {
     //   },
     //   10000000
     // );
+  }
+
+  private subscribeToPush() {
+    if (this.swPush.isEnabled) {
+      this.swPush
+        .requestSubscription({
+          serverPublicKey: this.VAPID_PUBLIC_KEY,
+        })
+        .then((subscription) => {
+          console.log('Push Subscription object: ', subscription);
+          this.sendSubscriptionToBackend(subscription);
+        })
+        .catch((err) =>
+          console.error('Could not subscribe to notifications', err)
+        );
+    }
+  }
+
+  private sendSubscriptionToBackend(subscription: PushSubscription) {
+    this.http.post('/api/notifications/subscribe', subscription).subscribe({
+      next: () => console.log('Sent push subscription to backend'),
+      error: (err) => console.error('Error sending push subscription to backend', err),
+    });
   }
 
   private requestNotificationPermission() {
