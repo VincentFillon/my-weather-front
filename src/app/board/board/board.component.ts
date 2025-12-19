@@ -14,6 +14,7 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { DatePipe, NgClass } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
@@ -91,6 +92,7 @@ export class BoardComponent implements OnInit, OnDestroy {
   private publicHolidaysService = inject(PublicHolidaysService);
   public themeService = inject(ThemeService);
   private dailyHuntService = inject(DailyHuntService);
+  private breakpointObserver = inject(BreakpointObserver);
 
   currentUser: User | null = null;
   isAdmin = false;
@@ -195,6 +197,8 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   // State for responsive sidebar
   public isSidebarOpen: boolean = false;
+  
+  public isMobile: boolean = false;
 
   constructor() {
     this.startOfDay = new Date(this.today);
@@ -324,6 +328,14 @@ export class BoardComponent implements OnInit, OnDestroy {
         this.huntWinners.sort((a, b) => a.rank - b.rank);
       });
     this.subscriptions.push(newHuntFindSubscription);
+
+    // Observer si on est sur mobile pour désactiver le drag & drop
+    const breakpointSubscription = this.breakpointObserver
+      .observe('(max-width: 768px)')
+      .subscribe((result) => {
+        this.isMobile = result.matches;
+      });
+    this.subscriptions.push(breakpointSubscription);
   }
 
   ngOnDestroy() {
@@ -450,6 +462,9 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   // Vérifier si l'utilisateur peut déplacer un utilisateur donné
   canMoveUser(userId: string): boolean {
+    if (this.isMobile) {
+      return false;
+    }
     return userId === this.currentUser?._id || this.isAdmin;
   }
 
