@@ -58,6 +58,8 @@ export class PongGameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   canvasWidth = fieldSize.x;
   canvasHeight = fieldSize.y;
+  private canvasOffsetTop = 0;
+  private canvasOffsetLeft = 0;
   private scale = 1;
 
   private playerNumber!: 1 | 2;
@@ -65,7 +67,9 @@ export class PongGameComponent implements OnInit, AfterViewInit, OnDestroy {
   private lastMouseVelocity = 0;
   private lastMouseTime = 0;
 
-  private mouseMoveSubject = new Subject<MouseEvent>();
+  isDragging = false;
+  private dragOffset = 0;
+  private dragSubject = new Subject<{ y: number; velocity: number }>();
 
   @Input() set gameId(gameId: string) {
     this._gameId = gameId;
@@ -73,11 +77,18 @@ export class PongGameComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   constructor() {
-    this.mouseMoveSubject
+    this.dragSubject
       .pipe(
         throttleTime(1000 / 60) // Ajuster selon besoin (~16ms = 60 maj/s)
       )
-      .subscribe((event) => this.processMouseMove(event));
+      .subscribe(({ y, velocity }) => {
+        this.pongService.update(
+          this._gameId,
+          this.playerNumber,
+          { x: this.playerNumber === 1 ? 0 : fieldSize.x, y },
+          velocity
+        );
+      });
   }
 
   ngOnInit() {
@@ -185,6 +196,9 @@ export class PongGameComponent implements OnInit, AfterViewInit, OnDestroy {
     const canvas = this.canvasRef.nativeElement;
     canvas.width = this.canvasWidth;
     canvas.height = this.canvasHeight;
+
+    this.canvasOffsetLeft = (maxWidth - this.canvasWidth) / 2;
+    this.canvasOffsetTop = (maxHeight - this.canvasHeight) / 2;
   }
 
   private initCanvas() {
@@ -276,32 +290,73 @@ export class PongGameComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  @HostListener('document:mousemove', ['$event'])
-  onMouseMove(event: MouseEvent) {
-    this.mouseMoveSubject.next(event);
+  get dragZoneWidth() {
+    return this.scale * racketWidth + 20;
   }
 
-  processMouseMove(event: MouseEvent) {
-    if (!this.game) return;
-    const newMouseTime = performance.now();
+  get dragZoneHeight() {
+    return this.scale * racketHeight + 20;
+  }
 
-    const canvas = this.canvasRef.nativeElement;
-    const rect = canvas.getBoundingClientRect();
+  get dragZoneTop() {
+    if (!this.game) return 0;
+    const y =
+      this.playerNumber === 1
+        ? this.game.player1RacketPosition.y
+        : this.game.player2RacketPosition.y;
+    return this.scale * y - this.dragZoneHeight / 2 + this.canvasOffsetTop;
+  }
 
-    // Récupérer la position du curseur (en limitant au rectangle du canvas)
-    const halfRacket = this.scale * (racketHeight / 2);
-    let newY = 0;
-    if (event.clientY <= rect.top + halfRacket) {
-      newY = racketHeight / 2;
-    } else if (event.clientY >= rect.bottom - halfRacket) {
-      newY = fieldSize.y - (racketHeight / 2);
+  get dragZoneLeft() {
+    if (this.playerNumber === 1) {
+      return 0 - 10 + this.canvasOffsetLeft;
     } else {
-      newY = (event.clientY - rect.top) / this.scale;
+      return this.canvasWidth - this.scale * racketWidth - 10 + this.canvasOffsetLeft;
     }
+  }
+
+  onDragStart(event: MouseEvent | TouchEvent) {
+    if (!this.game || !this.gameStarted || this.game.isPaused) return;
+    this.isDragging = true;
+    event.preventDefault();
+
+    const clientY =
+      event instanceof MouseEvent ? event.clientY : event.touches[0].clientY;
+    const canvasRect = this.canvasRef.nativeElement.getBoundingClientRect();
+    const relativeY = (clientY - canvasRect.top) / this.scale;
+    const racketY =
+      this.playerNumber === 1
+        ? this.game.player1RacketPosition.y
+        : this.game.player2RacketPosition.y;
+
+    this.dragOffset = racketY - relativeY;
+    this.lastMouseY = racketY;
+    this.lastMouseTime = performance.now();
+  }
+
+  @HostListener('window:mousemove', ['$event'])
+  @HostListener('window:touchmove', ['$event'])
+  onDragMove(event: MouseEvent | TouchEvent) {
+    if (!this.isDragging || !this.game) return;
+    event.preventDefault();
+
+    const clientY =
+      event instanceof MouseEvent ? event.clientY : event.touches[0].clientY;
+    const canvasRect = this.canvasRef.nativeElement.getBoundingClientRect();
+
+    // Calcul de la nouvelle position en Y
+    let newY = (clientY - canvasRect.top) / this.scale + this.dragOffset;
+
+    // Contraintes de bornes
+    newY = Math.max(
+      racketHeight / 2,
+      Math.min(fieldSize.y - racketHeight / 2, newY)
+    );
 
     // Calcul de la vélocité
+    const now = performance.now();
     const deltaY = Math.abs(newY - this.lastMouseY);
-    const deltaT = (newMouseTime - this.lastMouseTime) / 1000; // en secondes
+    const deltaT = (now - this.lastMouseTime) / 1000; // en secondes
 
     let velocity = 0;
     if (deltaT > 0) {
@@ -311,39 +366,25 @@ export class PongGameComponent implements OnInit, AfterViewInit, OnDestroy {
       );
     }
 
-
-    console.log(
-      `[${newMouseTime}] clientY: ${event.clientY}, rect.top: ${rect.top}, rect.bottom: ${rect.bottom}, halfRacket: ${halfRacket}, scale: ${this.scale}`
-    );
-
-
-    console.log(
-      `[${newMouseTime}]${
-        this.game.isPaused ? ' (PAUSE)' : ''
-      } Raquette : {x: ${
-        this.playerNumber === 1 ? 0 : fieldSize.x
-      }, y: ${newY}} Vitesse : ${velocity}`
-    );
-
-    // Envoyer la mise à jour seulement si la raquette bouge ou si la vélocité change
-    if (
-      (deltaY !== 0 || velocity !== this.lastMouseVelocity) &&
-      !this.game.isFinished &&
-      !this.game.isPaused &&
-      this.gameStarted
-    ) {
-      this.pongService.update(
-        this._gameId,
-        this.playerNumber,
-        { x: this.playerNumber === 1 ? 0 : fieldSize.x, y: newY },
-        velocity
-      );
+    // Mise à jour locale immédiate
+    if (this.playerNumber === 1) {
+      this.game.player1RacketPosition.y = newY;
+    } else {
+      this.game.player2RacketPosition.y = newY;
     }
 
-    // Mise à jour des valeurs précédentes
+    // Envoi via le subject (throttled)
+    this.dragSubject.next({ y: newY, velocity });
+
     this.lastMouseY = newY;
     this.lastMouseVelocity = velocity;
-    this.lastMouseTime = newMouseTime;
+    this.lastMouseTime = now;
+  }
+
+  @HostListener('window:mouseup')
+  @HostListener('window:touchend')
+  onDragEnd() {
+    this.isDragging = false;
   }
 
   @HostListener('document:keydown.space', ['$event'])

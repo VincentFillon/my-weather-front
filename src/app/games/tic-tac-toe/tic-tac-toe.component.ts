@@ -56,6 +56,19 @@ export class TicTacToeComponent implements OnInit, OnDestroy {
   selectedGame: TicTacToe | null = null;
   gameSubscription?: Subscription;
 
+  showGamesList = false;
+  showLeaderboard = false;
+
+  toggleGamesList() {
+    this.showGamesList = !this.showGamesList;
+    if (this.showGamesList) this.showLeaderboard = false;
+  }
+
+  toggleLeaderboard() {
+    this.showLeaderboard = !this.showLeaderboard;
+    if (this.showLeaderboard) this.showGamesList = false;
+  }
+
   ngOnInit() {
     this.userSubscription = this.authService.currentUser$.subscribe((user) => {
       this.user = user;
